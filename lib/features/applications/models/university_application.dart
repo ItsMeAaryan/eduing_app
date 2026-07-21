@@ -16,6 +16,34 @@ class ApplicationTimelineStage {
   });
 }
 
+class DocumentRequirement {
+  final String name;
+  final String status; // 'Uploaded', 'Pending', 'Missing'
+
+  const DocumentRequirement({required this.name, required this.status});
+}
+
+class ApplicationActivity {
+  final String action;
+  final String date;
+
+  const ApplicationActivity({required this.action, required this.date});
+}
+
+class ApplicationMetrics {
+  final int admissionProbability;
+  final int scholarshipChance;
+  final int interviewReadiness;
+  final int profileCompletion;
+
+  const ApplicationMetrics({
+    required this.admissionProbability,
+    required this.scholarshipChance,
+    required this.interviewReadiness,
+    required this.profileCompletion,
+  });
+}
+
 class UniversityApplication {
   final String id;
   final University university;
@@ -26,6 +54,12 @@ class UniversityApplication {
   final double progress;
   final int aiSuccessPrediction;
   final List<ApplicationTimelineStage> timeline;
+  final List<DocumentRequirement> documents;
+  final ApplicationMetrics metrics;
+  final List<ApplicationActivity> activities;
+  final String contactEmail;
+  final String contactPhone;
+  final String estimatedTimeRemaining;
 
   const UniversityApplication({
     required this.id,
@@ -37,6 +71,12 @@ class UniversityApplication {
     required this.progress,
     required this.aiSuccessPrediction,
     required this.timeline,
+    this.documents = const [],
+    this.metrics = const ApplicationMetrics(admissionProbability: 0, scholarshipChance: 0, interviewReadiness: 0, profileCompletion: 0),
+    this.activities = const [],
+    this.contactEmail = 'admissions@university.edu',
+    this.contactPhone = '+1 234 567 8900',
+    this.estimatedTimeRemaining = '14 Days',
   });
 
   String get statusDisplay {

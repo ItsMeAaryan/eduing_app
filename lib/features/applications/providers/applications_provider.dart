@@ -36,6 +36,22 @@ class ApplicationsNotifier extends StateNotifier<List<UniversityApplication>> {
         progress: 0.75,
         aiSuccessPrediction: 88,
         timeline: defaultTimeline,
+        documents: const [
+          DocumentRequirement(name: 'Passport', status: 'Uploaded'),
+          DocumentRequirement(name: 'Transcript', status: 'Uploaded'),
+          DocumentRequirement(name: 'Resume', status: 'Uploaded'),
+          DocumentRequirement(name: 'SOP', status: 'Uploaded'),
+          DocumentRequirement(name: 'Recommendation Letters', status: 'Pending'),
+        ],
+        metrics: const ApplicationMetrics(admissionProbability: 85, scholarshipChance: 60, interviewReadiness: 40, profileCompletion: 90),
+        activities: const [
+          ApplicationActivity(action: 'SOP Submitted', date: '10 Aug 2025'),
+          ApplicationActivity(action: 'Documents Uploaded', date: '05 Aug 2025'),
+          ApplicationActivity(action: 'Application Created', date: '01 Aug 2025'),
+        ],
+        contactEmail: 'admissions@bits-pilani.ac.in',
+        contactPhone: '+91 1596 242205',
+        estimatedTimeRemaining: 'Waiting for Decision',
       ),
       if (universities.length > 1)
         UniversityApplication(
@@ -51,6 +67,18 @@ class ApplicationsNotifier extends StateNotifier<List<UniversityApplication>> {
             const ApplicationTimelineStage(title: 'Application Started', date: '15 Aug', isCompleted: true),
             const ApplicationTimelineStage(title: 'Documents Uploaded', date: 'Pending', isActive: true),
           ],
+          documents: const [
+            DocumentRequirement(name: 'Passport', status: 'Missing'),
+            DocumentRequirement(name: 'Transcript', status: 'Missing'),
+            DocumentRequirement(name: 'Resume', status: 'Missing'),
+          ],
+          metrics: const ApplicationMetrics(admissionProbability: 92, scholarshipChance: 70, interviewReadiness: 0, profileCompletion: 30),
+          activities: const [
+            ApplicationActivity(action: 'Application Created', date: '15 Aug 2025'),
+          ],
+          contactEmail: 'admissions@iitb.ac.in',
+          contactPhone: '+91 22 2572 2545',
+          estimatedTimeRemaining: '30 Days Left',
         ),
     ];
   }

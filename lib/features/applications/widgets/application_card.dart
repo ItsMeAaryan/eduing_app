@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/colors/app_colors.dart';
@@ -22,8 +23,10 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
     final app = widget.application;
     final uni = app.university;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 24),
+    return GestureDetector(
+      onTap: () => context.push('/application/${app.id}'),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -53,20 +56,23 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
           ),
         ],
       ),
-    ).animate().fade().slideY(begin: 0.1);
+    )).animate().fade().slideY(begin: 0.1);
   }
 
   Widget _buildHeader(UniversityApplication app, dynamic uni) {
     return Stack(
       children: [
-        ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-          child: Image.network(
-            uni.imageUrl,
-            height: 120,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) => Container(height: 120, color: Colors.grey.shade200),
+        Hero(
+          tag: 'hero_app_${app.id}',
+          child: ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            child: Image.network(
+              uni.imageUrl,
+              height: 120,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (_, __, ___) => Container(height: 120, color: Colors.grey.shade200),
+            ),
           ),
         ),
         Container(
