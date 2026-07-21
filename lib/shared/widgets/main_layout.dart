@@ -4,6 +4,8 @@ import 'package:iconsax/iconsax.dart';
 import 'dart:ui';
 import '../../core/theme/colors/app_colors.dart';
 
+import 'sync_indicator.dart';
+
 class MainLayout extends StatelessWidget {
   final Widget child;
 
@@ -13,7 +15,12 @@ class MainLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: child,
+      body: Column(
+        children: [
+          const SyncIndicator(),
+          Expanded(child: child),
+        ],
+      ),
       bottomNavigationBar: const FloatingBottomNav(),
     );
   }
@@ -30,7 +37,8 @@ class FloatingBottomNav extends StatelessWidget {
     if (location.startsWith('/universities')) currentIndex = 1;
     if (location.startsWith('/applications')) currentIndex = 2;
     if (location.startsWith('/ai')) currentIndex = 3;
-    if (location.startsWith('/profile')) currentIndex = 4;
+    if (location.startsWith('/planner')) currentIndex = 4;
+    if (location.startsWith('/profile')) currentIndex = 5;
 
     return SafeArea(
       child: Container(
@@ -79,9 +87,15 @@ class FloatingBottomNav extends StatelessWidget {
                   onTap: () => context.go('/ai'),
                 ),
                 _NavItem(
+                  icon: Iconsax.calendar_1,
+                  label: 'Planner',
+                  isSelected: currentIndex == 4,
+                  onTap: () => context.go('/planner'),
+                ),
+                _NavItem(
                   icon: Iconsax.profile_circle,
                   label: 'Profile',
-                  isSelected: currentIndex == 4,
+                  isSelected: currentIndex == 5,
                   onTap: () => context.go('/profile'),
                 ),
               ],
@@ -131,13 +145,13 @@ class _NavItem extends StatelessWidget {
               size: 24,
             ),
             if (isSelected) ...[
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
               Text(
                 label,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontSize: 12,
                 ),
               ),
             ],
