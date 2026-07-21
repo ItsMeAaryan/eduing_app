@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
 import '../../../shared/models/dashboard_data.dart';
@@ -29,7 +30,7 @@ class DashboardScreen extends ConsumerWidget {
               const SizedBox(height: 32),
               _buildQuickActions(),
               const SizedBox(height: 32),
-              _buildStatistics(ref),
+              _buildStatistics(context, ref),
               const SizedBox(height: 32),
               _buildAdmissionProgress(),
               const SizedBox(height: 32),
@@ -204,7 +205,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatistics(WidgetRef ref) {
+  Widget _buildStatistics(BuildContext context, WidgetRef ref) {
     final stats = ref.watch(dashboardStatsProvider);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -213,7 +214,10 @@ class DashboardScreen extends ConsumerWidget {
           _buildStatCard('Applications', stats.applications.toString(), '+10.2%'),
           _buildStatCard('Offers Received', stats.offersReceived.toString(), '+2 New'),
           _buildStatCard('Profile Strength', '${stats.profileStrength}%', '+8.55%'),
-          _buildStatCard('Scholarships', stats.scholarships.toString(), '+1 New'),
+          GestureDetector(
+            onTap: () => context.push('/scholarships'),
+            child: _buildStatCard('Scholarships', stats.scholarships.toString(), '+1 New'),
+          ),
         ],
       ),
     );
