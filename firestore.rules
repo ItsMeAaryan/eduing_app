@@ -1,0 +1,32 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // User Profile & Settings - Only the user can read/write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // User Subcollections (Applications, Planner, Resumes, SOPs, Documents, Interviews)
+    match /users/{userId}/{collectionId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Global Public Read Only (Universities, Scholarships)
+    match /universities/{universityId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Admin only in the future
+    }
+
+    match /scholarships/{scholarshipId} {
+      allow read: if request.auth != null;
+      allow write: if false; // Admin only in the future
+    }
+  }
+}
