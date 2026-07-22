@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
 import '../providers/sop_provider.dart';
@@ -16,29 +17,135 @@ class SopDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
-  final Map<String, bool> _expandedSections = {};
+  void _showGenerateDialog() {
+    final uniCtrl = TextEditingController(text: 'MIT');
+    final progCtrl = TextEditingController(text: 'M.S. in Computer Science');
+    final bgCtrl = TextEditingController(text: 'B.S. in Computer Science, 3.9 GPA, ML research assistant');
+    final goalsCtrl = TextEditingController(text: 'Lead ethical AI research lab focused on efficient edge computing');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).cardColor,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 24, right: 24, top: 24,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Generate AI Draft Statement of Purpose', style: AppTypography.headline),
+                const SizedBox(height: 16),
+                TextField(controller: uniCtrl, decoration: const InputDecoration(labelText: 'Target University')),
+                const SizedBox(height: 12),
+                TextField(controller: progCtrl, decoration: const InputDecoration(labelText: 'Target Program')),
+                const SizedBox(height: 12),
+                TextField(controller: bgCtrl, maxLines: 2, decoration: const InputDecoration(labelText: 'Academic Background')),
+                const SizedBox(height: 12),
+                TextField(controller: goalsCtrl, maxLines: 2, decoration: const InputDecoration(labelText: 'Career Goals')),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    ctx.pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Generating custom SOP with Gemini AI...')),
+                    );
+                    await ref.read(sopProvider.notifier).generateSopWithAI(
+                          university: uniCtrl.text,
+                          program: progCtrl.text,
+                          background: bgCtrl.text,
+                          careerGoals: goalsCtrl.text,
+                        );
+                  },
+                  icon: const Icon(Iconsax.magic_star),
+                  label: const Text('Generate SOP Draft'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showEditContentDialog(UserSop sop) {
+    final controller = TextEditingController(text: sop.fullContent);
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).cardColor,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) {
+        return Padding(
+          padding: EdgeInsets.only(
+            left: 24, right: 24, top: 24,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+          ),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Edit Statement of Purpose', style: AppTypography.headline),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: TextField(
+                    controller: controller,
+                    maxLines: null,
+                    expands: true,
+                    textAlignVertical: TextAlignVertical.top,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                      hintText: 'Write your SOP content here...',
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    ref.read(sopProvider.notifier).updateContent(controller.text);
+                    ctx.pop();
+                  },
+                  child: const Text('Save SOP Content'),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final sop = ref.watch(sopProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left_2, color: AppColors.textPrimary),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
         title: Column(
           children: [
-            Text('SOP Workspace', style: AppTypography.title.copyWith(fontSize: 16)),
+            const Text('SOP Workspace'),
             Text(sop.universityName, style: AppTypography.caption.copyWith(color: AppColors.textSecondary, fontSize: 10)),
           ],
         ),
-        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Iconsax.arrow_left),
+          onPressed: () => context.pop(),
+        ),
         actions: [
+          IconButton(
+            icon: const Icon(Iconsax.magic_star, color: AppColors.primary),
+            onPressed: _showGenerateDialog,
+          ),
           IconButton(
             icon: const Icon(Iconsax.eye, color: AppColors.primary),
             onPressed: () => context.push('/sop/preview'),
@@ -51,7 +158,7 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
           children: [
             _buildStatsHeader(sop),
             _buildMetricsBar(sop),
-            _buildEditorSections(sop),
+            _buildContentPreviewTile(sop),
           ],
         ),
       ),
@@ -60,175 +167,157 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
 
   Widget _buildStatsHeader(UserSop sop) {
     return Container(
-      margin: const EdgeInsets.all(24),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 8)),
         ],
       ),
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildCircularScore('Completion', sop.completionPercentage, color: AppColors.success),
+              _buildCircularScore('Word Progress', sop.wordCountProgress, color: AppColors.success),
               _buildCircularScore('AI Score', sop.aiSopScore / 100.0, color: AppColors.primary),
               _buildCircularScore('Grammar', sop.review.grammar / 100.0, color: AppColors.secondary),
             ],
           ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => context.push('/sop/review'),
-              icon: const Icon(Iconsax.magic_star, color: Colors.white, size: 20),
-              label: const Text('Improve with AI Coach'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          const SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: () async {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Polishing tone & grammar with AI...')),
+                    );
+                    await ref.read(sopProvider.notifier).improveSopWithAI();
+                  },
+                  icon: const Icon(Iconsax.edit_2, color: AppColors.primary),
+                  label: const Text('Polish with AI'),
+                  style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 12)),
+                ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: () => context.push('/sop/review'),
+                  icon: const Icon(Iconsax.magic_star, color: Colors.white),
+                  label: const Text('AI Review'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
-    ).animate().fade().slideY(begin: 0.1);
+    ).animate().fade().slideY(begin: 0.05);
   }
 
-  Widget _buildCircularScore(String label, double value, {Color color = AppColors.success}) {
+  Widget _buildCircularScore(String label, double value, {Color color = AppColors.primary}) {
     return Column(
       children: [
         SizedBox(
-          width: 60,
-          height: 60,
+          width: 56,
+          height: 56,
           child: Stack(
             fit: StackFit.expand,
             children: [
               CircularProgressIndicator(
                 value: value,
-                backgroundColor: Colors.grey.shade200,
-                color: color,
                 strokeWidth: 6,
+                backgroundColor: color.withOpacity(0.15),
+                valueColor: AlwaysStoppedAnimation(color),
               ),
               Center(
                 child: Text(
                   '${(value * 100).toInt()}%',
-                  style: AppTypography.label.copyWith(fontWeight: FontWeight.bold),
+                  style: AppTypography.label.copyWith(fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 8),
-        Text(label, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+        Text(label, style: AppTypography.caption),
       ],
     );
   }
 
   Widget _buildMetricsBar(UserSop sop) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.05),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppColors.primary.withOpacity(0.1)),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildMetricItem('${sop.wordCount}', 'Words'),
-            _buildMetricItem('${sop.paragraphCount}', 'Paragraphs'),
-            _buildMetricItem('${sop.estimatedReadingTimeMinutes}m', 'Reading Time'),
-          ],
-        ),
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
+        children: [
+          Expanded(
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: [
+                    Text('${sop.wordCount}', style: AppTypography.headline.copyWith(color: AppColors.primary)),
+                    Text('Words (Target ~500)', style: AppTypography.caption),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12),
+                child: Column(
+                  children: [
+                    Text(sop.targetProgram, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(sop.universityName, style: AppTypography.caption, maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
-    ).animate().fade(delay: 100.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildMetricItem(String value, String label) {
-    return Column(
-      children: [
-        Text(value, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary)),
-        const SizedBox(height: 2),
-        Text(label, style: AppTypography.caption.copyWith(color: AppColors.textSecondary, fontSize: 10)),
-      ],
     );
   }
 
-  Widget _buildEditorSections(UserSop sop) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
+  Widget _buildContentPreviewTile(UserSop sop) {
+    return Container(
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Editor Workspace', style: AppTypography.title),
-              Text('Drafting ${sop.universityName}', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+              Text('Statement of Purpose Draft', style: AppTypography.subheading),
+              IconButton(
+                icon: const Icon(Iconsax.edit, color: AppColors.primary),
+                onPressed: () => _showEditContentDialog(sop),
+              ),
             ],
           ),
-          const SizedBox(height: 16),
-          ...sop.sections.map((section) => _buildSectionEditor(section)),
-        ],
-      ),
-    ).animate().fade(delay: 200.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildSectionEditor(SopSection section) {
-    final isExpanded = _expandedSections[section.title] ?? false;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
-        children: [
-          ListTile(
-            leading: Icon(
-              section.isCompleted ? Iconsax.tick_circle : Iconsax.edit_2,
-              color: section.isCompleted ? AppColors.success : AppColors.textSecondary,
-            ),
-            title: Text(section.title, style: AppTypography.label.copyWith(fontWeight: isExpanded ? FontWeight.bold : FontWeight.normal)),
-            trailing: Icon(isExpanded ? Iconsax.arrow_up_2 : Iconsax.arrow_down_1, size: 16, color: AppColors.textSecondary),
-            onTap: () {
-              setState(() {
-                _expandedSections[section.title] = !isExpanded;
-              });
-            },
+          const SizedBox(height: 12),
+          Text(
+            sop.fullContent.isNotEmpty ? sop.fullContent : 'No content generated yet. Tap AI Generate or Edit to start.',
+            style: AppTypography.body.copyWith(height: 1.5),
+            maxLines: 12,
+            overflow: TextOverflow.ellipsis,
           ),
-          if (isExpanded)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: TextFormField(
-                initialValue: section.content,
-                maxLines: null,
-                minLines: 3,
-                decoration: InputDecoration(
-                  hintText: 'Start writing your ${section.title.toLowerCase()}...',
-                  hintStyle: AppTypography.body.copyWith(color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.primary),
-                  ),
-                  contentPadding: const EdgeInsets.all(16),
-                ),
-                style: AppTypography.body,
-              ),
-            ),
         ],
       ),
     );
