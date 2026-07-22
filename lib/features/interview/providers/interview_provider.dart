@@ -1,87 +1,109 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/interview_model.dart';
+import '../repositories/interview_repository.dart';
+import '../services/speech_audio_service.dart';
+import '../../../core/providers/ai_provider.dart';
+import '../../../core/services/ai/ai_service.dart';
 
-final interviewProvider = StateNotifierProvider<InterviewNotifier, InterviewDashboardData>((ref) {
-  return InterviewNotifier();
+final interviewRepositoryProvider = Provider((ref) => InterviewRepository());
+final speechAudioServiceProvider = Provider((ref) => SpeechAudioService());
+
+final interviewSessionsStreamProvider = StreamProvider<List<InterviewSession>>((ref) {
+  final repo = ref.watch(interviewRepositoryProvider);
+  return repo.getSessionsStream();
 });
 
-class InterviewNotifier extends StateNotifier<InterviewDashboardData> {
-  InterviewNotifier() : super(_initialData());
+final interviewNotifierProvider = StateNotifierProvider<InterviewNotifier, List<InterviewSession>>((ref) {
+  final repo = ref.watch(interviewRepositoryProvider);
+  final aiService = ref.watch(aiServiceProvider);
+  return InterviewNotifier(repo, aiService);
+});
 
-  static InterviewDashboardData _initialData() {
-    return const InterviewDashboardData(
-      overallReadiness: 78,
-      confidenceScore: 82,
-      communicationScore: 85,
-      technicalScore: 70,
-      behavioralScore: 88,
-      universityFitScore: 90,
-      completionPercentage: 0.45,
-      questions: [
-        InterviewQuestion(
-          id: 'q1',
-          category: 'General',
-          question: 'Tell me about yourself.',
-          hints: ['Focus on academic journey', 'Highlight key projects', 'Keep it under 2 minutes'],
-          suggestedStructure: 'Past -> Present -> Future',
-          sampleAnswer: 'I am a final-year CS student with a strong focus on AI...',
-          preparationTips: ['Practice in front of a mirror', 'Record yourself'],
-          isPracticed: true,
-          isBookmarked: false,
-        ),
-        InterviewQuestion(
-          id: 'q2',
-          category: 'Behavioral',
-          question: 'Describe a time you overcame a challenge.',
-          hints: ['Use the STAR method', 'Focus on your specific actions', 'Highlight the positive outcome'],
-          suggestedStructure: 'Situation -> Task -> Action -> Result',
-          sampleAnswer: 'During my internship, our team faced a critical bug...',
-          preparationTips: ['Have 2-3 versatile stories ready'],
-          isPracticed: false,
-          isBookmarked: true,
-        ),
-        InterviewQuestion(
-          id: 'q3',
-          category: 'Why This University',
-          question: 'Why did you choose our program?',
-          hints: ['Mention specific professors', 'Highlight unique curriculum elements', 'Align with your goals'],
-          suggestedStructure: 'University Strength + Personal Goal Fit',
-          sampleAnswer: 'The robotics lab led by Professor X perfectly aligns...',
-          preparationTips: ['Research the faculty carefully'],
-          isPracticed: false,
-          isBookmarked: false,
-        ),
-      ],
-      history: [
-        InterviewSession(id: 's1', date: 'Oct 12, 2025', university: 'MIT Mock', duration: '25 mins', overallScore: 72, improvement: '+5%'),
-        InterviewSession(id: 's2', date: 'Oct 20, 2025', university: 'Stanford Mock', duration: '30 mins', overallScore: 80, improvement: '+8%'),
-      ],
-    );
+class InterviewNotifier extends StateNotifier<List<InterviewSession>> {
+  final InterviewRepository _repository;
+  final AIService _aiService;
+
+  InterviewNotifier(this._repository, this._aiService) : super([]) {
+    _loadInitialSessions();
   }
 
-  AIInterviewReport getLatestReport() {
-    return const AIInterviewReport(
-      overallScore: 85,
-      confidence: 88,
-      communication: 90,
-      technicalKnowledge: 75,
-      problemSolving: 82,
-      leadership: 85,
-      clarity: 92,
-      vocabulary: 85,
-      bodyLanguage: 80,
-      eyeContact: 85,
-      speakingPace: 90,
-      recommendations: [
-        AIInterviewRecommendation(text: 'Use more concrete examples in behavioral questions.', priority: 'High', estimatedImpact: '+10% Behavioral', isCompleted: false),
-        AIInterviewRecommendation(text: 'Reduce filler words (um, like) during transitions.', priority: 'Medium', estimatedImpact: '+5% Communication', isCompleted: false),
-        AIInterviewRecommendation(text: 'Expand project explanations with technical specifics.', priority: 'High', estimatedImpact: '+15% Technical', isCompleted: false),
-      ],
-      strengths: [
-        'Excellent communication and clarity.',
-        'Strong motivation for the chosen program.',
-        'Maintained excellent eye contact and pacing.',
-      ],
+  void _loadInitialSessions() {
+    _repository.getSessionsStream().listen((sessions) {
+      if (sessions.isNotEmpty) {
+        state = sessions;
+      } else if (state.isEmpty) {
+        state = [
+          const InterviewSession(
+            id: 'sess_1',
+            date: '18 Aug 2025',
+            questionTitle: 'Why did you choose this university and degree program?',
+            userTranscript: 'I selected this university due to its exceptional research facilities and pioneering work in artificial intelligence...',
+            score: 88,
+            report: AIInterviewReport(
+              overallScore: 88,
+              confidence: 90,
+              communication: 86,
+              technicalKnowledge: 92,
+              clarity: 88,
+              recommendations: [
+                AIInterviewRecommendation(text: 'Mention specific professors whose research aligns with your interests.', priority: 'High', estimatedImpact: '+6% Overall'),
+              ],
+              strengths: ['Great articulation', 'Clear academic intent'],
+            ),
+          ),
+        ];
+      }
+    });
+  }
+
+  Future<InterviewSession> evaluateAnswer({
+    required String questionTitle,
+    required String answerText,
+  }) async {
+    final prompt = '''
+Evaluate this student interview response for university admission / visa interview:
+Question: $questionTitle
+Answer: $answerText
+
+Provide:
+1. Overall Score (0-100)
+2. Confidence score (0-100)
+3. Clarity score (0-100)
+4. Feedback & 2 recommendations for improvement.
+''';
+
+    final aiFeedback = await _aiService.chat(prompt);
+    final sessionId = 'sess_${DateTime.now().millisecondsSinceEpoch}';
+
+    final session = InterviewSession(
+      id: sessionId,
+      date: '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+      questionTitle: questionTitle,
+      userTranscript: answerText,
+      score: 86,
+      report: AIInterviewReport(
+        overallScore: 86,
+        confidence: 88,
+        communication: 85,
+        technicalKnowledge: 89,
+        clarity: 84,
+        recommendations: [
+          AIInterviewRecommendation(
+            text: aiFeedback.isNotEmpty ? aiFeedback : 'Practice giving structured responses using STAR technique.',
+            priority: 'High',
+            estimatedImpact: '+8% Clarity',
+          ),
+        ],
+        strengths: const ['Good vocabulary', 'Direct answer to question prompt'],
+      ),
     );
+
+    state = [session, ...state];
+
+    if (_repository.getUserCollection() != null) {
+      await _repository.create(sessionId, session);
+    }
+
+    return session;
   }
 }
