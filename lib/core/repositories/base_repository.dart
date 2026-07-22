@@ -21,6 +21,14 @@ abstract class BaseRepository<T> {
     return _firestore.collection(collection);
   }
 
+  CollectionReference<Map<String, dynamic>>? getUserCollection() {
+    try {
+      return _colRef;
+    } catch (_) {
+      return null;
+    }
+  }
+
   T fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc);
   Map<String, dynamic> toFirestore(T model);
 
@@ -28,8 +36,8 @@ abstract class BaseRepository<T> {
     await _colRef.doc(id).set(toFirestore(model));
   }
 
-  Future<void> update(String id, Map<String, dynamic> data) async {
-    await _colRef.doc(id).update(data);
+  Future<void> update(String id, T model) async {
+    await _colRef.doc(id).update(toFirestore(model));
   }
 
   Future<void> delete(String id) async {

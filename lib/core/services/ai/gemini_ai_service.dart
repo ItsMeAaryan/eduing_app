@@ -32,6 +32,17 @@ class GeminiAIService implements AIService {
   }
 
   @override
+  Future<String> generateResponse(String prompt) async {
+    try {
+      final response = await _model.generateContent([Content.text(prompt)]);
+      return response.text ?? '';
+    } catch (e) {
+      debugPrint('Gemini generateResponse Error: $e');
+      return 'Mock AI response for prompt';
+    }
+  }
+
+  @override
   Future<String> chat(String message) async {
     try {
       final response = await _chatSession.sendMessage(Content.text(message));

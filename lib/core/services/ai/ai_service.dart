@@ -5,6 +5,7 @@ abstract class AIService {
   Stream<String> streamChat(String message);
   void resetChat();
   
+  Future<String> generateResponse(String prompt);
   Future<ResumeReview> analyzeResume(String resumeText);
   Future<SOPReview> analyzeSOP(String sopText);
   Future<DocumentAnalysis> analyzeDocument(String documentText);
