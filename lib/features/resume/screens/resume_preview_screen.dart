@@ -1,177 +1,195 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
+import '../providers/resume_provider.dart';
+import '../models/resume_model.dart';
 
-class ResumePreviewScreen extends StatelessWidget {
+class ResumePreviewScreen extends ConsumerWidget {
   const ResumePreviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final resume = ref.watch(resumeProvider);
+    final pdfService = ref.watch(resumePdfServiceProvider);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
+        title: Text('${resume.template} Template Preview', style: AppTypography.title.copyWith(fontSize: 16)),
         leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left_2, color: AppColors.textPrimary),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Iconsax.arrow_left),
+          onPressed: () => context.pop(),
         ),
-        title: Text('Live Preview', style: AppTypography.title.copyWith(fontSize: 16)),
-        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Iconsax.magic_star, color: AppColors.primary),
-            onPressed: () => context.push('/resume/review'),
+            icon: const Icon(Iconsax.share, color: AppColors.primary),
+            onPressed: () async {
+              await pdfService.shareResumePdf(resume);
+            },
           ),
           IconButton(
-            icon: const Icon(Iconsax.export_1, color: AppColors.textPrimary),
-            onPressed: () {},
+            icon: const Icon(Iconsax.printer, color: AppColors.primary),
+            onPressed: () async {
+              await pdfService.printOrExportPdf(resume);
+            },
           ),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildTemplateSelector(),
-            _buildA4Preview(),
+            _buildTemplateSelector(context, ref, resume),
+            _buildA4Preview(context, resume),
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/resume/review'),
+        onPressed: () async {
+          final file = await pdfService.savePdfFile(resume);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Saved ATS-friendly PDF to ${file.path}')),
+            );
+          }
+        },
         backgroundColor: AppColors.primary,
-        icon: const Icon(Iconsax.scan, color: Colors.white),
-        label: Text('AI Review', style: AppTypography.button.copyWith(color: Colors.white)),
+        icon: const Icon(Iconsax.document_download, color: Colors.white),
+        label: Text('Export ATS PDF', style: AppTypography.button.copyWith(color: Colors.white)),
       ),
     );
   }
 
-  Widget _buildTemplateSelector() {
+  Widget _buildTemplateSelector(BuildContext context, WidgetRef ref, UserResume resume) {
+    final templates = ['Modern', 'Executive', 'Academic', 'Minimal'];
+
     return Container(
-      color: Colors.white,
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: 12),
       child: SizedBox(
-        height: 100,
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
+        height: 80,
+        child: ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           scrollDirection: Axis.horizontal,
-          children: [
-            _buildTemplateThumb('Modern', true),
-            _buildTemplateThumb('Harvard', false),
-            _buildTemplateThumb('Creative', false),
-            _buildTemplateThumb('Minimal', false),
-          ],
+          itemCount: templates.length,
+          itemBuilder: (context, index) {
+            final t = templates[index];
+            final isSelected = resume.template == t;
+            return GestureDetector(
+              onTap: () {
+                ref.read(resumeProvider.notifier).setTemplate(t);
+              },
+              child: Container(
+                width: 90,
+                margin: const EdgeInsets.only(right: 12),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary.withOpacity(0.12) : Theme.of(context).cardColor,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isSelected ? AppColors.primary : Theme.of(context).dividerColor.withOpacity(0.2),
+                    width: isSelected ? 2 : 1,
+                  ),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Iconsax.document_text, color: isSelected ? AppColors.primary : Colors.grey, size: 22),
+                    const SizedBox(height: 4),
+                    Text(
+                      t,
+                      style: AppTypography.caption.copyWith(
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                        color: isSelected ? AppColors.primary : null,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ),
-    ).animate().fade().slideY(begin: -0.1);
-  }
-
-  Widget _buildTemplateThumb(String name, bool isSelected) {
-    return Container(
-      width: 70,
-      margin: const EdgeInsets.only(right: 16),
-      child: Column(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(8),
-                border: isSelected ? Border.all(color: AppColors.primary, width: 2) : null,
-              ),
-              child: const Icon(Iconsax.document, color: Colors.grey),
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(name, style: AppTypography.caption.copyWith(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal, color: isSelected ? AppColors.primary : AppColors.textSecondary)),
-        ],
-      ),
     );
   }
 
-  Widget _buildA4Preview() {
+  Widget _buildA4Preview(BuildContext context, UserResume resume) {
     return Container(
       width: double.infinity,
       constraints: const BoxConstraints(maxWidth: 600),
-      margin: const EdgeInsets.all(24),
-      padding: const EdgeInsets.all(32),
+      margin: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 30, offset: const Offset(0, 15)),
+          BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 20, offset: const Offset(0, 10)),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Column(
-              children: [
-                Text('JOHN DOE', style: AppTypography.headline.copyWith(fontSize: 28, letterSpacing: 2)),
-                const SizedBox(height: 8),
-                Text('Software Engineer | B.Tech Computer Science', style: AppTypography.label.copyWith(color: AppColors.textSecondary)),
-                const SizedBox(height: 4),
-                Text('john.doe@email.com • +1 234 567 8900 • linkedin.com/in/johndoe', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-              ],
-            ),
+          Text(
+            resume.fullName.isNotEmpty ? resume.fullName : 'Alex Morgan',
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.indigo),
           ),
-          const SizedBox(height: 32),
-          _buildPreviewSection('EDUCATION', [
-            _buildPreviewItem('B.Tech Computer Science', 'BITS Pilani', 'Aug 2021 - May 2025', 'CGPA: 8.5/10'),
-          ]),
-          const SizedBox(height: 24),
-          _buildPreviewSection('EXPERIENCE', [
-            _buildPreviewItem('Software Engineering Intern', 'Google', 'May 2024 - Aug 2024', '• Developed microservices using Go.\n• Improved API response time by 20%.'),
-          ]),
-          const SizedBox(height: 24),
-          _buildPreviewSection('PROJECTS', [
-            _buildPreviewItem('AI Chatbot', 'Personal', 'Jan 2024 - Mar 2024', '• Built an AI chatbot using Flutter and OpenAI API.\n• Deployed on AWS with 1000+ active users.'),
-          ]),
-          const SizedBox(height: 24),
-          _buildPreviewSection('SKILLS', [
-            Text('Languages: Dart, Java, Python, C++', style: AppTypography.caption),
-            const SizedBox(height: 4),
-            Text('Frameworks: Flutter, React, Spring Boot', style: AppTypography.caption),
-            const SizedBox(height: 4),
-            Text('Tools: Git, Docker, AWS, Firebase', style: AppTypography.caption),
-          ]),
-        ],
-      ),
-    ).animate().fade(delay: 200.ms).scale(begin: const Offset(0.95, 0.95));
-  }
-
-  Widget _buildPreviewSection(String title, List<Widget> children) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold, letterSpacing: 1)),
-        const Padding(padding: EdgeInsets.symmetric(vertical: 8), child: Divider(height: 1, color: Colors.black)),
-        ...children,
-      ],
-    );
-  }
-
-  Widget _buildPreviewItem(String title, String subtitle, String date, String details) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title, style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
-              Text(date, style: AppTypography.caption),
-            ],
-          ),
-          const SizedBox(height: 2),
-          Text(subtitle, style: AppTypography.caption.copyWith(fontStyle: FontStyle.italic)),
           const SizedBox(height: 4),
-          Text(details, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+          Text(
+            '${resume.email} • ${resume.phone} • ${resume.location}',
+            style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+          ),
+          const Divider(height: 24, thickness: 1.5),
+
+          if (resume.summary.isNotEmpty) ...[
+            _sectionTitle('SUMMARY'),
+            Text(resume.summary, style: const TextStyle(fontSize: 12, height: 1.4, color: Colors.black87)),
+            const SizedBox(height: 16),
+          ],
+
+          if (resume.education.isNotEmpty) ...[
+            _sectionTitle('EDUCATION'),
+            ...resume.education.map((e) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text('• $e', style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                )),
+            const SizedBox(height: 16),
+          ],
+
+          if (resume.experience.isNotEmpty) ...[
+            _sectionTitle('EXPERIENCE'),
+            ...resume.experience.map((e) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text('• $e', style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                )),
+            const SizedBox(height: 16),
+          ],
+
+          if (resume.skills.isNotEmpty) ...[
+            _sectionTitle('SKILLS'),
+            Text(resume.skills.join(' • '), style: const TextStyle(fontSize: 12, color: Colors.black87)),
+            const SizedBox(height: 16),
+          ],
+
+          if (resume.projects.isNotEmpty) ...[
+            _sectionTitle('PROJECTS'),
+            ...resume.projects.map((p) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text('• $p', style: const TextStyle(fontSize: 12, color: Colors.black87)),
+                )),
+          ],
         ],
+      ),
+    ).animate().fade().scale();
+  }
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, letterSpacing: 0.8, color: Colors.indigo),
       ),
     );
   }

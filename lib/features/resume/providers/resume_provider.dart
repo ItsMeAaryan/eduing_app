@@ -1,59 +1,151 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/resume_model.dart';
+import '../repositories/resume_repository.dart';
+import '../services/resume_pdf_service.dart';
+import '../../../core/providers/ai_provider.dart';
+import '../../../core/services/ai/ai_service.dart';
+
+final resumeRepositoryProvider = Provider((ref) => ResumeRepository());
+final resumePdfServiceProvider = Provider((ref) => ResumePdfService());
+
+final resumesStreamProvider = StreamProvider<List<UserResume>>((ref) {
+  final repo = ref.watch(resumeRepositoryProvider);
+  return repo.getResumesStream();
+});
 
 final resumeProvider = StateNotifierProvider<ResumeNotifier, UserResume>((ref) {
-  return ResumeNotifier();
+  final repo = ref.watch(resumeRepositoryProvider);
+  final aiService = ref.watch(aiServiceProvider);
+  return ResumeNotifier(repo, aiService);
 });
 
 class ResumeNotifier extends StateNotifier<UserResume> {
-  ResumeNotifier() : super(_initialData());
+  final ResumeRepository _repository;
+  final AIService _aiService;
+
+  ResumeNotifier(this._repository, this._aiService) : super(_initialData()) {
+    _loadFromFirestore();
+  }
 
   static UserResume _initialData() {
     return const UserResume(
-      id: 'resume_1',
-      name: 'Primary Application Resume',
-      lastUpdated: 'Just now',
-      completionPercentage: 0.85,
-      atsReadiness: 92,
-      aiResumeScore: 88,
-      sections: [
-        ResumeSection(title: 'Personal Information', isCompleted: true),
-        ResumeSection(title: 'Education', isCompleted: true),
-        ResumeSection(title: 'Experience', isCompleted: true),
-        ResumeSection(title: 'Projects', isCompleted: true),
-        ResumeSection(title: 'Research', isCompleted: false),
-        ResumeSection(title: 'Achievements', isCompleted: true),
-        ResumeSection(title: 'Skills', isCompleted: true),
-        ResumeSection(title: 'Languages', isCompleted: true),
-        ResumeSection(title: 'Certifications', isCompleted: false),
-        ResumeSection(title: 'Publications', isCompleted: false),
-        ResumeSection(title: 'Volunteer Experience', isCompleted: false),
-        ResumeSection(title: 'Extracurricular Activities', isCompleted: true),
+      id: 'default_resume',
+      title: 'Master Academic Resume',
+      template: 'Modern',
+      fullName: 'Alex Morgan',
+      email: 'alex.morgan@university.edu',
+      phone: '+1 (555) 234-5678',
+      location: 'Boston, MA',
+      summary: 'Passionate Computer Science scholar aiming for MS in Artificial Intelligence with hands-on research in deep learning.',
+      education: [
+        'B.S. in Computer Science, Northeastern University (GPA 3.9/4.0, 2021-2025)',
       ],
-      review: AIResumeReview(
-        overallScore: 88,
-        atsCompatibility: 92,
-        grammarScore: 98,
-        formattingScore: 95,
-        skillsCoverage: 85,
-        leadership: 70,
-        researchProfile: 40,
-        projectQuality: 90,
-        achievements: 85,
-        careerReadiness: 88,
-        recommendations: [
-          AIRecommendation(text: 'Add measurable achievements to your internship experience.', priority: 'High', estimatedImpact: '+5% ATS Score', isCompleted: false),
-          AIRecommendation(text: 'Include more backend technical skills in the skills section.', priority: 'Medium', estimatedImpact: '+3% Skills Coverage', isCompleted: false),
-          AIRecommendation(text: 'Quantify the impact of your major projects.', priority: 'High', estimatedImpact: '+8% Project Quality', isCompleted: false),
-          AIRecommendation(text: 'Improve formatting consistency in the achievements section.', priority: 'Low', estimatedImpact: '+2% Formatting Score', isCompleted: true),
-        ],
-        strengths: [
-          'Excellent academic record.',
-          'Strong project portfolio demonstrating full-stack capability.',
-          'Well-balanced skill set between technical and soft skills.',
-          'Grammar and spelling are perfect.',
-        ],
-      ),
+      experience: [
+        'Research Assistant at AI Research Lab - Developed PyTorch vision models (2024-Present)',
+        'Software Engineering Intern at Tech Corp - Built REST APIs in Node.js (Summer 2023)',
+      ],
+      skills: ['Python', 'Dart', 'Flutter', 'PyTorch', 'TensorFlow', 'PostgreSQL', 'Docker'],
+      projects: [
+        'Edge AI Vision Classifier - Real-time mobile classification with 94% accuracy',
+        'EDUING Mobile App - Cross-platform study abroad guidance portal',
+      ],
     );
+  }
+
+  void _loadFromFirestore() {
+    _repository.getResumesStream().listen((resumes) {
+      if (resumes.isNotEmpty) {
+        state = resumes.first;
+      }
+    });
+  }
+
+  Future<void> updatePersonalInfo({
+    required String fullName,
+    required String email,
+    required String phone,
+    required String location,
+    required String summary,
+  }) async {
+    state = state.copyWith(
+      fullName: fullName,
+      email: email,
+      phone: phone,
+      location: location,
+      summary: summary,
+      lastUpdated: 'Just now',
+    );
+    await _autoSave();
+  }
+
+  Future<void> setTemplate(String templateName) async {
+    state = state.copyWith(template: templateName);
+    await _autoSave();
+  }
+
+  Future<void> updateEducation(List<String> education) async {
+    state = state.copyWith(education: education);
+    await _autoSave();
+  }
+
+  Future<void> updateExperience(List<String> experience) async {
+    state = state.copyWith(experience: experience);
+    await _autoSave();
+  }
+
+  Future<void> updateSkills(List<String> skills) async {
+    state = state.copyWith(skills: skills);
+    await _autoSave();
+  }
+
+  Future<void> updateProjects(List<String> projects) async {
+    state = state.copyWith(projects: projects);
+    await _autoSave();
+  }
+
+  Future<void> runAIReview() async {
+    final prompt = '''
+Analyze this student resume for ATS compatibility, grammar, and university admission quality:
+Full Name: ${state.fullName}
+Summary: ${state.summary}
+Education: ${state.education.join('; ')}
+Experience: ${state.experience.join('; ')}
+Skills: ${state.skills.join(', ')}
+
+Provide an estimated overall score (out of 100), ATS score (out of 100), and 3 bullet point recommendations for improvement.
+''';
+
+    final aiResponse = await _aiService.chat(prompt);
+
+    final newReview = AIResumeReview(
+      overallScore: 92,
+      atsCompatibility: 94,
+      grammarScore: 96,
+      formattingScore: 90,
+      skillsCoverage: 88,
+      recommendations: [
+        AIRecommendation(
+          text: aiResponse.isNotEmpty ? aiResponse : 'Add quantifiable metrics to experience bullets.',
+          priority: 'High',
+          estimatedImpact: '+6% ATS Score',
+        ),
+      ],
+      strengths: const ['Clear academic background', 'Strong technical skill representation'],
+    );
+
+    state = state.copyWith(
+      aiResumeScore: 92,
+      atsReadiness: 94,
+      review: newReview,
+    );
+    await _autoSave();
+  }
+
+  Future<void> _autoSave() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      await _repository.create(state.id, state);
+    }
   }
 }
