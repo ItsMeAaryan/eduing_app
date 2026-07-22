@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
 import '../providers/scholarships_provider.dart';
@@ -57,7 +58,7 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       leading: IconButton(
         icon: const Icon(Iconsax.arrow_left_2, color: Colors.white),
-        onPressed: () => Navigator.of(context).pop(),
+        onPressed: () => context.pop(),
       ),
       flexibleSpace: FlexibleSpaceBar(
         background: Stack(

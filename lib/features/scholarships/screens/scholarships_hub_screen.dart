@@ -31,7 +31,7 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Iconsax.arrow_left_2, color: AppColors.textPrimary),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => context.pop(),
         ),
         title: Text('Scholarship Hub', style: AppTypography.title.copyWith(fontSize: 16)),
         centerTitle: true,
