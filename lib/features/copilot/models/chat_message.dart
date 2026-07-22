@@ -30,6 +30,53 @@ class ChatMessage {
       isTyping: isTyping ?? this.isTyping,
     );
   }
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'text': text,
+        'role': role.name,
+        'timestamp': timestamp.millisecondsSinceEpoch,
+        'isTyping': isTyping,
+      };
+
+  factory ChatMessage.fromMap(Map<String, dynamic> map) => ChatMessage(
+        id: map['id'] ?? '',
+        text: map['text'] ?? '',
+        role: map['role'] == 'user' ? MessageRole.user : MessageRole.ai,
+        timestamp: DateTime.fromMillisecondsSinceEpoch(map['timestamp'] ?? DateTime.now().millisecondsSinceEpoch),
+        isTyping: map['isTyping'] ?? false,
+      );
+}
+
+class ChatSession {
+  final String id;
+  final String title;
+  final List<ChatMessage> messages;
+  final DateTime createdAt;
+
+  const ChatSession({
+    required this.id,
+    required this.title,
+    required this.messages,
+    required this.createdAt,
+  });
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'title': title,
+        'messages': messages.map((m) => m.toMap()).toList(),
+        'createdAt': createdAt.millisecondsSinceEpoch,
+      };
+
+  factory ChatSession.fromMap(Map<String, dynamic> map, String docId) => ChatSession(
+        id: docId,
+        title: map['title'] ?? 'AI Guidance Session',
+        messages: (map['messages'] as List<dynamic>?)
+                ?.map((m) => ChatMessage.fromMap(m as Map<String, dynamic>))
+                .toList() ??
+            const [],
+        createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? DateTime.now().millisecondsSinceEpoch),
+      );
 }
 
 class CopilotDashboardData {

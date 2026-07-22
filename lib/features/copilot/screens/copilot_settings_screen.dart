@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
 
@@ -9,106 +10,40 @@ class CopilotSettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
+        title: const Text('AI Preferences & Settings'),
         leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left_2, color: AppColors.textPrimary),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Iconsax.arrow_left),
+          onPressed: () => context.pop(),
         ),
-        title: Text('AI Settings',
-            style: AppTypography.title.copyWith(fontSize: 16)),
-        centerTitle: true,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Preferences', style: AppTypography.title),
-            const SizedBox(height: 16),
+            Text('Preferences', style: AppTypography.subheading),
+            const SizedBox(height: 12),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
               ),
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Iconsax.language_square,
-                        color: AppColors.primary),
-                    title: Text('Language', style: AppTypography.label),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('English',
-                            style: AppTypography.caption
-                                .copyWith(color: AppColors.textSecondary)),
-                        const Icon(Iconsax.arrow_right_3,
-                            size: 16, color: AppColors.textSecondary),
-                      ],
-                    ),
+                    leading: const Icon(Iconsax.language_square, color: AppColors.primary),
+                    title: Text('Primary Language', style: AppTypography.label),
+                    trailing: Text('English', style: AppTypography.caption),
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Iconsax.moon, color: AppColors.primary),
-                    title: Text('Theme', style: AppTypography.label),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('System',
-                            style: AppTypography.caption
-                                .copyWith(color: AppColors.textSecondary)),
-                        const Icon(Iconsax.arrow_right_3,
-                            size: 16, color: AppColors.textSecondary),
-                      ],
-                    ),
+                    leading: const Icon(Iconsax.cpu, color: AppColors.primary),
+                    title: Text('AI Engine Provider', style: AppTypography.label),
+                    trailing: Text('Gemini Flash 1.5', style: AppTypography.caption),
                   ),
                 ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            Text('Data & Privacy', style: AppTypography.title),
-            const SizedBox(height: 16),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Column(
-                children: [
-                  SwitchListTile(
-                    value: true,
-                    onChanged: (v) {},
-                    activeColor: AppColors.primary,
-                    secondary:
-                        const Icon(Iconsax.save_2, color: AppColors.primary),
-                    title:
-                        Text('Conversation Memory', style: AppTypography.label),
-                    subtitle: Text('Allow AI to remember past contexts.',
-                        style: AppTypography.caption
-                            .copyWith(color: AppColors.textSecondary)),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {},
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.error,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
-                  side: const BorderSide(color: AppColors.error),
-                ),
-                child: Text('Reset Conversation History',
-                    style: AppTypography.button),
               ),
             ),
           ],

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
 import '../providers/copilot_provider.dart';
@@ -17,6 +19,7 @@ class CopilotChatScreen extends ConsumerStatefulWidget {
 class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  String? _selectedContext;
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -30,11 +33,12 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
     });
   }
 
-  void _sendMessage() {
-    final text = _controller.text.trim();
+  void _sendMessage([String? textToSend]) {
+    final text = textToSend ?? _controller.text.trim();
     if (text.isNotEmpty) {
-      ref.read(copilotProvider.notifier).sendMessage(text);
+      ref.read(copilotProvider.notifier).sendMessage(text, contextInjection: _selectedContext);
       _controller.clear();
+      setState(() => _selectedContext = null);
       _scrollToBottom();
     }
   }
@@ -42,8 +46,7 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
   @override
   Widget build(BuildContext context) {
     final history = ref.watch(copilotProvider).history;
-    
-    // Auto-scroll when history changes
+
     ref.listen(copilotProvider, (previous, next) {
       if (previous?.history.length != next.history.length) {
         _scrollToBottom();
@@ -51,34 +54,48 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
     });
 
     return Scaffold(
-      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 1,
-        leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left_2, color: AppColors.textPrimary),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Iconsax.magic_star, color: AppColors.primary, size: 20),
             const SizedBox(width: 8),
-            Text('Copilot', style: AppTypography.title.copyWith(fontSize: 16)),
+            Text('AI Copilot Assistant', style: AppTypography.title.copyWith(fontSize: 16)),
           ],
         ),
-        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Iconsax.arrow_left),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: Column(
         children: [
+          _buildQuickPromptsBar(),
+          if (_selectedContext != null)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+              color: AppColors.primary.withOpacity(0.1),
+              child: Row(
+                children: [
+                  const Icon(Iconsax.document_text, size: 16, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('Context Attached: $_selectedContext', style: AppTypography.caption.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 16, color: AppColors.primary),
+                    onPressed: () => setState(() => _selectedContext = null),
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(16),
               itemCount: history.length,
               itemBuilder: (context, index) {
-                final message = history[index];
-                return _buildMessage(message);
+                return _buildMessage(history[index]);
               },
             ),
           ),
@@ -88,111 +105,125 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
     );
   }
 
+  Widget _buildQuickPromptsBar() {
+    final suggestions = [
+      'What documents do I need for Stanford?',
+      'How to structure an SOP for MIT?',
+      'Find STEM scholarships for CS majors',
+    ];
+
+    return Container(
+      height: 44,
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        itemCount: suggestions.length,
+        itemBuilder: (context, index) {
+          final s = suggestions[index];
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ActionChip(
+              label: Text(s, style: const TextStyle(fontSize: 11)),
+              onPressed: () => _sendMessage(s),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildMessage(ChatMessage message) {
     final isAI = message.role == MessageRole.ai;
     return Padding(
-      padding: const EdgeInsets.only(bottom: 24),
+      padding: const EdgeInsets.only(bottom: 16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: isAI ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: [
           if (isAI) ...[
-            CircleAvatar(
+            const CircleAvatar(
+              backgroundColor: AppColors.primary,
               radius: 16,
-              backgroundColor: AppColors.primary.withOpacity(0.1),
-              child: const Icon(Iconsax.magic_star, color: AppColors.primary, size: 16),
+              child: Icon(Iconsax.magic_star, color: Colors.white, size: 16),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
           ],
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: isAI ? Colors.white : AppColors.primary,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(24),
-                  topRight: const Radius.circular(24),
-                  bottomLeft: Radius.circular(isAI ? 4 : 24),
-                  bottomRight: Radius.circular(isAI ? 24 : 4),
-                ),
-                boxShadow: isAI ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))] : null,
+                color: isAI ? Theme.of(context).cardColor : AppColors.primary,
+                borderRadius: BorderRadius.circular(16),
+                border: isAI ? Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)) : null,
               ),
               child: message.isTyping
-                  ? Row(
+                  ? const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const CircleAvatar(radius: 4, backgroundColor: AppColors.primary).animate(onPlay: (c) => c.repeat()).fade(duration: 500.ms),
-                        const SizedBox(width: 4),
-                        const CircleAvatar(radius: 4, backgroundColor: AppColors.primary).animate(onPlay: (c) => c.repeat()).fade(duration: 500.ms, delay: 200.ms),
-                        const SizedBox(width: 4),
-                        const CircleAvatar(radius: 4, backgroundColor: AppColors.primary).animate(onPlay: (c) => c.repeat()).fade(duration: 500.ms, delay: 400.ms),
+                        SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                        ),
+                        SizedBox(width: 8),
+                        Text('Generating response...', style: TextStyle(fontSize: 12)),
                       ],
                     )
                   : Text(
                       message.text,
                       style: AppTypography.body.copyWith(
-                        color: isAI ? AppColors.textPrimary : Colors.white,
-                        height: 1.5,
+                        color: isAI ? Theme.of(context).textTheme.bodyMedium?.color : Colors.white,
                       ),
                     ),
             ),
           ),
           if (!isAI) ...[
-            const SizedBox(width: 12),
-            CircleAvatar(
+            const SizedBox(width: 10),
+            const CircleAvatar(
+              backgroundColor: Colors.grey,
               radius: 16,
-              backgroundColor: Colors.grey.shade200,
-              child: const Icon(Iconsax.user, color: AppColors.textSecondary, size: 16),
+              child: Icon(Iconsax.user, color: Colors.white, size: 16),
             ),
           ],
         ],
-      ).animate().fade().slideY(begin: 0.1),
-    );
+      ),
+    ).animate().fade();
   }
 
   Widget _buildInputArea() {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -10))],
+        color: Theme.of(context).cardColor,
+        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
       ),
-      child: SafeArea(
-        child: Row(
-          children: [
-            IconButton(
-              icon: const Icon(Iconsax.attach_circle, color: AppColors.textSecondary),
-              onPressed: () {},
-            ),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: TextField(
-                  controller: _controller,
-                  decoration: InputDecoration(
-                    hintText: 'Message Copilot...',
-                    hintStyle: AppTypography.caption.copyWith(color: AppColors.textSecondary),
-                    border: InputBorder.none,
-                  ),
-                  onSubmitted: (_) => _sendMessage(),
-                ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: const Icon(Iconsax.paperclip, color: AppColors.primary),
+            onPressed: () {
+              setState(() => _selectedContext = 'Application & Resume Context');
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Attached application context to next query.')),
+              );
+            },
+          ),
+          Expanded(
+            child: TextField(
+              controller: _controller,
+              onSubmitted: (_) => _sendMessage(),
+              decoration: const InputDecoration(
+                hintText: 'Ask Copilot anything...',
+                border: InputBorder.none,
               ),
             ),
-            const SizedBox(width: 12),
-            GestureDetector(
-              onTap: _sendMessage,
-              child: const CircleAvatar(
-                radius: 24,
-                backgroundColor: AppColors.primary,
-                child: Icon(Iconsax.send_1, color: Colors.white, size: 20),
-              ),
-            ),
-          ],
-        ),
+          ),
+          IconButton(
+            icon: const Icon(Iconsax.send_1, color: AppColors.primary),
+            onPressed: () => _sendMessage(),
+          ),
+        ],
       ),
     );
   }

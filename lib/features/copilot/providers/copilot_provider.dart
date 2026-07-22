@@ -1,87 +1,99 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:uuid/uuid.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/chat_message.dart';
-
+import '../repositories/copilot_repository.dart';
 import '../../../core/providers/ai_provider.dart';
 import '../../../core/services/ai/ai_service.dart';
 
+final copilotRepositoryProvider = Provider((ref) => CopilotRepository());
+
+final chatSessionsStreamProvider = StreamProvider<List<ChatSession>>((ref) {
+  final repo = ref.watch(copilotRepositoryProvider);
+  return repo.getChatSessionsStream();
+});
+
 final copilotProvider = StateNotifierProvider<CopilotNotifier, CopilotDashboardData>((ref) {
-  return CopilotNotifier(ref.watch(aiServiceProvider));
+  final repo = ref.watch(copilotRepositoryProvider);
+  final aiService = ref.watch(aiServiceProvider);
+  return CopilotNotifier(repo, aiService);
 });
 
 class CopilotNotifier extends StateNotifier<CopilotDashboardData> {
+  final CopilotRepository _repository;
   final AIService _aiService;
-  
-  CopilotNotifier(this._aiService) : super(_initialData());
+  String _activeSessionId = 'session_default';
+
+  CopilotNotifier(this._repository, this._aiService) : super(_initialData()) {
+    _loadSessionsFromFirestore();
+  }
 
   static CopilotDashboardData _initialData() {
     return CopilotDashboardData(
-      recentInsights: [
-        'Your SOP alignment for Stanford is currently at 82%.',
-        'You have a strong scholarship match for the STEM Innovators Grant.',
+      recentInsights: const [
+        'Your SOP alignment for target programs is currently at 88%.',
+        'You have a strong scholarship match for STEM Innovators Grant.',
       ],
-      priorityTasks: [
-        'Upload your final transcript.',
-        'Complete the behavioral interview mock session.',
+      priorityTasks: const [
+        'Upload your final official transcript.',
+        'Complete mock interview practice.',
       ],
-      upcomingDeadlines: [
+      upcomingDeadlines: const [
         'Nov 15: Stanford Application Deadline',
-        'Dec 30: Tech Foundation Grant',
+        'Dec 30: Global Tech Scholarship',
       ],
-      recommendedNextActions: [
+      recommendedNextActions: const [
         'Review SOP',
         'Practice Interview',
         'Search Scholarships',
       ],
-      overallReadiness: 78,
+      overallReadiness: 82,
       history: [
         ChatMessage(
-          id: const Uuid().v4(),
-          text: 'Hello! I am your AI Admissions Copilot. How can I assist you with your applications today?',
+          id: 'welcome_1',
+          text: 'Hello! I am your EDUING AI Copilot. Ask me anything about university admissions, SOPs, resumes, or scholarships.',
           role: MessageRole.ai,
-          timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+          timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
         ),
       ],
     );
   }
 
-  void sendMessage(String text) async {
+  void _loadSessionsFromFirestore() {
+    _repository.getChatSessionsStream().listen((sessions) {
+      if (sessions.isNotEmpty) {
+        final active = sessions.first;
+        _activeSessionId = active.id;
+        state = CopilotDashboardData(
+          recentInsights: state.recentInsights,
+          priorityTasks: state.priorityTasks,
+          upcomingDeadlines: state.upcomingDeadlines,
+          recommendedNextActions: state.recommendedNextActions,
+          overallReadiness: state.overallReadiness,
+          history: active.messages,
+        );
+      }
+    });
+  }
+
+  Future<void> sendMessage(String text, {String? contextInjection}) async {
+    final userMsgId = 'msg_${DateTime.now().millisecondsSinceEpoch}';
     final userMsg = ChatMessage(
-      id: const Uuid().v4(),
+      id: userMsgId,
       text: text,
       role: MessageRole.user,
       timestamp: DateTime.now(),
     );
 
+    final aiTypingId = 'ai_${DateTime.now().millisecondsSinceEpoch}';
     final aiTyping = ChatMessage(
-      id: const Uuid().v4(),
+      id: aiTypingId,
       text: '...',
       role: MessageRole.ai,
       timestamp: DateTime.now(),
       isTyping: true,
     );
 
-    state = CopilotDashboardData(
-      recentInsights: state.recentInsights,
-      priorityTasks: state.priorityTasks,
-      upcomingDeadlines: state.upcomingDeadlines,
-      recommendedNextActions: state.recommendedNextActions,
-      overallReadiness: state.overallReadiness,
-      history: [...state.history, userMsg, aiTyping],
-    );
-
-    // Call real Gemini API
-    String aiResponse = await _aiService.chat(text);
-
-    final aiMsg = ChatMessage(
-      id: aiTyping.id,
-      text: aiResponse,
-      role: MessageRole.ai,
-      timestamp: DateTime.now(),
-    );
-
-    final updatedHistory = List<ChatMessage>.from(state.history);
-    updatedHistory[updatedHistory.length - 1] = aiMsg;
+    final updatedHistory = [...state.history, userMsg, aiTyping];
 
     state = CopilotDashboardData(
       recentInsights: state.recentInsights,
@@ -91,5 +103,42 @@ class CopilotNotifier extends StateNotifier<CopilotDashboardData> {
       overallReadiness: state.overallReadiness,
       history: updatedHistory,
     );
+
+    final prompt = contextInjection != null ? '[CONTEXT: $contextInjection]\n\nUser Question: $text' : text;
+    final aiResponse = await _aiService.chat(prompt);
+
+    final finalAiMsg = ChatMessage(
+      id: aiTypingId,
+      text: aiResponse.isNotEmpty ? aiResponse : 'I am here to guide your study abroad journey. How can I help with your documents or applications?',
+      role: MessageRole.ai,
+      timestamp: DateTime.now(),
+      isTyping: false,
+    );
+
+    final finalHistory = state.history.map((m) => m.id == aiTypingId ? finalAiMsg : m).toList();
+
+    state = CopilotDashboardData(
+      recentInsights: state.recentInsights,
+      priorityTasks: state.priorityTasks,
+      upcomingDeadlines: state.upcomingDeadlines,
+      recommendedNextActions: state.recommendedNextActions,
+      overallReadiness: state.overallReadiness,
+      history: finalHistory,
+    );
+
+    await _autoSaveSession();
+  }
+
+  Future<void> _autoSaveSession() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final session = ChatSession(
+        id: _activeSessionId,
+        title: 'Application Guidance',
+        messages: state.history,
+        createdAt: DateTime.now(),
+      );
+      await _repository.create(_activeSessionId, session);
+    }
   }
 }
