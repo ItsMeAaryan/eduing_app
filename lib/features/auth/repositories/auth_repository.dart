@@ -20,6 +20,27 @@ class AuthRepository {
     }
   }
 
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return null;
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final OAuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCredential = await _auth.signInWithCredential(credential);
+      if (userCredential.user != null) {
+        await _createUserDocument(userCredential.user!, userCredential.user!.displayName ?? 'User');
+      }
+      return userCredential;
+    } catch (e) {
+      throw e.toString();
+    }
+  }
+
   Future<UserCredential?> registerWithEmail(String email, String password, String fullName) async {
     try {
       final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);

@@ -23,6 +23,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   final _formKey = GlobalKey<FormState>();
 
   AuthMode _mode = AuthMode.login;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -87,126 +89,172 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final state = ref.watch(authControllerProvider);
     final isLoading = state.isLoading;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Icon(Iconsax.book_1, size: 64, color: AppColors.primary),
-                  const SizedBox(height: 24),
-                  Text(
-                    _mode == AuthMode.login ? 'Welcome back'
-                        : _mode == AuthMode.register ? 'Create an account'
-                        : 'Reset Password',
-                    style: AppTypography.headline,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    _mode == AuthMode.login ? 'Sign in to access your dashboard'
-                        : _mode == AuthMode.register ? 'Join EDUING today'
-                        : 'Enter your email to receive a reset link',
-                    style: AppTypography.body.copyWith(color: AppColors.textSecondary),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 40),
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
-                  if (_mode == AuthMode.register) ...[
-                    TextFormField(
-                      controller: _fullNameController,
-                      decoration: _inputDecoration('Full Name', Iconsax.user),
-                      validator: (v) => v!.isEmpty ? 'Enter your name' : null,
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Icon(Iconsax.book_1, size: 64, color: AppColors.primary),
+                    const SizedBox(height: 24),
+                    Text(
+                      _mode == AuthMode.login ? 'Welcome back'
+                          : _mode == AuthMode.register ? 'Create an account'
+                          : 'Reset Password',
+                      style: AppTypography.headline,
+                      textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 16),
-                  ],
-
-                  TextFormField(
-                    controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    decoration: _inputDecoration('Email Address', Iconsax.sms),
-                    validator: (v) => v!.isEmpty || !v.contains('@') ? 'Enter a valid email' : null,
-                  ),
-                  const SizedBox(height: 16),
-
-                  if (_mode != AuthMode.forgotPassword) ...[
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: _inputDecoration('Password', Iconsax.lock),
-                      validator: (v) => v!.length < 6 ? 'Password must be at least 6 characters' : null,
+                    const SizedBox(height: 8),
+                    Text(
+                      _mode == AuthMode.login ? 'Sign in to access your dashboard'
+                          : _mode == AuthMode.register ? 'Join EDUING today'
+                          : 'Enter your email to receive a reset link',
+                      style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+                      textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 16),
-                  ],
+                    const SizedBox(height: 40),
 
-                  if (_mode == AuthMode.register) ...[
-                    TextFormField(
-                      controller: _confirmPasswordController,
-                      obscureText: true,
-                      decoration: _inputDecoration('Confirm Password', Iconsax.lock),
-                      validator: (v) => v != _passwordController.text ? 'Passwords do not match' : null,
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-
-                  if (_mode == AuthMode.login)
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () => setState(() => _mode = AuthMode.forgotPassword),
-                        child: Text('Forgot Password?', style: AppTypography.label.copyWith(color: AppColors.primary)),
+                    if (_mode == AuthMode.register) ...[
+                      TextFormField(
+                        controller: _fullNameController,
+                        decoration: _inputDecoration('Full Name', Iconsax.user),
+                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
                       ),
-                    ),
+                      const SizedBox(height: 16),
+                    ],
 
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: isLoading ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      elevation: 0,
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: _inputDecoration('Email Address', Iconsax.sms),
+                      validator: (v) => (v == null || !emailRegex.hasMatch(v.trim())) ? 'Enter a valid email' : null,
                     ),
-                    child: isLoading
-                        ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : Text(
-                            _mode == AuthMode.login ? 'Sign In'
-                                : _mode == AuthMode.register ? 'Sign Up'
-                                : 'Send Reset Link',
-                            style: AppTypography.button.copyWith(color: Colors.white),
+                    const SizedBox(height: 16),
+
+                    if (_mode != AuthMode.forgotPassword) ...[
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscurePassword,
+                        decoration: _inputDecoration(
+                          'Password',
+                          Iconsax.lock,
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscurePassword ? Iconsax.eye_slash : Iconsax.eye, color: AppColors.textSecondary),
+                            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                           ),
-                  ),
-
-                  const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        _mode == AuthMode.login ? 'Don\'t have an account?'
-                            : _mode == AuthMode.register ? 'Already have an account?'
-                            : 'Remember your password?',
-                        style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+                        ),
+                        validator: (v) => (v == null || v.length < 6) ? 'Password must be at least 6 characters' : null,
                       ),
-                      TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _mode = _mode == AuthMode.login ? AuthMode.register : AuthMode.login;
-                          });
-                        },
-                        child: Text(
-                          _mode == AuthMode.login ? 'Sign Up' : 'Sign In',
-                          style: AppTypography.label.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
+                      const SizedBox(height: 16),
+                    ],
+
+                    if (_mode == AuthMode.register) ...[
+                      TextFormField(
+                        controller: _confirmPasswordController,
+                        obscureText: _obscureConfirmPassword,
+                        decoration: _inputDecoration(
+                          'Confirm Password',
+                          Iconsax.lock,
+                          suffixIcon: IconButton(
+                            icon: Icon(_obscureConfirmPassword ? Iconsax.eye_slash : Iconsax.eye, color: AppColors.textSecondary),
+                            onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                          ),
+                        ),
+                        validator: (v) => v != _passwordController.text ? 'Passwords do not match' : null,
+                      ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    if (_mode == AuthMode.login)
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: TextButton(
+                          onPressed: () => setState(() => _mode = AuthMode.forgotPassword),
+                          child: Text('Forgot Password?', style: AppTypography.label.copyWith(color: AppColors.primary)),
+                        ),
+                      ),
+
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        elevation: 0,
+                      ),
+                      child: isLoading
+                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          : Text(
+                              _mode == AuthMode.login ? 'Sign In'
+                                  : _mode == AuthMode.register ? 'Sign Up'
+                                  : 'Send Reset Link',
+                              style: AppTypography.button.copyWith(color: Colors.white),
+                            ),
+                    ),
+
+                    if (_mode == AuthMode.login) ...[
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        onPressed: isLoading
+                            ? null
+                            : () async {
+                                final repo = ref.read(authRepositoryProvider);
+                                try {
+                                  final credential = await repo.signInWithGoogle();
+                                  if (!context.mounted) return;
+                                  if (credential != null) {
+                                    context.go('/');
+                                  }
+                                } catch (e) {
+                                  if (context.mounted) _showError('Google Sign-In: $e');
+                                }
+                              },
+                        icon: const Icon(Iconsax.login, color: AppColors.primary),
+                        label: Text('Continue with Google', style: AppTypography.button.copyWith(color: AppColors.textPrimary)),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          side: BorderSide(color: Colors.grey.shade300),
                         ),
                       ),
                     ],
-                  ),
-                ],
+
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _mode == AuthMode.login ? 'Don\'t have an account?'
+                              : _mode == AuthMode.register ? 'Already have an account?'
+                              : 'Remember your password?',
+                          style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            setState(() {
+                              _mode = _mode == AuthMode.login ? AuthMode.register : AuthMode.login;
+                            });
+                          },
+                          child: Text(
+                            _mode == AuthMode.login ? 'Sign Up' : 'Sign In',
+                            style: AppTypography.label.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -215,19 +263,20 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon) {
+  InputDecoration _inputDecoration(String label, IconData icon, {Widget? suffixIcon}) {
     return InputDecoration(
       labelText: label,
       prefixIcon: Icon(icon, color: AppColors.textSecondary),
+      suffixIcon: suffixIcon,
       filled: true,
-      fillColor: Colors.white,
+      fillColor: Theme.of(context).cardColor,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: Colors.grey.shade200),
+        borderSide: BorderSide(color: Colors.grey.shade300),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
