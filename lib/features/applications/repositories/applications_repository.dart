@@ -1,16 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/repositories/base_repository.dart';
+import '../models/university_application.dart';
 
-class ApplicationRepository extends BaseRepository<Map<String, dynamic>> {
+class ApplicationRepository extends BaseRepository<UniversityApplication> {
   ApplicationRepository() : super('applications');
 
   @override
-  Map<String, dynamic> fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    return doc.data() ?? {};
+  UniversityApplication fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+    return UniversityApplication.fromMap(doc.data() ?? {}, doc.id);
   }
 
   @override
-  Map<String, dynamic> toFirestore(Map<String, dynamic> model) {
-    return model;
+  Map<String, dynamic> toFirestore(UniversityApplication model) {
+    return model.toMap();
+  }
+
+  Stream<List<UniversityApplication>> getApplicationsStream() {
+    final col = getUserCollection();
+    if (col == null) return Stream.value([]);
+    return col.snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => UniversityApplication.fromMap(doc.data(), doc.id)).toList();
+    });
   }
 }

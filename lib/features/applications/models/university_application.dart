@@ -14,13 +14,33 @@ class ApplicationTimelineStage {
     this.isCompleted = false,
     this.isActive = false,
   });
+
+  Map<String, dynamic> toMap() => {
+        'title': title,
+        'date': date,
+        'isCompleted': isCompleted,
+        'isActive': isActive,
+      };
+
+  factory ApplicationTimelineStage.fromMap(Map<String, dynamic> map) => ApplicationTimelineStage(
+        title: map['title'] ?? '',
+        date: map['date'] ?? '',
+        isCompleted: map['isCompleted'] ?? false,
+        isActive: map['isActive'] ?? false,
+      );
 }
 
 class DocumentRequirement {
   final String name;
-  final String status; // 'Uploaded', 'Pending', 'Missing'
+  final String status;
 
   const DocumentRequirement({required this.name, required this.status});
+
+  Map<String, dynamic> toMap() => {'name': name, 'status': status};
+  factory DocumentRequirement.fromMap(Map<String, dynamic> map) => DocumentRequirement(
+        name: map['name'] ?? '',
+        status: map['status'] ?? 'Pending',
+      );
 }
 
 class ApplicationActivity {
@@ -28,20 +48,12 @@ class ApplicationActivity {
   final String date;
 
   const ApplicationActivity({required this.action, required this.date});
-}
 
-class ApplicationMetrics {
-  final int admissionProbability;
-  final int scholarshipChance;
-  final int interviewReadiness;
-  final int profileCompletion;
-
-  const ApplicationMetrics({
-    required this.admissionProbability,
-    required this.scholarshipChance,
-    required this.interviewReadiness,
-    required this.profileCompletion,
-  });
+  Map<String, dynamic> toMap() => {'action': action, 'date': date};
+  factory ApplicationActivity.fromMap(Map<String, dynamic> map) => ApplicationActivity(
+        action: map['action'] ?? '',
+        date: map['date'] ?? '',
+      );
 }
 
 class UniversityApplication {
@@ -55,11 +67,9 @@ class UniversityApplication {
   final int aiSuccessPrediction;
   final List<ApplicationTimelineStage> timeline;
   final List<DocumentRequirement> documents;
-  final ApplicationMetrics metrics;
   final List<ApplicationActivity> activities;
-  final String contactEmail;
-  final String contactPhone;
-  final String estimatedTimeRemaining;
+  final String notes;
+  final List<String> linkedDocumentIds;
 
   const UniversityApplication({
     required this.id,
@@ -68,26 +78,95 @@ class UniversityApplication {
     required this.status,
     required this.submissionDate,
     required this.deadline,
-    required this.progress,
-    required this.aiSuccessPrediction,
-    required this.timeline,
+    this.progress = 0.5,
+    this.aiSuccessPrediction = 85,
+    this.timeline = const [],
     this.documents = const [],
-    this.metrics = const ApplicationMetrics(admissionProbability: 0, scholarshipChance: 0, interviewReadiness: 0, profileCompletion: 0),
     this.activities = const [],
-    this.contactEmail = 'admissions@university.edu',
-    this.contactPhone = '+1 234 567 8900',
-    this.estimatedTimeRemaining = '14 Days',
+    this.notes = '',
+    this.linkedDocumentIds = const [],
   });
 
-  String get statusDisplay {
-    switch (status) {
-      case ApplicationStatus.draft: return 'Draft';
-      case ApplicationStatus.submitted: return 'Submitted';
-      case ApplicationStatus.review: return 'Under Review';
-      case ApplicationStatus.accepted: return 'Accepted';
-      case ApplicationStatus.rejected: return 'Rejected';
-      case ApplicationStatus.interview: return 'Interview Scheduled';
-      case ApplicationStatus.scholarship: return 'Scholarship Review';
+  String get statusDisplay => status.name.toUpperCase();
+
+  UniversityApplication copyWith({
+    String? id,
+    University? university,
+    String? course,
+    ApplicationStatus? status,
+    String? submissionDate,
+    String? deadline,
+    double? progress,
+    int? aiSuccessPrediction,
+    List<ApplicationTimelineStage>? timeline,
+    List<DocumentRequirement>? documents,
+    List<ApplicationActivity>? activities,
+    String? notes,
+    List<String>? linkedDocumentIds,
+  }) {
+    return UniversityApplication(
+      id: id ?? this.id,
+      university: university ?? this.university,
+      course: course ?? this.course,
+      status: status ?? this.status,
+      submissionDate: submissionDate ?? this.submissionDate,
+      deadline: deadline ?? this.deadline,
+      progress: progress ?? this.progress,
+      aiSuccessPrediction: aiSuccessPrediction ?? this.aiSuccessPrediction,
+      timeline: timeline ?? this.timeline,
+      documents: documents ?? this.documents,
+      activities: activities ?? this.activities,
+      notes: notes ?? this.notes,
+      linkedDocumentIds: linkedDocumentIds ?? this.linkedDocumentIds,
+    );
+  }
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'university': university.toMap(),
+        'course': course,
+        'status': status.name,
+        'submissionDate': submissionDate,
+        'deadline': deadline,
+        'progress': progress,
+        'aiSuccessPrediction': aiSuccessPrediction,
+        'timeline': timeline.map((t) => t.toMap()).toList(),
+        'documents': documents.map((d) => d.toMap()).toList(),
+        'activities': activities.map((a) => a.toMap()).toList(),
+        'notes': notes,
+        'linkedDocumentIds': linkedDocumentIds,
+      };
+
+  factory UniversityApplication.fromMap(Map<String, dynamic> map, String docId) {
+    ApplicationStatus parsedStatus = ApplicationStatus.submitted;
+    final statusStr = map['status'] as String?;
+    for (final s in ApplicationStatus.values) {
+      if (s.name == statusStr) parsedStatus = s;
     }
+
+    return UniversityApplication(
+      id: docId,
+      university: University.fromMap(map['university'] as Map<String, dynamic>? ?? {}),
+      course: map['course'] ?? 'Computer Science',
+      status: parsedStatus,
+      submissionDate: map['submissionDate'] ?? '15 Oct 2025',
+      deadline: map['deadline'] ?? '01 Dec 2025',
+      progress: (map['progress'] as num?)?.toDouble() ?? 0.5,
+      aiSuccessPrediction: map['aiSuccessPrediction'] ?? 85,
+      timeline: (map['timeline'] as List<dynamic>?)
+              ?.map((t) => ApplicationTimelineStage.fromMap(t as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      documents: (map['documents'] as List<dynamic>?)
+              ?.map((d) => DocumentRequirement.fromMap(d as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      activities: (map['activities'] as List<dynamic>?)
+              ?.map((a) => ApplicationActivity.fromMap(a as Map<String, dynamic>))
+              .toList() ??
+          const [],
+      notes: map['notes'] ?? '',
+      linkedDocumentIds: List<String>.from(map['linkedDocumentIds'] ?? []),
+    );
   }
 }
