@@ -649,7 +649,11 @@ class UniversityDetailsScreen extends ConsumerWidget {
                 flex: 2,
                 child: ElevatedButton(
                   onPressed: () {
-                    ref.read(applicationsProvider.notifier).addMockApplication(university.id);
+                    ref.read(applicationsNotifierProvider.notifier).createApplication(
+                      universityName: university.name,
+                      course: university.course,
+                      deadline: '01 Dec 2025',
+                    );
                     context.go('/applications');
                   },
                   style: ElevatedButton.styleFrom(

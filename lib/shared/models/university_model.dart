@@ -118,4 +118,70 @@ class University {
       facilities: facilities ?? this.facilities,
     );
   }
+
+  Map<String, dynamic> toMap() => toFirestore();
+
+  Map<String, dynamic> toFirestore() {
+    return {
+      'id': id,
+      'name': name,
+      'location': location,
+      'imageUrl': imageUrl,
+      'logoUrl': logoUrl,
+      'aiMatch': aiMatch,
+      'rating': rating,
+      'nirfRanking': nirfRanking,
+      'accreditation': accreditation,
+      'type': type,
+      'established': established,
+      'course': course,
+      'fees': fees,
+      'placementScore': placementScore,
+      'roiScore': roiScore,
+      'researchScore': researchScore,
+      'tags': tags,
+      'studentCount': studentCount,
+      'isFavorite': isFavorite,
+      'description': description,
+      'admissionProbability': admissionProbability,
+      'scholarshipProbability': scholarshipProbability,
+      'hostelCompatibility': hostelCompatibility,
+      'internationalOpportunities': internationalOpportunities,
+      'gallery': gallery,
+      'coursesList': coursesList,
+      'facilities': facilities,
+    };
+  }
+
+  factory University.fromMap(Map<String, dynamic> map, {String? docId}) {
+    return University(
+      id: docId ?? map['id'] ?? '',
+      name: map['name'] ?? '',
+      location: map['location'] ?? '',
+      imageUrl: map['imageUrl'] ?? '',
+      logoUrl: map['logoUrl'] ?? '',
+      aiMatch: (map['aiMatch'] as num?)?.toInt() ?? 90,
+      rating: (map['rating'] as num?)?.toDouble() ?? 4.5,
+      nirfRanking: map['nirfRanking'] ?? '',
+      accreditation: map['accreditation'] ?? '',
+      type: map['type'] ?? '',
+      established: map['established'] ?? '',
+      course: map['course'] ?? '',
+      fees: map['fees'] ?? '',
+      placementScore: (map['placementScore'] as num?)?.toDouble() ?? 90.0,
+      roiScore: (map['roiScore'] as num?)?.toDouble() ?? 90.0,
+      researchScore: (map['researchScore'] as num?)?.toDouble() ?? 85.0,
+      tags: List<String>.from(map['tags'] ?? []),
+      studentCount: map['studentCount'] ?? '',
+      isFavorite: map['isFavorite'] ?? false,
+      description: map['description'] ?? 'A premier institution known for excellence in education and research.',
+      admissionProbability: (map['admissionProbability'] as num?)?.toDouble() ?? 85.0,
+      scholarshipProbability: (map['scholarshipProbability'] as num?)?.toDouble() ?? 75.0,
+      hostelCompatibility: (map['hostelCompatibility'] as num?)?.toDouble() ?? 90.0,
+      internationalOpportunities: (map['internationalOpportunities'] as num?)?.toDouble() ?? 80.0,
+      gallery: List<String>.from(map['gallery'] ?? []),
+      coursesList: List<String>.from(map['coursesList'] ?? ['Engineering', 'Management', 'Sciences']),
+      facilities: List<String>.from(map['facilities'] ?? ['Hostels', 'Labs', 'Library']),
+    );
+  }
 }

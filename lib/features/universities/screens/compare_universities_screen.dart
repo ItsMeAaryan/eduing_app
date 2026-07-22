@@ -398,7 +398,11 @@ class CompareUniversitiesScreen extends ConsumerWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     for (var id in universityIds) {
-                      ref.read(applicationsProvider.notifier).addMockApplication(id);
+                      ref.read(applicationsNotifierProvider.notifier).createApplication(
+                        universityName: 'University $id',
+                        course: 'M.S. Degree',
+                        deadline: '01 Dec 2025',
+                      );
                     }
                     context.go('/applications');
                   },

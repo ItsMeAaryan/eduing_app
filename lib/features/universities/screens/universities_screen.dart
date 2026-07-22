@@ -17,6 +17,13 @@ class UniversitiesScreen extends ConsumerStatefulWidget {
 class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
   final List<String> _filters = ['All', 'Engineering', 'Management', 'Sciences', 'Arts', 'Medical', 'More'];
   String _selectedFilter = 'All';
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +36,8 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
         child: Column(
           children: [
             _buildHeader(),
-            _buildSearchBar(),
-            _buildFilters(),
+            _buildSearchBar(notifier),
+            _buildFilters(notifier),
             _buildResultsHeader(universities.length),
             Expanded(
               child: universities.isEmpty
@@ -79,9 +86,9 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).cardColor,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(color: Colors.grey.shade300),
                 ),
                 child: const Icon(Iconsax.notification, size: 24),
               ),
@@ -97,31 +104,38 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
     );
   }
 
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(UniversitiesNotifier notifier) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: Colors.grey.shade300),
               ),
-              child: Row(
-                children: [
-                  const Icon(Iconsax.search_normal, color: AppColors.textSecondary, size: 20),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Search universities, courses, locations...',
-                      style: AppTypography.body.copyWith(color: AppColors.textSecondary, fontSize: 14),
-                    ),
-                  ),
-                  const Icon(Iconsax.microphone, color: AppColors.textSecondary, size: 20),
-                ],
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) => notifier.filterByQuery(val),
+                decoration: InputDecoration(
+                  hintText: 'Search universities, courses...',
+                  hintStyle: AppTypography.body.copyWith(color: AppColors.textSecondary, fontSize: 14),
+                  icon: const Icon(Iconsax.search_normal, color: AppColors.textSecondary, size: 20),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.clear, size: 18),
+                          onPressed: () {
+                            _searchController.clear();
+                            notifier.filterByQuery('');
+                            setState(() {});
+                          },
+                        )
+                      : const Icon(Iconsax.microphone, color: AppColors.textSecondary, size: 20),
+                  border: InputBorder.none,
+                ),
               ),
             ),
           ),
@@ -129,9 +143,9 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: Colors.grey.shade300),
             ),
             child: Row(
               children: [
@@ -146,7 +160,7 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
     );
   }
 
-  Widget _buildFilters() {
+  Widget _buildFilters(UniversitiesNotifier notifier) {
     return Padding(
       padding: const EdgeInsets.only(top: 24, bottom: 24),
       child: SizedBox(
@@ -164,6 +178,7 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
                 setState(() {
                   _selectedFilter = filter;
                 });
+                notifier.filterByCategory(filter);
               },
             );
           },

@@ -6,15 +6,51 @@ final universitiesProvider = StateNotifierProvider<UniversitiesNotifier, List<Un
 });
 
 class UniversitiesNotifier extends StateNotifier<List<University>> {
+  List<University> _allUniversities = _initialData;
+  String _currentQuery = '';
+  String _currentCategory = 'All';
+
   UniversitiesNotifier() : super(_initialData);
 
+  void setUniversities(List<University> list) {
+    _allUniversities = list;
+    _applyFilters();
+  }
+
+  void filterByQuery(String query) {
+    _currentQuery = query.toLowerCase().trim();
+    _applyFilters();
+  }
+
+  void filterByCategory(String category) {
+    _currentCategory = category;
+    _applyFilters();
+  }
+
+  void _applyFilters() {
+    state = _allUniversities.where((uni) {
+      final matchesQuery = _currentQuery.isEmpty ||
+          uni.name.toLowerCase().contains(_currentQuery) ||
+          uni.location.toLowerCase().contains(_currentQuery) ||
+          uni.course.toLowerCase().contains(_currentQuery);
+
+      final matchesCategory = _currentCategory == 'All' ||
+          uni.type.toLowerCase().contains(_currentCategory.toLowerCase()) ||
+          uni.course.toLowerCase().contains(_currentCategory.toLowerCase()) ||
+          uni.coursesList.any((c) => c.toLowerCase().contains(_currentCategory.toLowerCase()));
+
+      return matchesQuery && matchesCategory;
+    }).toList();
+  }
+
   void toggleFavorite(String id) {
-    state = state.map((uni) {
+    _allUniversities = _allUniversities.map((uni) {
       if (uni.id == id) {
         return uni.copyWith(isFavorite: !uni.isFavorite);
       }
       return uni;
     }).toList();
+    _applyFilters();
   }
 
   static const List<University> _initialData = [
