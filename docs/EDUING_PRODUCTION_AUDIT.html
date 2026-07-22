@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDUING App — Production Readiness Audit</title>
+<style>
+  :root {
+    --bg: #0E0F14;
+    --surface: #161820;
+    --border: #252733;
+    --primary: #4353FF;
+    --green: #10C675;
+    --yellow: #F59E0B;
+    --red: #EF4444;
+    --gray: #64748B;
+    --text: #E2E8F0;
+    --muted: #94A3B8;
+    --font: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 13px; line-height: 1.6; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
+  
+  /* Header */
+  .header { border-bottom: 1px solid var(--border); padding-bottom: 32px; margin-bottom: 40px; }
+  .header h1 { font-size: 22px; color: #fff; letter-spacing: -0.5px; }
+  .header .meta { color: var(--muted); font-size: 11px; margin-top: 8px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; letter-spacing: 0.5px; text-transform: uppercase; }
+  .badge-red { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .badge-yellow { background: rgba(245,158,11,0.15); color: var(--yellow); border: 1px solid rgba(245,158,11,0.3); }
+  .badge-green { background: rgba(16,198,117,0.15); color: var(--green); border: 1px solid rgba(16,198,117,0.3); }
+  .badge-gray { background: rgba(100,116,139,0.15); color: var(--muted); border: 1px solid rgba(100,116,139,0.3); }
+  .badge-blue { background: rgba(67,83,255,0.15); color: #8B9FFF; border: 1px solid rgba(67,83,255,0.3); }
+  
+  /* Scores */
+  .scores-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-bottom: 48px; }
+  .score-card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+  .score-card .label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .score-card .value { font-size: 28px; font-weight: bold; }
+  .score-card .bar { height: 3px; background: var(--border); border-radius: 2px; margin-top: 8px; }
+  .score-card .bar-fill { height: 100%; border-radius: 2px; }
+  .c-red { color: var(--red); } .c-yellow { color: var(--yellow); } .c-green { color: var(--green); } .c-blue { color: #8B9FFF; }
+  .bg-red { background: var(--red); } .bg-yellow { background: var(--yellow); } .bg-green { background: var(--green); } .bg-blue { background: var(--primary); }
+  
+  /* Critical findings */
+  .critical-box { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 20px 24px; margin-bottom: 40px; }
+  .critical-box h3 { color: var(--red); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; }
+  .critical-box ul { list-style: none; }
+  .critical-box li { color: var(--text); padding: 4px 0; padding-left: 20px; position: relative; }
+  .critical-box li::before { content: '⚠'; position: absolute; left: 0; color: var(--red); font-size: 11px; }
+
+  /* Section */
+  .section { margin-bottom: 48px; }
+  .section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); border-bottom: 1px solid var(--border); padding-bottom: 8px; margin-bottom: 20px; }
+  
+  /* Feature table */
+  table { width: 100%; border-collapse: collapse; }
+  th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  td { padding: 8px 12px; border-bottom: 1px solid rgba(37,39,51,0.6); vertical-align: top; font-size: 12px; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .status { font-size: 14px; }
+  .pct { color: var(--muted); font-size: 11px; }
+  .detail { color: var(--muted); font-size: 11px; line-height: 1.5; }
+  
+  /* Master checklist */
+  .checklist-group { margin-bottom: 32px; }
+  .checklist-group h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); margin-bottom: 12px; }
+  .checklist-item { display: flex; align-items: flex-start; gap: 10px; padding: 6px 0; border-bottom: 1px solid rgba(37,39,51,0.4); }
+  .checklist-item:last-child { border-bottom: none; }
+  .check-icon { flex-shrink: 0; font-size: 14px; width: 20px; }
+  .check-text { flex: 1; font-size: 12px; }
+  .check-sub { color: var(--muted); font-size: 11px; display: block; margin-top: 2px; }
+  
+  /* UX section */
+  .ux-finding { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; margin-bottom: 10px; }
+  .ux-finding .tag { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .ux-finding .issue { font-size: 12px; color: var(--text); }
+  .ux-finding .fix { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  
+  footer { border-top: 1px solid var(--border); padding-top: 24px; margin-top: 48px; color: var(--muted); font-size: 10px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>EDUING Mobile App — Production Readiness Audit</h1>
+  <div class="meta">
+    Repo: github.com/ItsMeAaryan/eduing_app &nbsp;|&nbsp; 
+    Audited: July 2026 &nbsp;|&nbsp; 
+    Flutter SDK ^3.5.0 &nbsp;|&nbsp; 
+    <span class="badge badge-red">NOT PRODUCTION READY</span>
+  </div>
+</div>
+
+<!-- ─── OVERALL SCORES ─── -->
+<div class="section">
+  <div class="section-title">Product Readiness Scores</div>
+  <div class="scores-grid">
+    <div class="score-card"><div class="label">Overall</div><div class="value c-red">22%</div><div class="bar"><div class="bar-fill bg-red" style="width:22%"></div></div></div>
+    <div class="score-card"><div class="label">Authentication</div><div class="value c-yellow">45%</div><div class="bar"><div class="bar-fill bg-yellow" style="width:45%"></div></div></div>
+    <div class="score-card"><div class="label">AI Features</div><div class="value c-yellow">30%</div><div class="bar"><div class="bar-fill bg-yellow" style="width:30%"></div></div></div>
+    <div class="score-card"><div class="label">Universities</div><div class="value c-yellow">40%</div><div class="bar"><div class="bar-fill bg-yellow" style="width:40%"></div></div></div>
+    <div class="score-card"><div class="label">Applications</div><div class="value c-red">25%</div><div class="bar"><div class="bar-fill bg-red" style="width:25%"></div></div></div>
+    <div class="score-card"><div class="label">Documents</div><div class="value c-red">20%</div><div class="bar"><div class="bar-fill bg-red" style="width:20%"></div></div></div>
+    <div class="score-card"><div class="label">Planner</div><div class="value c-yellow">35%</div><div class="bar"><div class="bar-fill bg-yellow" style="width:35%"></div></div></div>
+    <div class="score-card"><div class="label">Notifications</div><div class="value c-yellow">40%</div><div class="bar"><div class="bar-fill bg-yellow" style="width:40%"></div></div></div>
+    <div class="score-card"><div class="label">Offline</div><div class="value c-red">20%</div><div class="bar"><div class="bar-fill bg-red" style="width:20%"></div></div></div>
+    <div class="score-card"><div class="label">Security</div><div class="value c-yellow">50%</div><div class="bar"><div class="bar-fill bg-yellow" style="width:50%"></div></div></div>
+    <div class="score-card"><div class="label">Performance</div><div class="value c-red">15%</div><div class="bar"><div class="bar-fill bg-red" style="width:15%"></div></div></div>
+    <div class="score-card"><div class="label">Testing</div><div class="value c-red">2%</div><div class="bar"><div class="bar-fill bg-red" style="width:2%"></div></div></div>
+    <div class="score-card"><div class="label">UI Design</div><div class="value c-yellow">55%</div><div class="bar"><div class="bar-fill bg-yellow" style="width:55%"></div></div></div>
+    <div class="score-card"><div class="label">UX</div><div class="value c-red">20%</div><div class="bar"><div class="bar-fill bg-red" style="width:20%"></div></div></div>
+    <div class="score-card"><div class="label">Accessibility</div><div class="value c-red">5%</div><div class="bar"><div class="bar-fill bg-red" style="width:5%"></div></div></div>
+    <div class="score-card"><div class="label">Play Store</div><div class="value c-red">10%</div><div class="bar"><div class="bar-fill bg-red" style="width:10%"></div></div></div>
+    <div class="score-card"><div class="label">App Store</div><div class="value c-red">10%</div><div class="bar"><div class="bar-fill bg-red" style="width:10%"></div></div></div>
+  </div>
+</div>
+
+<!-- ─── CRITICAL FINDINGS ─── -->
+<div class="critical-box">
+  <h3>Critical Blockers — Must fix before any release</h3>
+  <ul>
+    <li>ALL providers use hardcoded mock data — zero real Firestore reads in any feature provider</li>
+    <li>GEMINI_API_KEY injected via --dart-define; falls back to string "mock_key" — will silently fail in production builds</li>
+    <li>No auth guard in router — unauthenticated users can reach all routes by navigating directly</li>
+    <li>firebase_options.dart / google-services.json NOT in repo — app cannot build for any real environment</li>
+    <li>No dark mode — lightTheme only, no darkTheme, ThemeMode.system ignored</li>
+    <li>Document upload FAB does nothing (onPressed: () {})</li>
+    <li>Application "Add" button does nothing (onPressed: () {})</li>
+    <li>All search bars are non-functional UI decoration (no TextEditingController, no actual search)</li>
+    <li>BackgroundTaskService registered in notification_provider but never called in main()</li>
+    <li>Only 1 test file, 35 lines, tests only a data model — zero widget tests, zero integration tests</li>
+    <li>No app signing config in android/app/build.gradle — Play Store submission blocked</li>
+    <li>No GoogleService-Info.plist reference in iOS project — App Store submission blocked</li>
+    <li>BaseRepository.streamQuery returns generic Map not typed models — all repos are shell wrappers</li>
+  </ul>
+</div>
+
+<!-- ─── FEATURE CHECKLIST ─── -->
+<div class="section">
+  <div class="section-title">Feature Verification Checklist</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Status</th>
+        <th>Feature</th>
+        <th>Files</th>
+        <th>Notes / Missing</th>
+        <th>%</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- AUTH -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Authentication</td></tr>
+      <tr><td class="status">🟡</td><td>Email Login</td><td class="detail">auth_screen.dart, auth_repository.dart</td><td class="detail">UI + Firebase call implemented. No input debounce, no email verification gate before login allowed.</td><td class="pct">60%</td></tr>
+      <tr><td class="status">🟡</td><td>Registration</td><td class="detail">auth_repository.dart</td><td class="detail">Creates Firestore user doc + sends email verification. But app doesn't enforce verified email before granting access.</td><td class="pct">65%</td></tr>
+      <tr><td class="status">✅</td><td>Forgot Password</td><td class="detail">auth_screen.dart</td><td class="detail">Calls Firebase sendPasswordResetEmail. Works.</td><td class="pct">90%</td></tr>
+      <tr><td class="status">🟡</td><td>Google Login</td><td class="detail">auth_repository.dart (GoogleSignIn imported)</td><td class="detail">signOut calls _googleSignIn.signOut() but no signInWithGoogle method implemented. Button absent in UI.</td><td class="pct">10%</td></tr>
+      <tr><td class="status">🔴</td><td>Apple Login</td><td class="detail">—</td><td class="detail">Not implemented anywhere. No sign_in_with_apple package in pubspec.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Biometric Login</td><td class="detail">—</td><td class="detail">No local_auth package. Not mentioned anywhere.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Session Management / Remember Me</td><td class="detail">—</td><td class="detail">Firebase Auth handles token persistence by default but no explicit session timeout, refresh logic, or "remember me" toggle.</td><td class="pct">20%</td></tr>
+      <tr><td class="status">✅</td><td>Logout</td><td class="detail">auth_provider.dart</td><td class="detail">signOut implemented and signs out Google session too.</td><td class="pct">90%</td></tr>
+      <tr><td class="status">🔴</td><td>Multi-device Login</td><td class="detail">—</td><td class="detail">Not implemented. No device tracking in Firestore.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Auth Guard / Route Protection</td><td class="detail">app_router.dart</td><td class="detail">Router has no redirect logic. authStateProvider exists but never consumed by router. All routes accessible without auth.</td><td class="pct">0%</td></tr>
+
+      <!-- PROFILE -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Profile</td></tr>
+      <tr><td class="status">🟡</td><td>Student Profile</td><td class="detail">profile_dashboard_screen.dart, profile_provider.dart</td><td class="detail">UI complete. All data is hardcoded mock ("Prince Mittal"). Zero Firestore reads.</td><td class="pct">40%</td></tr>
+      <tr><td class="status">🔴</td><td>Profile Photo Upload</td><td class="detail">storage_provider.dart has uploadProfileImage()</td><td class="detail">Method exists but no UI trigger. CircleAvatar uses hardcoded pravatar URL.</td><td class="pct">10%</td></tr>
+      <tr><td class="status">🔴</td><td>Profile Editing</td><td class="detail">profile_provider.dart has updateField()</td><td class="detail">Edit button in appBar does nothing (onPressed: () {}). Edit icons in rows do nothing.</td><td class="pct">5%</td></tr>
+      <tr><td class="status">🔴</td><td>AI Profile Analysis</td><td class="detail">profile_dashboard_screen.dart (aiInsights hardcoded)</td><td class="detail">AI insights are static strings, not generated by Gemini. No call to aiService.</td><td class="pct">5%</td></tr>
+      <tr><td class="status">🔴</td><td>AI Photo Verification / Liveness Detection</td><td class="detail">—</td><td class="detail">Not implemented. No camera plugin, no ML kit package.</td><td class="pct">0%</td></tr>
+
+      <!-- UNIVERSITIES -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Universities</td></tr>
+      <tr><td class="status">🟡</td><td>University List</td><td class="detail">universities_screen.dart, universities_provider.dart</td><td class="detail">UI works with 4 hardcoded mock universities. No Firestore fetch.</td><td class="pct">40%</td></tr>
+      <tr><td class="status">🔴</td><td>University Search</td><td class="detail">universities_screen.dart</td><td class="detail">Search bar is a static Container with placeholder text. No TextField, no controller, no filter logic.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🟡</td><td>Category Filters</td><td class="detail">universities_screen.dart</td><td class="detail">Filter chips update selectedFilter state but provider doesn't filter on it — list never changes.</td><td class="pct">25%</td></tr>
+      <tr><td class="status">🟡</td><td>AI Match %</td><td class="detail">university_model.dart, university_card.dart</td><td class="detail">aiMatch field exists and renders on card. Not computed by AI — hardcoded static value.</td><td class="pct">30%</td></tr>
+      <tr><td class="status">⚪</td><td>University Details</td><td class="detail">university_details_screen.dart</td><td class="detail">Route exists. Cannot verify screen content without reading the file (not read above).</td><td class="pct">?</td></tr>
+      <tr><td class="status">🟡</td><td>Save Universities</td><td class="detail">universities_provider.dart toggleFavorite()</td><td class="detail">In-memory toggle only. Not persisted to Firestore.</td><td class="pct">30%</td></tr>
+      <tr><td class="status">⚪</td><td>Compare Universities</td><td class="detail">compare_universities_screen.dart</td><td class="detail">Route exists with ids param. Screen content unverified.</td><td class="pct">?</td></tr>
+      <tr><td class="status">🔴</td><td>Advanced Filters / Sorting</td><td class="detail">—</td><td class="detail">Filter button in search bar row does nothing. Sort dropdown is decorative text.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>AI Recommendations (real)</td><td class="detail">gemini_ai_service.dart recommendUniversities()</td><td class="detail">Method implemented but never called from UI. UI shows hardcoded aiMatch scores.</td><td class="pct">10%</td></tr>
+
+      <!-- APPLICATIONS -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Applications</td></tr>
+      <tr><td class="status">🟡</td><td>Application List / Tracking</td><td class="detail">applications_screen.dart, applications_provider.dart</td><td class="detail">UI complete with 2 mock applications. No Firestore reads.</td><td class="pct">40%</td></tr>
+      <tr><td class="status">🔴</td><td>Apply (from University)</td><td class="detail">—</td><td class="detail">No "Apply" button in university_card or details. ApplicationsNotifier.addMockApplication() exists but not triggered from UI.</td><td class="pct">5%</td></tr>
+      <tr><td class="status">🔴</td><td>Withdraw Application</td><td class="detail">—</td><td class="detail">Not implemented.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Offline Draft Applications</td><td class="detail">—</td><td class="detail">Not implemented. Firestore offline persistence is enabled but no explicit draft queue.</td><td class="pct">5%</td></tr>
+      <tr><td class="status">🟡</td><td>Status Timeline</td><td class="detail">application_details_screen.dart</td><td class="detail">Timeline model exists with mock data. UI unverified.</td><td class="pct">30%</td></tr>
+
+      <!-- DOCUMENTS -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Documents</td></tr>
+      <tr><td class="status">🟡</td><td>Document List</td><td class="detail">documents_screen.dart, documents_provider.dart</td><td class="detail">UI complete with 3 mock documents. No Firestore reads.</td><td class="pct">40%</td></tr>
+      <tr><td class="status">🔴</td><td>Document Upload (Gallery/Camera)</td><td class="detail">documents_screen.dart FAB onPressed: () {}</td><td class="detail">Upload button exists in UI but does nothing. No image_picker or file_picker in pubspec.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Document Scanner / AI Auto Crop / OCR</td><td class="detail">—</td><td class="detail">No camera plugin, no ML kit, no google_mlkit_document_scanner. Not in pubspec.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>AI Document Quality Checker</td><td class="detail">gemini_ai_service.dart analyzeDocument()</td><td class="detail">Method implemented. Not called anywhere from documents UI. Mock data has aiAnalysis field.</td><td class="pct">10%</td></tr>
+      <tr><td class="status">🔴</td><td>Native PDF Viewer</td><td class="detail">document_preview_screen.dart</td><td class="detail">No syncfusion_flutter_pdfviewer or pdfx in pubspec. Screen exists but content unknown.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Share Documents</td><td class="detail">—</td><td class="detail">No share_plus in pubspec.</td><td class="pct">0%</td></tr>
+
+      <!-- RESUME / SOP -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Resume & SOP</td></tr>
+      <tr><td class="status">🟡</td><td>Resume Builder UI</td><td class="detail">resume_dashboard_screen.dart</td><td class="detail">Section list renders. Tapping sections does nothing. ATS/AI scores are hardcoded from model.</td><td class="pct">30%</td></tr>
+      <tr><td class="status">🔴</td><td>Resume Templates</td><td class="detail">—</td><td class="detail">No template system. resume_preview_screen.dart unverified.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Resume Export (PDF)</td><td class="detail">—</td><td class="detail">No pdf generation package (pdf, printing) in pubspec.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🟡</td><td>AI Resume Review</td><td class="detail">ai_resume_review_screen.dart, gemini_ai_service.dart</td><td class="detail">analyzeResume() implemented in service. "Improve with AI" button does nothing. Connection to screen unverified.</td><td class="pct">20%</td></tr>
+      <tr><td class="status">🟡</td><td>SOP Builder / AI Review</td><td class="detail">sop_dashboard_screen.dart, gemini_ai_service.dart</td><td class="detail">Same state as resume — UI shell exists, AI service method exists, not connected.</td><td class="pct">20%</td></tr>
+
+      <!-- INTERVIEW -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Interview</td></tr>
+      <tr><td class="status">🟡</td><td>Mock Interview UI</td><td class="detail">mock_interview_screen.dart</td><td class="detail">UI impressive — dark video layout, question overlay, mic button animation. Timer is static "12:45". No actual recording.</td><td class="pct">35%</td></tr>
+      <tr><td class="status">🔴</td><td>Speech-to-Text / Recording</td><td class="detail">—</td><td class="detail">No record or speech_to_text package in pubspec. Mic button animates but records nothing.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🟡</td><td>AI Interview Feedback</td><td class="detail">gemini_ai_service.dart evaluateInterview()</td><td class="detail">Service method implemented. interview_report_screen.dart exists. Connection unverified.</td><td class="pct">25%</td></tr>
+
+      <!-- SCHOLARSHIPS -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Scholarships</td></tr>
+      <tr><td class="status">🟡</td><td>Scholarship Hub</td><td class="detail">scholarships_hub_screen.dart, scholarships_provider.dart</td><td class="detail">Rich mock data (2 scholarships). No Firestore reads.</td><td class="pct">35%</td></tr>
+      <tr><td class="status">🟡</td><td>Save Scholarships</td><td class="detail">scholarships_provider.dart toggleSaveStatus()</td><td class="detail">In-memory toggle only. Not persisted.</td><td class="pct">30%</td></tr>
+      <tr><td class="status">🟡</td><td>AI Eligibility</td><td class="detail">scholarship_model.dart AIEligibilityAnalysis</td><td class="detail">Model exists with rich fields. Not generated by AI — hardcoded in provider.</td><td class="pct">20%</td></tr>
+
+      <!-- PLANNER -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Planner</td></tr>
+      <tr><td class="status">🟡</td><td>Calendar / Timeline</td><td class="detail">planner_dashboard_screen.dart</td><td class="detail">Custom calendar grid renders. Tab switching works. Events from mock data. Month navigation arrows do nothing.</td><td class="pct">40%</td></tr>
+      <tr><td class="status">🟡</td><td>Task Completion</td><td class="detail">planner_provider.dart toggleTaskCompletion()</td><td class="detail">In-memory toggle works with UI feedback. Not persisted.</td><td class="pct">50%</td></tr>
+      <tr><td class="status">🔴</td><td>Add Task / Deadline</td><td class="detail">—</td><td class="detail">Add button (+) in appBar does nothing.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Calendar Integration (device)</td><td class="detail">—</td><td class="detail">No device_calendar package.</td><td class="pct">0%</td></tr>
+
+      <!-- AI COPILOT -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">AI Copilot</td></tr>
+      <tr><td class="status">🟡</td><td>AI Chat</td><td class="detail">chat_screen.dart, copilot_provider.dart, gemini_ai_service.dart</td><td class="detail">Most functional feature. Streaming chat implemented. Falls back to mock string if API key empty.</td><td class="pct">65%</td></tr>
+      <tr><td class="status">🔴</td><td>AI Voice Assistant / Voice Search</td><td class="detail">—</td><td class="detail">Microphone icon in university search bar — decorative only. No speech_to_text package.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>AI Dashboard Insights (live)</td><td class="detail">—</td><td class="detail">Dashboard hardcoded. No AI calls on load.</td><td class="pct">0%</td></tr>
+
+      <!-- NOTIFICATIONS -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Notifications</td></tr>
+      <tr><td class="status">🟡</td><td>Push Notifications</td><td class="detail">notification_service.dart</td><td class="detail">FCM setup complete: foreground, background, terminated handlers all present. Solid implementation.</td><td class="pct">70%</td></tr>
+      <tr><td class="status">🟡</td><td>Background Tasks</td><td class="detail">background_task_service.dart</td><td class="detail">Workmanager tasks defined and registered. Task bodies are empty switch-case stubs (break; only).</td><td class="pct">25%</td></tr>
+      <tr><td class="status">🔴</td><td>Notification channels (Android 8+)</td><td class="detail">notification_service.dart</td><td class="detail">Single "eduing_channel" hardcoded. No separate channels for deadlines vs updates vs AI.</td><td class="pct">20%</td></tr>
+
+      <!-- SECURITY -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Security</td></tr>
+      <tr><td class="status">✅</td><td>Firebase Auth</td><td class="detail">firebase_service.dart</td><td class="detail">Properly initialized.</td><td class="pct">90%</td></tr>
+      <tr><td class="status">🟡</td><td>Firestore Security Rules</td><td class="detail">firestore.rules</td><td class="detail">Default deny + user-scoped rules + public read for universities/scholarships. Solid foundation. Missing field-level validation rules.</td><td class="pct">65%</td></tr>
+      <tr><td class="status">🔴</td><td>Secure Storage</td><td class="detail">—</td><td class="detail">No flutter_secure_storage. API keys not stored securely.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Screenshot Protection</td><td class="detail">—</td><td class="detail">Not implemented. flutter_windowmanager not in pubspec.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🟡</td><td>Crashlytics</td><td class="detail">firebase_service.dart</td><td class="detail">FlutterError.onError hooked. Only catches Flutter framework errors, not isolate/async errors.</td><td class="pct">50%</td></tr>
+
+      <!-- MOBILE UX -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Mobile / UX Primitives</td></tr>
+      <tr><td class="status">🔴</td><td>Dark Mode</td><td class="detail">app_theme.dart</td><td class="detail">Only lightTheme defined. MaterialApp.router has no darkTheme. ThemeMode not wired.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Haptic Feedback</td><td class="detail">—</td><td class="detail">Not implemented anywhere.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Pull to Refresh</td><td class="detail">—</td><td class="detail">Not implemented on any list.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🟡</td><td>Skeleton Loading</td><td class="detail">—</td><td class="detail">No shimmer or skeleton widgets. flutter_animate used for fade-in but no loading state skeletons.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🟡</td><td>Empty States</td><td class="detail">Multiple screens</td><td class="detail">Empty state widgets present in universities, applications, documents screens. Good coverage.</td><td class="pct">70%</td></tr>
+      <tr><td class="status">🔴</td><td>Error Screens / Error Handling UI</td><td class="detail">—</td><td class="detail">No global error boundary. AsyncError states from providers not handled in UI.</td><td class="pct">5%</td></tr>
+      <tr><td class="status">🔴</td><td>Accessibility (Semantics)</td><td class="detail">—</td><td class="detail">Zero Semantics widgets. No MergeSemantics, no excludeSemantics, no tooltip. Fails WCAG.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Tablet / Responsive UI</td><td class="detail">—</td><td class="detail">No LayoutBuilder or MediaQuery breakpoints. Will look broken on tablets.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Deep Links</td><td class="detail">AndroidManifest.xml</td><td class="detail">No intent-filter for deep links in manifest.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>QR / Digital Student ID</td><td class="detail">—</td><td class="detail">Not implemented.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Share (WhatsApp / Email / Native)</td><td class="detail">—</td><td class="detail">No share_plus in pubspec.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🟡</td><td>Animations</td><td class="detail">flutter_animate used throughout</td><td class="detail">fade/slideY/scale used consistently. Good use. No page transitions defined.</td><td class="pct">60%</td></tr>
+      <tr><td class="status">🔴</td><td>Infinite Scroll / Pagination</td><td class="detail">—</td><td class="detail">Not implemented. All lists render full in-memory array.</td><td class="pct">0%</td></tr>
+
+      <!-- PERFORMANCE -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Performance</td></tr>
+      <tr><td class="status">🔴</td><td>Image Optimization / Caching</td><td class="detail">—</td><td class="detail">No cached_network_image. All NetworkImage calls uncached — repeated downloads on every rebuild.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Lazy Loading</td><td class="detail">—</td><td class="detail">All data loaded at provider init. No pagination, no lazy fetch.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Startup Optimization</td><td class="detail">main.dart</td><td class="detail">Firebase init + notification init on startup is fine but no deferred loading or splash management.</td><td class="pct">20%</td></tr>
+      <tr><td class="status">🔴</td><td>Memory Optimization</td><td class="detail">—</td><td class="detail">AnimationControllers in flutter_animate auto-disposed only if framework handles it. No manual disposal auditing done.</td><td class="pct">10%</td></tr>
+
+      <!-- TESTING -->
+      <tr><td colspan="5" style="color:var(--primary);font-size:10px;text-transform:uppercase;letter-spacing:1px;padding-top:16px">Testing</td></tr>
+      <tr><td class="status">🟡</td><td>Unit Tests</td><td class="detail">test/features/settings/models/settings_model_test.dart</td><td class="detail">1 file, 3 tests, model-only. Nothing else tested.</td><td class="pct">2%</td></tr>
+      <tr><td class="status">🔴</td><td>Widget Tests</td><td class="detail">—</td><td class="detail">None.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Integration Tests</td><td class="detail">—</td><td class="detail">None. integration_test package not in pubspec.</td><td class="pct">0%</td></tr>
+      <tr><td class="status">🔴</td><td>Production Build Tested</td><td class="detail">—</td><td class="detail">Cannot verify — no google-services.json in repo. flutter build release will fail.</td><td class="pct">0%</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ─── MISSING FEATURES ─── -->
+<div class="section">
+  <div class="section-title">Missing Modern App Features (not in repo at all)</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+    <div class="ux-finding"><div class="tag">Core</div><div class="issue">image_picker / file_picker — no way to upload anything</div></div>
+    <div class="ux-finding"><div class="tag">Core</div><div class="issue">pdf / printing package — cannot export any document</div></div>
+    <div class="ux-finding"><div class="tag">Core</div><div class="issue">cached_network_image — all images re-downloaded each render</div></div>
+    <div class="ux-finding"><div class="tag">Core</div><div class="issue">speech_to_text / record — voice features are dead</div></div>
+    <div class="ux-finding"><div class="tag">Core</div><div class="issue">share_plus — no document or profile sharing</div></div>
+    <div class="ux-finding"><div class="tag">Core</div><div class="issue">flutter_secure_storage — API keys exposed in memory</div></div>
+    <div class="ux-finding"><div class="tag">Core</div><div class="issue">local_auth — no biometric login</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">shimmer / skeletons — no loading state visual feedback</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">haptic feedback on every tap action</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">pull-to-refresh on all lists</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">undo snackbar for destructive actions (delete, withdraw)</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">search history / recent searches persistence</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">upload progress indicator (file uploads)</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">retry on failed uploads / network errors</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">offline banner / network status indicator</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">app update checker (in-app update API)</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">dark mode support</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">page transition animations (GoRouter transitions)</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">swipe-to-dismiss / swipe actions on list items</div></div>
+    <div class="ux-finding"><div class="tag">UX</div><div class="issue">long-press context menus</div></div>
+    <div class="ux-finding"><div class="tag">Security</div><div class="issue">screenshot protection (flutter_windowmanager)</div></div>
+    <div class="ux-finding"><div class="tag">Security</div><div class="issue">session timeout after inactivity</div></div>
+    <div class="ux-finding"><div class="tag">Security</div><div class="issue">root/jailbreak detection</div></div>
+    <div class="ux-finding"><div class="tag">Perf</div><div class="issue">image compression before upload</div></div>
+    <div class="ux-finding"><div class="tag">Perf</div><div class="issue">smart cache invalidation strategy</div></div>
+    <div class="ux-finding"><div class="tag">Perf</div><div class="issue">background upload queue</div></div>
+    <div class="ux-finding"><div class="tag">A11y</div><div class="issue">Semantics labels on all interactive widgets</div></div>
+    <div class="ux-finding"><div class="tag">A11y</div><div class="issue">minimum 48x48 touch target enforcement</div></div>
+    <div class="ux-finding"><div class="tag">A11y</div><div class="issue">text scaling support (textScaleFactor)</div></div>
+    <div class="ux-finding"><div class="tag">A11y</div><div class="issue">reduced motion support (MediaQuery.disableAnimations)</div></div>
+    <div class="ux-finding"><div class="tag">Platform</div><div class="issue">deep links for notifications routing</div></div>
+    <div class="ux-finding"><div class="tag">Platform</div><div class="issue">app shortcuts (Android shortcuts / iOS Quick Actions)</div></div>
+    <div class="ux-finding"><div class="tag">Platform</div><div class="issue">localization (intl package exists but no arb files)</div></div>
+    <div class="ux-finding"><div class="tag">Platform</div><div class="issue">QR code scanner (qr_code_scanner)</div></div>
+    <div class="ux-finding"><div class="tag">Platform</div><div class="issue">device_calendar integration</div></div>
+    <div class="ux-finding"><div class="tag">Analytics</div><div class="issue">analytics.logEvent() calls — only logAppOpen() wired</div></div>
+    <div class="ux-finding"><div class="tag">Analytics</div><div class="issue">Crashlytics isolate + PlatformDispatcher error hooks</div></div>
+  </div>
+</div>
+
+<!-- ─── UI/UX REVIEW ─── -->
+<div class="section">
+  <div class="section-title">UI/UX Review — Screen-by-Screen Issues</div>
+  
+  <div class="checklist-group">
+    <h4>Auth Screen</h4>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Password field has no visibility toggle (eye icon). Users cannot see what they typed.</div><div class="fix">Add obscureText toggle with suffix IconButton.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Email validation regex is just contains('@') — accepts "a@" as valid email.</div><div class="fix">Use proper regex or email_validator package.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Error shown via SnackBar after async. If user rotates phone, context may be invalid. Uses !mounted check but then reads ref after it.</div><div class="fix">Read error state before async gap, not after.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">No Google / Apple sign-in buttons in UI despite being in feature list. Auth screen looks incomplete.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">No keyboard dismiss on tap outside. Form submits on Enter in email field but not password field.</div></div>
+  </div>
+
+  <div class="checklist-group">
+    <h4>Universities Screen</h4>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Search bar is fake Container — no user input possible. This is the primary discovery mechanism. Critical miss.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Filter chips visually update (selectedFilter state) but list doesn't change — misleading UX.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Hardcoded avatar URL in header (pravatar.cc) — shows random stranger's photo, not logged-in user.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">"Sort by: AI Match" is static Text + Icon — not a real dropdown.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><td class="issue">List has no pull-to-refresh and no infinite scroll. 4 items with no pagination signal.</td></div>
+  </div>
+
+  <div class="checklist-group">
+    <h4>Documents Screen</h4>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">AI Document Health card has shimmer animation on the title Row permanently (onPlay: c.repeat) — distracting and misleading as a "loading" signal.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Circular indicators show hardcoded 80/92/85% regardless of actual documents.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Scan icon in header CircleAvatar does nothing.</div></div>
+  </div>
+
+  <div class="checklist-group">
+    <h4>Mock Interview Screen</h4>
+    <div class="ux-finding"><div class="tag">Positive</div><div class="issue">Best-designed screen. Dark video UI, pulsing mic animation, question overlay. High-quality shell.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Timer is hardcoded "12:45" — doesn't count up or down.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">No actual camera or microphone integration. "Camera Active" text but no camera feed.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Mic button pulsing animation but no recording state.</div></div>
+  </div>
+
+  <div class="checklist-group">
+    <h4>AI Copilot Chat</h4>
+    <div class="ux-finding"><div class="tag">Positive</div><div class="issue">Streaming chat is actually wired end-to-end. Most complete feature in the app.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Attach icon does nothing. No file or document context injection into prompt.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">No conversation history persistence. Session resets on screen pop.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Typing indicator uses three dots that all fade in/out simultaneously (same duration, just delayed) — looks off. Should stagger up-down like iMessage.</div></div>
+  </div>
+
+  <div class="checklist-group">
+    <h4>Global / Cross-Cutting</h4>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">AppColors.withOpacity() deprecated in Flutter 3.3+. Should use .withValues(alpha:) or Color.fromRGBO. Will produce deprecation warnings everywhere.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">No loading state UI for any async operation except auth. If Firestore reads were added, users would see blank screens.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Navigator.of(context).pop() used alongside GoRouter. Mixing navigation systems will cause issues. Use context.pop() from go_router exclusively.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">No consistent page transition — GoRouter defaults to platform default (slide on iOS, fade on Android). No custom transition defined.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Scaffold uses bottom: false in SafeArea but main_layout.dart bottom nav may overlap content. Inconsistent handling.</div></div>
+    <div class="ux-finding"><div class="tag">Issue</div><div class="issue">Two duplicate AI service classes: GeminiService and GeminiAIService — different interfaces, overlapping concerns. gemini_service.dart appears unused by any provider.</div></div>
+  </div>
+</div>
+
+<!-- ─── MASTER CHECKLIST ─── -->
+<div class="section">
+  <div class="section-title">Master Checklist — Single Source of Truth</div>
+
+  <div class="checklist-group">
+    <h4>✅ Actually Done (keep, but verify)</h4>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Email/password auth + forgot password (Firebase)<span class="check-sub">Verify email verification gating</span></span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Logout (clears Google session too)</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Firestore user document creation on register</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">FCM push notification infrastructure (foreground/background/terminated)</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Firestore offline persistence enabled</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Firebase Analytics + Crashlytics initialized</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Firestore security rules (default deny + user-scoped)</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">AI Copilot streaming chat (Gemini 1.5 Flash)</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Riverpod architecture with StateNotifier pattern</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">GoRouter navigation with shell route</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Design system: AppColors, AppTypography, AppSpacing, AppTheme</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">flutter_animate animations across screens</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Empty state widgets (universities, applications, documents)</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Workmanager background tasks registered (bodies empty)</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Connectivity monitoring (SyncService)</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Firebase Storage repository with upload progress support</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Gemini AI service: analyzeResume, analyzeSOP, analyzeDocument, evaluateInterview, recommendScholarships, recommendUniversities — all methods coded</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">Rich data models: University, Application, Document, Resume, SOP, Scholarship, Planner, Interview</span></div>
+    <div class="checklist-item"><span class="check-icon">✅</span><span class="check-text">GitHub Actions CI workflow</span></div>
+  </div>
+
+  <div class="checklist-group">
+    <h4>🟡 Partially Done — Fix before alpha</h4>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Auth guard in router<span class="check-sub">Add GoRouter redirect: authStateProvider → /login if unauthenticated</span></span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Google Sign-In (method in repo, no UI button)<span class="check-sub">Add button to auth_screen.dart, call signInWithGoogle()</span></span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Email verification enforcement<span class="check-sub">Gate post-login to a "Verify Email" screen if !emailVerified</span></span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Gemini API key management<span class="check-sub">Move to flutter_secure_storage or Firebase Remote Config, not --dart-define</span></span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Password field visibility toggle</span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">GeminiService vs GeminiAIService deduplication<span class="check-sub">Delete gemini_service.dart, use GeminiAIService everywhere</span></span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Navigation: replace Navigator.of(context).pop() with context.pop()</span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Color.withOpacity() → .withValues(alpha:)<span class="check-sub">~40 occurrences across all screens</span></span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Background task bodies (switch cases are empty stubs)</span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Planner calendar month navigation</span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">University filter chips (chips update state, list doesn't filter)</span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">AI insights in profile (hardcoded → call aiServiceProvider)</span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Save scholarship / favorite university persistence (in-memory → Firestore)</span></div>
+    <div class="checklist-item"><span class="check-icon">🟡</span><span class="check-text">Resume "Improve with AI" button → call analyzeResume() → navigate to review screen</span></div>
+  </div>
+
+  <div class="checklist-group">
+    <h4>🔴 Not Implemented — Critical path to beta</h4>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Replace ALL mock data providers with Firestore reads<span class="check-sub">universities, applications, documents, scholarships, profile, resume, sop, planner, interview — all hardcoded</span></span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add firebase_options.dart (FlutterFire CLI)<span class="check-sub">Without this the app does not build for any real environment</span></span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add image_picker + file_picker<span class="check-sub">Required for document upload, profile photo, resume upload</span></span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Implement document upload flow end-to-end</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Implement Apply flow (university → application creation in Firestore)</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add cached_network_image across all image widgets</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Implement real search (UniversitySearch TextField → provider filter)</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Dark mode (ThemeData darkTheme + settingsProvider wiring)</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add shimmer / skeleton loading states to all data-driven screens</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add pull-to-refresh to all list screens</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add haptic feedback (HapticFeedback.lightImpact on taps)</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add pdf / printing package + PDF export for resume/SOP</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add share_plus for document sharing</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add flutter_secure_storage for API keys</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add local_auth for biometric login</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add speech_to_text for voice assistant</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add Semantics labels (accessibility) throughout</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add deep link intent-filter to AndroidManifest.xml</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add Apple Sign-In (sign_in_with_apple package + iOS entitlement)</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add error handling UI for AsyncError states in all providers</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add upload progress indicator widget</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add network status banner (online/offline/syncing from SyncService)</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add pagination / infinite scroll on university and scholarship lists</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add Add Task / Add Deadline dialogs to Planner</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add edit profile flow (real form, Firestore write)</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add actual interview recording (record package + STT)</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add Crashlytics PlatformDispatcher + isolate hooks</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add Android app signing config + keystore</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add iOS GoogleService-Info.plist + capabilities</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Write widget tests for auth, documents, universities, applications screens</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Write integration tests for auth flow end-to-end</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add responsive breakpoints for tablet layouts</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add GoRouter page transitions</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add screenshot protection (flutter_windowmanager on Android)</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Copilot: persist chat history to Firestore</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Connect Attach button in Copilot to document context injection</span></div>
+    <div class="checklist-item"><span class="check-icon">🔴</span><span class="check-text">Add analytics.logEvent() at key user journeys</span></div>
+  </div>
+</div>
+
+<footer>
+  EDUING App Audit · Generated July 2026 · All findings based on repo state at time of clone. 
+  Status definitions: ✅ Implemented &amp; verified · 🟡 Partial / broken / not connected · 🔴 Not implemented · ⚪ Route exists but screen content unverified
+</footer>
+
+</div>
+</body>
+</html>
