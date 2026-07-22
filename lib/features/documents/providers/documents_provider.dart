@@ -1,80 +1,118 @@
+import 'dart:io';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../models/document_model.dart';
+import '../repositories/documents_repository.dart';
+import '../services/document_storage_service.dart';
 
-final documentsProvider = StateNotifierProvider<DocumentsNotifier, List<AppDocument>>((ref) {
-  return DocumentsNotifier();
+final documentRepositoryProvider = Provider((ref) => DocumentRepository());
+final documentStorageServiceProvider = Provider((ref) => DocumentStorageService());
+
+final documentsStreamProvider = StreamProvider<List<AppDocument>>((ref) {
+  final repo = ref.watch(documentRepositoryProvider);
+  return repo.getDocumentsStream();
+});
+
+final activeUploadProgressProvider = StateProvider.family<UploadProgress?, String>((ref, docId) => null);
+
+final documentsNotifierProvider = StateNotifierProvider<DocumentsNotifier, List<AppDocument>>((ref) {
+  final repo = ref.watch(documentRepositoryProvider);
+  final storageService = ref.watch(documentStorageServiceProvider);
+  return DocumentsNotifier(repo, storageService, ref);
 });
 
 class DocumentsNotifier extends StateNotifier<List<AppDocument>> {
-  DocumentsNotifier() : super([]) {
-    _initMockData();
+  final DocumentRepository _repository;
+  final DocumentStorageService _storageService;
+  final Ref _ref;
+
+  DocumentsNotifier(this._repository, this._storageService, this._ref) : super([]) {
+    _loadInitialData();
   }
 
-  void _initMockData() {
-    state = [
-      const AppDocument(
-        id: 'doc_1',
-        name: 'High School Transcript',
-        category: 'Academic',
-        size: '2.4 MB',
-        uploadDate: '15 Aug 2025',
-        status: DocumentStatus.verified,
-        aiQualityScore: 98,
-        previewUrl: 'https://via.placeholder.com/400x600.png?text=Transcript',
-        aiAnalysis: DocumentAIAnalysis(
-          isVerified: true,
-          isOcrComplete: true,
-          readabilityScore: 95,
-          resolutionScore: 100,
-          missingInformation: [],
-          recommendations: ['Transcript formatting is excellent.'],
-        ),
-      ),
-      const AppDocument(
-        id: 'doc_2',
-        name: 'Passport',
-        category: 'Identity',
-        size: '4.1 MB',
-        uploadDate: '10 Aug 2025',
-        status: DocumentStatus.pending,
-        aiQualityScore: 75,
-        expiryDate: '12 Dec 2025',
-        previewUrl: 'https://via.placeholder.com/400x600.png?text=Passport',
-        aiAnalysis: DocumentAIAnalysis(
-          isVerified: false,
-          isOcrComplete: true,
-          readabilityScore: 80,
-          resolutionScore: 70,
-          missingInformation: ['Signature missing'],
-          recommendations: ['Passport expires soon.', 'Image is slightly blurry.'],
-        ),
-      ),
-      const AppDocument(
-        id: 'doc_3',
-        name: 'Statement of Purpose',
-        category: 'Academic',
-        size: '1.2 MB',
-        uploadDate: '20 Aug 2025',
-        status: DocumentStatus.verified,
-        aiQualityScore: 92,
-        previewUrl: 'https://via.placeholder.com/400x600.png?text=SOP',
-        aiAnalysis: DocumentAIAnalysis(
-          isVerified: true,
-          isOcrComplete: true,
-          readabilityScore: 100,
-          resolutionScore: 100,
-          missingInformation: [],
-          recommendations: ['SOP formatting is excellent.', 'Word count is optimal.'],
-        ),
-      ),
-    ];
+  void _loadInitialData() {
+    _repository.getDocumentsStream().listen((docs) {
+      if (docs.isNotEmpty) {
+        state = docs;
+      }
+    });
   }
 
-  void addDocument(AppDocument doc) {
-    state = [doc, ...state];
+  Future<void> uploadDocumentFile({
+    required File file,
+    required String name,
+    required String category,
+  }) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid ?? 'guest_user';
+    final docId = 'doc_${DateTime.now().millisecondsSinceEpoch}';
+
+    final sizeInMb = (await file.length()) / (1024 * 1024);
+    final sizeStr = '${sizeInMb.toStringAsFixed(1)} MB';
+    final nowStr = '${DateTime.now().day} ${_monthName(DateTime.now().month)} ${DateTime.now().year}';
+
+    final initialDoc = AppDocument(
+      id: docId,
+      name: name,
+      category: category,
+      size: sizeStr,
+      uploadDate: nowStr,
+      status: DocumentStatus.pending,
+      aiQualityScore: 88,
+      localPath: file.path,
+      previewUrl: '',
+    );
+
+    // Optimistically add to state
+    state = [initialDoc, ...state];
+
+    // Listen to upload stream
+    _storageService.uploadDocument(uid: uid, docId: docId, file: file).listen((progress) async {
+      _ref.read(activeUploadProgressProvider(docId).notifier).state = progress;
+
+      if (progress.isCompleted && progress.downloadUrl != null) {
+        final updatedDoc = initialDoc.copyWith(
+          previewUrl: progress.downloadUrl,
+          storagePath: progress.storagePath,
+          status: DocumentStatus.verified,
+        );
+
+        // Sync to Firestore
+        await _repository.create(docId, updatedDoc);
+        _ref.read(activeUploadProgressProvider(docId).notifier).state = null;
+      }
+    });
   }
 
-  void removeDocument(String id) {
+  Future<void> renameDocument(String id, String newName) async {
+    final doc = state.firstWhere((d) => d.id == id);
+    final updated = doc.copyWith(name: newName);
+    state = state.map((d) => d.id == id ? updated : d).toList();
+
+    if (_repository.getUserCollection() != null) {
+      await _repository.update(id, updated);
+    }
+  }
+
+  Future<void> deleteDocument(String id) async {
+    final doc = state.firstWhere((d) => d.id == id);
     state = state.where((d) => d.id != id).toList();
+
+    if (doc.storagePath != null) {
+      await _storageService.deleteStorageFile(doc.storagePath!);
+    }
+
+    if (_repository.getUserCollection() != null) {
+      await _repository.delete(id);
+    }
+  }
+
+  Future<void> shareDocument(String id) async {
+    final doc = state.firstWhere((d) => d.id == id);
+    await _storageService.shareDocumentFile(doc.name, doc.localPath, doc.previewUrl);
+  }
+
+  String _monthName(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[month - 1];
   }
 }

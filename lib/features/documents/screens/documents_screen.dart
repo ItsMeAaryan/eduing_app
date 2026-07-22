@@ -1,12 +1,16 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
+
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
 import '../../universities/widgets/filter_chip.dart';
 import '../providers/documents_provider.dart';
 import '../widgets/document_card.dart';
+import '../models/document_model.dart';
 
 class DocumentsScreen extends ConsumerStatefulWidget {
   const DocumentsScreen({super.key});
@@ -19,266 +23,339 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
   final List<String> _filters = ['All', 'Academic', 'Identity', 'Financial', 'Certificates', 'Miscellaneous'];
   String _selectedFilter = 'All';
 
+  Future<void> _handleFileSelection(BuildContext context, String source, String name, String category) async {
+    final storageService = ref.read(documentStorageServiceProvider);
+    File? selectedFile;
+
+    try {
+      if (source == 'file') {
+        selectedFile = await storageService.pickDocumentFile();
+      } else if (source == 'gallery') {
+        selectedFile = await storageService.pickImageFromGallery();
+      } else if (source == 'camera') {
+        selectedFile = await storageService.captureImageFromCamera();
+      }
+
+      if (selectedFile != null) {
+        await ref.read(documentsNotifierProvider.notifier).uploadDocumentFile(
+              file: selectedFile,
+              name: name,
+              category: category,
+            );
+
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Uploading $name...'),
+              backgroundColor: AppColors.primary,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll('Exception: ', '')),
+            backgroundColor: Colors.redAccent,
+          ),
+        );
+      }
+    }
+  }
+
+  void _showUploadModal() {
+    final nameController = TextEditingController();
+    String category = 'Academic';
+    String source = 'file';
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Theme.of(context).cardColor,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 24,
+                right: 24,
+                top: 24,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text('Upload New Document', style: AppTypography.headline),
+                  const SizedBox(height: 16),
+                  TextField(
+                    controller: nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Document Title',
+                      hintText: 'e.g. Passport Copy, Official Transcript',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: category,
+                    items: ['Academic', 'Identity', 'Financial', 'Certificates', 'Miscellaneous']
+                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                        .toList(),
+                    onChanged: (val) {
+                      if (val != null) setModalState(() => category = val);
+                    },
+                    decoration: InputDecoration(
+                      labelText: 'Category',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text('Select Attachment Source', style: AppTypography.subheading),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => setModalState(() => source = 'file'),
+                          icon: Icon(Iconsax.folder_add, color: source == 'file' ? AppColors.primary : Colors.grey),
+                          label: Text('File', style: TextStyle(color: source == 'file' ? AppColors.primary : null)),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: source == 'file' ? AppColors.primary : Colors.grey.shade300),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => setModalState(() => source = 'gallery'),
+                          icon: Icon(Iconsax.gallery, color: source == 'gallery' ? AppColors.primary : Colors.grey),
+                          label: Text('Gallery', style: TextStyle(color: source == 'gallery' ? AppColors.primary : null)),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: source == 'gallery' ? AppColors.primary : Colors.grey.shade300),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => setModalState(() => source = 'camera'),
+                          icon: Icon(Iconsax.camera, color: source == 'camera' ? AppColors.primary : Colors.grey),
+                          label: Text('Camera', style: TextStyle(color: source == 'camera' ? AppColors.primary : null)),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: source == 'camera' ? AppColors.primary : Colors.grey.shade300),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      final name = nameController.text.trim();
+                      if (name.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Please enter a document title.')),
+                        );
+                        return;
+                      }
+                      ctx.pop();
+                      _handleFileSelection(context, source, name, category);
+                    },
+                    icon: const Icon(Iconsax.document_upload),
+                    label: const Text('Select File & Upload'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showRenameModal(AppDocument doc) {
+    final controller = TextEditingController(text: doc.name);
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Rename Document'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: 'New Title'),
+        ),
+        actions: [
+          TextButton(onPressed: () => ctx.pop(), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              final newName = controller.text.trim();
+              if (newName.isNotEmpty) {
+                ref.read(documentsNotifierProvider.notifier).renameDocument(doc.id, newName);
+                ctx.pop();
+              }
+            },
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final documents = ref.watch(documentsProvider);
+    final documents = ref.watch(documentsNotifierProvider);
 
-    final filteredDocs = _selectedFilter == 'All'
+    final filteredDocuments = _selectedFilter == 'All'
         ? documents
         : documents.where((d) => d.category == _selectedFilter).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            _buildHeader(context),
-            _buildAIHealthCard(),
-            _buildStats(),
-            _buildSearchBar(),
-            _buildFilters(),
-            Expanded(
-              child: filteredDocs.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      itemCount: filteredDocs.length + 1,
-                      itemBuilder: (context, index) {
-                        if (index == filteredDocs.length) return const SizedBox(height: 100);
-                        return AppDocumentCard(document: filteredDocs[index]);
-                      },
-                    ),
-            ),
-          ],
+      appBar: AppBar(
+        title: const Text('Document Vault'),
+        leading: IconButton(
+          icon: const Icon(Iconsax.arrow_left),
+          onPressed: () => context.pop(),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Iconsax.add),
+            onPressed: _showUploadModal,
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {},
+        onPressed: _showUploadModal,
+        icon: const Icon(Iconsax.document_upload),
+        label: const Text('Upload Document'),
         backgroundColor: AppColors.primary,
-        icon: const Icon(Iconsax.document_upload, color: Colors.white),
-        label: Text('Upload', style: AppTypography.button.copyWith(color: Colors.white)),
       ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Iconsax.arrow_left_2, color: AppColors.textPrimary),
-                onPressed: () => Navigator.of(context).pop(),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
-              const SizedBox(width: 16),
-              Column(
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Document Vault', style: AppTypography.headline),
-                  const SizedBox(height: 4),
-                  Text('Manage your admissions documents securely.', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                  Text(
+                    'Stored Credentials & Application Documents',
+                    style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 16),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _filters.map((filter) {
+                        return Padding(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          child: AppFilterChip(
+                            label: filter,
+                            isSelected: _selectedFilter == filter,
+                            onTap: () {
+                              setState(() => _selectedFilter = filter);
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ],
               ),
-            ],
+            ),
           ),
-          const CircleAvatar(
-            backgroundColor: Colors.white,
-            child: Icon(Iconsax.scan, color: AppColors.textPrimary),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAIHealthCard() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: AppColors.aiGradient,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Iconsax.magic_star, color: Colors.white, size: 24),
-              const SizedBox(width: 12),
-              Text('Document Health', style: AppTypography.title.copyWith(color: Colors.white)),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(8)),
-                child: Text('92% Verified', style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildCircularIndicator('Completion', 0.8),
-              _buildCircularIndicator('Verification', 0.92),
-              _buildCircularIndicator('AI Readiness', 0.85),
-            ],
-          ),
-        ],
-      ),
-    ).animate().fade().slideY(begin: 0.1);
-  }
-
-  Widget _buildCircularIndicator(String label, double value) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 50,
-          height: 50,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              CircularProgressIndicator(
-                value: value,
-                backgroundColor: Colors.white24,
-                color: Colors.white,
-                strokeWidth: 4,
-              ),
-              Center(
-                child: Text(
-                  '${(value * 100).toInt()}%',
-                  style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+          if (filteredDocuments.isEmpty)
+            SliverFillRemaining(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Iconsax.folder_cross, size: 64, color: AppColors.textSecondary.withOpacity(0.5)),
+                    const SizedBox(height: 16),
+                    Text('No documents found', style: AppTypography.subheading),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tap the button below to upload your first document.',
+                      style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: AppTypography.caption.copyWith(color: Colors.white70, fontSize: 10)),
-      ],
-    );
-  }
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final doc = filteredDocuments[index];
+                    final progressState = ref.watch(activeUploadProgressProvider(doc.id));
 
-  Widget _buildStats() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
-      child: Row(
-        children: [
-          _buildStatCard('Uploaded', '12', Iconsax.document_upload),
-          const SizedBox(width: 12),
-          _buildStatCard('Pending', '3', Iconsax.document_1, color: AppColors.warning),
-          const SizedBox(width: 12),
-          _buildStatCard('Verified', '9', Iconsax.verify, color: AppColors.success),
-        ],
-      ),
-    ).animate().fade().slideY(begin: 0.1);
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, {Color color = AppColors.textPrimary}) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, size: 20, color: color),
-            const SizedBox(height: 12),
-            Text(value, style: AppTypography.headline.copyWith(fontSize: 24, color: color)),
-            const SizedBox(height: 4),
-            Text(title, style: AppTypography.caption.copyWith(color: AppColors.textSecondary, fontSize: 10)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSearchBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Row(
-          children: [
-            const Icon(Iconsax.search_normal, color: AppColors.textSecondary, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                'Search documents...',
-                style: AppTypography.body.copyWith(color: AppColors.textSecondary, fontSize: 14),
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: Stack(
+                        children: [
+                          DocumentCard(
+                            document: doc,
+                            onTap: () {
+                              context.push('/documents/preview', extra: doc);
+                            },
+                            onDelete: () {
+                              ref.read(documentsNotifierProvider.notifier).deleteDocument(doc.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Deleted ${doc.name}')),
+                              );
+                            },
+                            onRename: () => _showRenameModal(doc),
+                            onShare: () {
+                              ref.read(documentsNotifierProvider.notifier).shareDocument(doc.id);
+                            },
+                          ),
+                          if (progressState != null && !progressState.isCompleted)
+                            Positioned.fill(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CircularProgressIndicator(
+                                        value: progressState.progress > 0 ? progressState.progress : null,
+                                        color: AppColors.primary,
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Uploading... ${(progressState.progress * 100).toInt()}%',
+                                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ).animate().fadeIn(duration: 200.ms),
+                    );
+                  },
+                  childCount: filteredDocuments.length,
+                ),
               ),
             ),
-          ],
-        ),
-      ),
-    ).animate().fade().slideY(begin: 0.1);
-  }
-
-  Widget _buildFilters() {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16, bottom: 24),
-      child: SizedBox(
-        height: 45,
-        child: ListView.builder(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          scrollDirection: Axis.horizontal,
-          itemCount: _filters.length,
-          itemBuilder: (context, index) {
-            final filter = _filters[index];
-            return AppFilterChip(
-              label: filter,
-              isSelected: _selectedFilter == filter,
-              onTap: () => setState(() => _selectedFilter = filter),
-            );
-          },
-        ),
-      ),
-    ).animate().fade().slideX();
-  }
-
-  Widget _buildEmptyState() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Iconsax.document_text_1, size: 64, color: Colors.grey.shade300),
-          const SizedBox(height: 16),
-          Text('No Documents Found', style: AppTypography.title),
-          const SizedBox(height: 8),
-          Text(
-            'Upload documents to securely store them.',
-            style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () {},
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: const Text('Upload Document'),
-          ),
         ],
       ),
-    ).animate().fade().scale();
+    );
   }
 }
