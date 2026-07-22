@@ -19,6 +19,11 @@ class AppTypography {
     fontWeight: FontWeight.w600,
   );
 
+  static TextStyle get subheading => GoogleFonts.poppins(
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+  );
+
   static TextStyle get body => GoogleFonts.poppins(
     fontSize: 16,
     fontWeight: FontWeight.normal,

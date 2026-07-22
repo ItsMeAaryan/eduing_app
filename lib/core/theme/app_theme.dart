@@ -28,4 +28,31 @@ class AppTheme {
       ),
     );
   }
+
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: const ColorScheme.dark(
+        primary: AppColors.primary,
+        secondary: AppColors.secondary,
+        surface: AppColors.darkSurface,
+        error: AppColors.error,
+      ),
+      scaffoldBackgroundColor: AppColors.darkBackground,
+      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.darkSurface,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AppColors.darkTextPrimary),
+      ),
+      cardTheme: CardTheme(
+        color: AppColors.darkSurface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+      ),
+    );
+  }
 }
