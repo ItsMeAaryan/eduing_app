@@ -27,9 +27,26 @@ import '../../features/copilot/screens/chat_screen.dart';
 import '../../features/copilot/screens/copilot_settings_screen.dart';
 import '../../features/planner/screens/planner_dashboard_screen.dart';
 import '../../features/profile/screens/profile_dashboard_screen.dart';
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../features/settings/screens/settings_dashboard_screen.dart';
 import '../../features/auth/screens/auth_screen.dart';
 import '../../shared/widgets/main_layout.dart';
+
+class GoRouterRefreshStream extends ChangeNotifier {
+  late final StreamSubscription<dynamic> _subscription;
+
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -37,6 +54,18 @@ class AppRouter {
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
+    refreshListenable: GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
+    redirect: (context, state) {
+      final user = FirebaseAuth.instance.currentUser;
+      final isLoggingIn = state.matchedLocation == '/login';
+      if (user == null && !isLoggingIn) {
+        return '/login';
+      }
+      if (user != null && isLoggingIn) {
+        return '/';
+      }
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/login',
