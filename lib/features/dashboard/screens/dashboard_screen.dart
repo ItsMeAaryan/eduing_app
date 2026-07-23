@@ -2,12 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:fl_chart/fl_chart.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
+import '../../../core/theme/spacing/app_spacing.dart';
 import '../../../shared/models/dashboard_data.dart';
 import '../providers/dashboard_provider.dart';
+
+// Reusable Components
+import '../../../shared/components/atoms/app_avatar.dart';
+import '../../../shared/components/atoms/app_icon_button.dart';
+import '../../../shared/components/atoms/status_pill.dart';
+import '../../../shared/components/molecules/quick_action_tile.dart';
+import '../../../shared/components/molecules/metric_item.dart';
+import '../../../shared/components/molecules/squircle_card.dart';
+import '../../../shared/components/organisms/admission_progress_card.dart';
+import '../../../shared/components/organisms/premium_application_card.dart';
+import '../../../shared/components/organisms/planner_card.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -17,28 +28,27 @@ class DashboardScreen extends ConsumerWidget {
     final user = ref.watch(userProfileProvider);
     
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _DashboardGreeting(user: user),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppSpacing.p24),
               const _HeroAiCard(),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.p32),
               const _QuickActionsGrid(),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.p32),
+              const _AdmissionProgressSection(),
+              const SizedBox(height: AppSpacing.p32),
               const _StatisticsOverview(),
-              const SizedBox(height: 32),
-              const _AdmissionProgressChart(),
-              const SizedBox(height: 32),
-              const _UpcomingDeadlinesList(),
-              const SizedBox(height: 32),
+              const SizedBox(height: AppSpacing.p32),
               const _RecentApplicationsList(),
-              const SizedBox(height: 32),
-              const _AiInsightBanner(),
+              const SizedBox(height: AppSpacing.p32),
+              const _UpcomingDeadlinesList(),
               const SizedBox(height: 100),
             ],
           ),
@@ -63,47 +73,38 @@ class _DashboardGreeting extends StatelessWidget {
           children: [
             Text(
               'Good Evening,',
-              style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
             ),
+            const SizedBox(height: AppSpacing.p4),
             Row(
               children: [
                 Text(
                   user.name,
-                  style: AppTypography.title.copyWith(
+                  style: AppTypography.headline.copyWith(
                     fontWeight: FontWeight.bold,
-                    fontSize: 24,
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.p8),
                 const Text('👋', style: TextStyle(fontSize: 24)),
               ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              "Let's make your dream university a reality!",
-              style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
             ),
           ],
         ),
         Row(
           children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: const Icon(Iconsax.notification, size: 24),
+            AppIconButton(
+              icon: Iconsax.notification,
+              isFilled: true,
+              onPressed: () {},
             ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(
               begin: const Offset(1, 1),
-              end: const Offset(1.1, 1.1),
+              end: const Offset(1.05, 1.05),
               duration: 1.seconds,
             ),
-            const SizedBox(width: 12),
-            CircleAvatar(
-              radius: 22,
-              backgroundImage: NetworkImage(user.avatarUrl),
+            const SizedBox(width: AppSpacing.p12),
+            AppAvatar(
+              imageUrl: user.avatarUrl,
+              size: 44,
             ),
           ],
         ),
@@ -118,45 +119,54 @@ class _HeroAiCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         gradient: AppColors.aiGradient,
         borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: SquircleCard(
+        color: Colors.transparent,
+        padding: const EdgeInsets.all(AppSpacing.p24),
+        hasShadow: true,
+        child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              const Icon(Iconsax.magic_star, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                'EDUIng AI',
-                style: AppTypography.label.copyWith(color: Colors.white),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Iconsax.magic_star, color: Colors.white, size: 20),
+                    const SizedBox(width: AppSpacing.p8),
+                    Text(
+                      'EDUIng AI Insight',
+                      style: AppTypography.labelMedium.copyWith(color: Colors.white),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.p16),
+                Text(
+                  'Improve your SOP to increase admission probability by 6%',
+                  style: AppTypography.titleMedium.copyWith(color: Colors.white, height: 1.3),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 16),
-          Text(
-            'Your admission\nprobability is',
-            style: AppTypography.title.copyWith(color: Colors.white, height: 1.2),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            '91%',
-            style: AppTypography.display.copyWith(color: Colors.white),
+          const SizedBox(width: AppSpacing.p16),
+          Container(
+            padding: const EdgeInsets.all(AppSpacing.p16),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.2),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              '91%',
+              style: AppTypography.headline.copyWith(color: Colors.white),
+            ),
           ).animate().shimmer(duration: 2.seconds, delay: 1.seconds, color: Colors.white54),
         ],
       ),
-    ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(
+    )).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(
       begin: const Offset(1, 1),
       end: const Offset(1.02, 1.02),
       duration: 2.seconds,
@@ -169,80 +179,64 @@ class _QuickActionsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _ActionCard(title: 'Applications', subtitle: '18 Active', icon: Iconsax.document, route: '/applications'),
-        _ActionCard(title: 'Universities', subtitle: '24 Shortlisted', icon: Iconsax.building, route: '/universities'),
-        _ActionCard(title: 'Documents', subtitle: '10 Uploaded', icon: Iconsax.folder, route: '/documents'),
-        _ActionCard(title: 'Planner', subtitle: '5 Tasks', icon: Iconsax.calendar, route: '/planner'),
+        Expanded(
+          child: QuickActionTile(
+            label: 'Applications',
+            icon: Iconsax.document,
+            onTap: () => context.push('/applications'),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.p12),
+        Expanded(
+          child: QuickActionTile(
+            label: 'Universities',
+            icon: Iconsax.building,
+            onTap: () => context.push('/universities'),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.p12),
+        Expanded(
+          child: QuickActionTile(
+            label: 'Documents',
+            icon: Iconsax.folder,
+            onTap: () => context.push('/documents'),
+          ),
+        ),
+        const SizedBox(width: AppSpacing.p12),
+        Expanded(
+          child: QuickActionTile(
+            label: 'Planner',
+            icon: Iconsax.calendar,
+            onTap: () => context.push('/planner'),
+          ),
+        ),
       ],
     );
   }
 }
 
-class _ActionCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final IconData icon;
-  final String route;
-
-  const _ActionCard({
-    required this.title,
-    required this.subtitle,
-    required this.icon,
-    required this.route,
-  });
+class _AdmissionProgressSection extends ConsumerWidget {
+  const _AdmissionProgressSection();
 
   @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stats = ref.watch(dashboardStatsProvider);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Admission Journey', style: AppTypography.titleLarge),
+        const SizedBox(height: AppSpacing.p16),
+        AdmissionProgressCard(
+          readinessPercentage: stats.profileStrength.toInt(),
+          applicationsCount: stats.applications,
+          documentsCount: 10, // hardcoded for demo
+          onImproveWithAI: () {},
         ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () => context.push(route),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Column(
-                children: [
-                  Icon(icon, color: AppColors.primary),
-                  const SizedBox(height: 12),
-                  Text(
-                    title,
-                    style: AppTypography.caption.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 10,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: AppTypography.caption.copyWith(
-                      color: AppColors.textSecondary,
-                      fontSize: 8,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+      ],
+    ).animate().fade(duration: 500.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
   }
 }
 
@@ -252,125 +246,42 @@ class _StatisticsOverview extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final stats = ref.watch(dashboardStatsProvider);
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _StatCard(title: 'Applications', value: stats.applications.toString(), trend: '+10.2%'),
-          _StatCard(title: 'Offers Received', value: stats.offersReceived.toString(), trend: '+2 New'),
-          _StatCard(title: 'Profile Strength', value: '${stats.profileStrength}%', trend: '+8.55%'),
-          GestureDetector(
-            onTap: () => context.push('/scholarships'),
-            child: _StatCard(title: 'Scholarships', value: stats.scholarships.toString(), trend: '+1 New'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _StatCard extends StatelessWidget {
-  final String title;
-  final String value;
-  final String trend;
-
-  const _StatCard({
-    required this.title,
-    required this.value,
-    required this.trend,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 140,
-      margin: const EdgeInsets.only(right: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: AppTypography.caption.copyWith(color: AppColors.textSecondary),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: AppTypography.title.copyWith(fontSize: 28),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            trend,
-            style: AppTypography.caption.copyWith(color: AppColors.success),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AdmissionProgressChart extends StatelessWidget {
-  const _AdmissionProgressChart();
-
-  @override
-  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Admission Progress', style: AppTypography.title.copyWith(fontSize: 20)),
-        const SizedBox(height: 16),
-        Container(
-          height: 250,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: BarChart(
-            BarChartData(
-              alignment: BarChartAlignment.spaceAround,
-              maxY: 300,
-              barTouchData: BarTouchData(enabled: false),
-              titlesData: FlTitlesData(
-                show: true,
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    getTitlesWidget: (value, meta) {
-                      const titles = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-                      if (value.toInt() >= 0 && value.toInt() < titles.length) {
-                        return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(titles[value.toInt()], style: AppTypography.caption),
-                        );
-                      }
-                      return const Text('');
-                    },
-                  ),
+        Text('Overview', style: AppTypography.titleLarge),
+        const SizedBox(height: AppSpacing.p16),
+        Row(
+          children: [
+            Expanded(
+              child: SquircleCard(
+                padding: const EdgeInsets.all(AppSpacing.p16),
+                child: MetricItem(
+                  label: 'Offers',
+                  value: stats.offersReceived.toString(),
+                  icon: Iconsax.award,
+                  trend: '+2',
+                  isPositiveTrend: true,
                 ),
-                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
-              gridData: const FlGridData(show: false),
-              borderData: FlBorderData(show: false),
-              barGroups: [
-                BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 150, color: AppColors.primary, width: 20, borderRadius: BorderRadius.circular(4))]),
-                BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 120, color: AppColors.primary, width: 20, borderRadius: BorderRadius.circular(4))]),
-                BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 200, color: AppColors.primary, width: 20, borderRadius: BorderRadius.circular(4))]),
-                BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 180, color: AppColors.primary, width: 20, borderRadius: BorderRadius.circular(4))]),
-                BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 250, color: AppColors.primaryDark, width: 20, borderRadius: BorderRadius.circular(4))]),
-                BarChartGroupData(x: 5, barRods: [BarChartRodData(toY: 140, color: AppColors.primary, width: 20, borderRadius: BorderRadius.circular(4))]),
-              ],
             ),
-          ),
+            const SizedBox(width: AppSpacing.p16),
+            Expanded(
+              child: SquircleCard(
+                padding: const EdgeInsets.all(AppSpacing.p16),
+                child: MetricItem(
+                  label: 'Scholarships',
+                  value: stats.scholarships.toString(),
+                  icon: Iconsax.coin,
+                  trend: '+1',
+                  isPositiveTrend: true,
+                ),
+              ),
+            ),
+          ],
         ),
       ],
-    ).animate().fade(duration: 500.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
+    );
   }
 }
 
@@ -386,53 +297,21 @@ class _UpcomingDeadlinesList extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Upcoming Deadlines', style: AppTypography.title.copyWith(fontSize: 20)),
-            Text('View all', style: AppTypography.button.copyWith(color: AppColors.primary)),
+            Text('Upcoming Deadlines', style: AppTypography.titleLarge),
+            Text('View all', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
           ],
         ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
-          child: Column(
-            children: deadlines.map((d) => _DeadlineItem(deadline: d)).toList(),
+        const SizedBox(height: AppSpacing.p16),
+        ...deadlines.map((d) => Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.p12),
+          child: PlannerCard(
+            title: d.task,
+            date: d.date,
+            type: d.priority,
           ),
-        ),
+        )),
       ],
     ).animate().fade(duration: 500.ms, delay: 100.ms).slideY(begin: 0.1);
-  }
-}
-
-class _DeadlineItem extends StatelessWidget {
-  final Deadline deadline;
-
-  const _DeadlineItem({required this.deadline});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        children: [
-          Container(width: 8, height: 8, decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle)),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(deadline.date, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-                Text(deadline.task, style: AppTypography.label),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-            child: Text(deadline.priority, style: AppTypography.caption.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
   }
 }
 
@@ -448,96 +327,36 @@ class _RecentApplicationsList extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Recent Applications', style: AppTypography.title.copyWith(fontSize: 20)),
-            Text('View all', style: AppTypography.button.copyWith(color: AppColors.primary)),
+            Text('Recent Applications', style: AppTypography.titleLarge),
+            Text('View all', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
           ],
         ),
-        const SizedBox(height: 16),
-        ...applications.map((app) => _ApplicationStatusCard(app: app)),
+        const SizedBox(height: AppSpacing.p16),
+        ...applications.map((app) => Padding(
+          padding: const EdgeInsets.only(bottom: AppSpacing.p16),
+          child: PremiumApplicationCard(
+            logoUrl: app.logoUrl,
+            universityName: app.university,
+            course: app.campus, // Using campus as course for demo since model doesn't have course
+            status: _mapStatus(app.status),
+            deadline: 'TBD',
+            progress: app.aiMatch / 100.0,
+            onTap: () {},
+            onMenuTap: () {},
+          ),
+        )),
       ],
     ).animate().fade(duration: 500.ms, delay: 200.ms).slideY(begin: 0.1);
   }
-}
 
-class _ApplicationStatusCard extends StatelessWidget {
-  final ApplicationStatus app;
-
-  const _ApplicationStatusCard({required this.app});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
-      child: Row(
-        children: [
-          CircleAvatar(backgroundImage: NetworkImage(app.logoUrl), radius: 24, backgroundColor: Colors.transparent),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(app.university, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
-                Text(app.campus, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-              ],
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text('${app.aiMatch}%', style: AppTypography.title.copyWith(color: AppColors.primary, fontSize: 16)),
-              Text(app.status, style: AppTypography.caption.copyWith(color: AppColors.success)),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _AiInsightBanner extends StatelessWidget {
-  const _AiInsightBanner();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(gradient: AppColors.aiGradient, borderRadius: BorderRadius.circular(16)),
-            child: const Icon(Iconsax.magic_star, color: Colors.white),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text('AI Insight', style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-                      child: Text('Beta', style: AppTypography.caption.copyWith(color: AppColors.primary, fontSize: 10)),
-                    ).animate(onPlay: (controller) => controller.repeat(reverse: true)).fade(begin: 0.5, end: 1.0, duration: 1.seconds),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text('Improve your SOP to increase your admission probability by 6%', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ).animate().fade(duration: 500.ms, delay: 300.ms).slideY(begin: 0.1);
+  StatusType _mapStatus(String statusText) {
+    switch(statusText.toLowerCase()) {
+      case 'submitted': return StatusType.submitted;
+      case 'under review': return StatusType.underReview;
+      case 'accepted': return StatusType.accepted;
+      case 'rejected': return StatusType.rejected;
+      case 'not started': return StatusType.notStarted;
+      default: return StatusType.inProgress;
+    }
   }
 }

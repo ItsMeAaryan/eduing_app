@@ -8,6 +8,9 @@ class MetricItem extends StatelessWidget {
   final String value;
   final Color? labelColor;
   final Color? valueColor;
+  final IconData? icon;
+  final String? trend;
+  final bool isPositiveTrend;
 
   const MetricItem({
     super.key,
@@ -15,6 +18,9 @@ class MetricItem extends StatelessWidget {
     required this.value,
     this.labelColor,
     this.valueColor,
+    this.icon,
+    this.trend,
+    this.isPositiveTrend = true,
   });
 
   @override
@@ -25,6 +31,10 @@ class MetricItem extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
+        if (icon != null) ...[
+          Icon(icon, size: 20, color: labelColor ?? (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
+          const SizedBox(height: AppSpacing.p8),
+        ],
         Text(
           label,
           style: AppTypography.labelMedium.copyWith(
@@ -39,6 +49,26 @@ class MetricItem extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
+        if (trend != null) ...[
+          const SizedBox(height: AppSpacing.p4),
+          Row(
+            children: [
+              Icon(
+                isPositiveTrend ? Icons.arrow_upward : Icons.arrow_downward,
+                size: 12,
+                color: isPositiveTrend ? AppColors.success : AppColors.error,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                trend!,
+                style: AppTypography.caption.copyWith(
+                  color: isPositiveTrend ? AppColors.success : AppColors.error,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
