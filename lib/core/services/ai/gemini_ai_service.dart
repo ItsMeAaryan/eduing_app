@@ -48,8 +48,8 @@ class GeminiAIService implements AIService {
       final response = await _chatSession.sendMessage(Content.text(message));
       return response.text ?? 'I could not generate a response.';
     } catch (e) {
-      debugPrint('Gemini Chat Error: \$e');
-      return 'Mock AI Copilot response to: \$message';
+      debugPrint('Gemini Chat Error: $e');
+      return 'Mock AI Copilot response to: $message';
     }
   }
 
@@ -61,8 +61,8 @@ class GeminiAIService implements AIService {
         if (chunk.text != null) yield chunk.text!;
       }
     } catch (e) {
-      debugPrint('Gemini Stream Error: \$e');
-      yield 'Mock stream response to: \$message';
+      debugPrint('Gemini Stream Error: $e');
+      yield 'Mock stream response to: $message';
     }
   }
 
@@ -72,14 +72,14 @@ class GeminiAIService implements AIService {
       if (response.text == null) return {};
       return jsonDecode(response.text!);
     } catch (e) {
-      debugPrint('Gemini JSON Error: \$e');
+      debugPrint('Gemini JSON Error: $e');
       return {};
     }
   }
 
   @override
   Future<ResumeReview> analyzeResume(String resumeText) async {
-    const prompt = '''
+    final prompt = '''
       Analyze the following resume and return a JSON object with this exact structure:
       {
         "atsScore": 85,
@@ -89,15 +89,15 @@ class GeminiAIService implements AIService {
         "recommendations": ["string"],
         "summary": "string"
       }
-      Resume: \$resumeText
+      Resume: $resumeText
     ''';
-    final json = await _generateJson(prompt.replaceAll('\$resumeText', resumeText));
+    final json = await _generateJson(prompt);
     return ResumeReview.fromJson(json);
   }
 
   @override
   Future<SOPReview> analyzeSOP(String sopText) async {
-    const prompt = '''
+    final prompt = '''
       Analyze the following SOP and return a JSON object:
       {
         "overallScore": 90,
@@ -107,15 +107,15 @@ class GeminiAIService implements AIService {
         "suggestions": ["string"],
         "rewrittenExample": "string"
       }
-      SOP: \$sopText
+      SOP: $sopText
     ''';
-    final json = await _generateJson(prompt.replaceAll('\$sopText', sopText));
+    final json = await _generateJson(prompt);
     return SOPReview.fromJson(json);
   }
 
   @override
   Future<DocumentAnalysis> analyzeDocument(String documentText) async {
-    const prompt = '''
+    final prompt = '''
       Analyze the document and return a JSON object:
       {
         "documentType": "string",
@@ -123,15 +123,15 @@ class GeminiAIService implements AIService {
         "missingFields": ["string"],
         "confidenceScore": 95
       }
-      Document: \$documentText
+      Document: $documentText
     ''';
-    final json = await _generateJson(prompt.replaceAll('\$documentText', documentText));
+    final json = await _generateJson(prompt);
     return DocumentAnalysis.fromJson(json);
   }
 
   @override
   Future<InterviewFeedback> evaluateInterview(String question, String answer) async {
-    const prompt = '''
+    final prompt = '''
       Evaluate the interview answer and return a JSON object:
       {
         "confidenceScore": 80,
@@ -140,21 +140,22 @@ class GeminiAIService implements AIService {
         "behavioralFeedback": "string",
         "improvementPlan": "string"
       }
-      Question: \$question
-      Answer: \$answer
+      Question: $question
+      Answer: $answer
     ''';
-    final json = await _generateJson(prompt.replaceAll('\$question', question).replaceAll('\$answer', answer));
+    final json = await _generateJson(prompt);
     return InterviewFeedback.fromJson(json);
   }
 
   @override
   Future<List<ScholarshipRecommendation>> recommendScholarships(Map<String, dynamic> profile) async {
-    const prompt = '''
+    final profileData = jsonEncode(profile);
+    final prompt = '''
       Recommend 3 scholarships based on this profile. Return JSON array of objects:
       [{ "title": "string", "amount": "string", "reason": "string" }]
-      Profile: \$profileData
+      Profile: $profileData
     ''';
-    final json = await _generateJson(prompt.replaceAll('\$profileData', jsonEncode(profile)));
+    final json = await _generateJson(prompt);
     if (json.containsKey('recommendations') && json['recommendations'] is List) {
       return (json['recommendations'] as List).map((e) => ScholarshipRecommendation.fromJson(e)).toList();
     }
@@ -163,12 +164,13 @@ class GeminiAIService implements AIService {
 
   @override
   Future<List<UniversityRecommendation>> recommendUniversities(Map<String, dynamic> profile) async {
-    const prompt = '''
+    final profileData = jsonEncode(profile);
+    final prompt = '''
       Recommend 3 universities based on this profile. Return JSON array of objects:
       [{ "name": "string", "matchReason": "string", "matchScore": 95 }]
-      Profile: \$profileData
+      Profile: $profileData
     ''';
-    final json = await _generateJson(prompt.replaceAll('\$profileData', jsonEncode(profile)));
+    final json = await _generateJson(prompt);
     if (json.containsKey('recommendations') && json['recommendations'] is List) {
       return (json['recommendations'] as List).map((e) => UniversityRecommendation.fromJson(e)).toList();
     }
