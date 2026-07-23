@@ -24,30 +24,37 @@ class DashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildGreeting(user),
+              _DashboardGreeting(user: user),
               const SizedBox(height: 24),
-              _buildHeroAICard(),
+              const _HeroAiCard(),
               const SizedBox(height: 32),
-              _buildQuickActions(),
+              const _QuickActionsGrid(),
               const SizedBox(height: 32),
-              _buildStatistics(context, ref),
+              const _StatisticsOverview(),
               const SizedBox(height: 32),
-              _buildAdmissionProgress(),
+              const _AdmissionProgressChart(),
               const SizedBox(height: 32),
-              _buildDeadlines(ref),
+              const _UpcomingDeadlinesList(),
               const SizedBox(height: 32),
-              _buildRecentApplications(ref),
+              const _RecentApplicationsList(),
               const SizedBox(height: 32),
-              _buildAIInsights(),
-              const SizedBox(height: 100), // padding for bottom nav
+              const _AiInsightBanner(),
+              const SizedBox(height: 100),
             ],
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _buildGreeting(user) {
+class _DashboardGreeting extends StatelessWidget {
+  final UserProfile user;
+
+  const _DashboardGreeting({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -88,7 +95,11 @@ class DashboardScreen extends ConsumerWidget {
                 border: Border.all(color: Colors.grey.shade200),
               ),
               child: const Icon(Iconsax.notification, size: 24),
-            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 1.seconds),
+            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(
+              begin: const Offset(1, 1),
+              end: const Offset(1.1, 1.1),
+              duration: 1.seconds,
+            ),
             const SizedBox(width: 12),
             CircleAvatar(
               radius: 22,
@@ -99,8 +110,13 @@ class DashboardScreen extends ConsumerWidget {
       ],
     );
   }
+}
 
-  Widget _buildHeroAICard() {
+class _HeroAiCard extends StatelessWidget {
+  const _HeroAiCard();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -140,22 +156,46 @@ class DashboardScreen extends ConsumerWidget {
           ).animate().shimmer(duration: 2.seconds, delay: 1.seconds, color: Colors.white54),
         ],
       ),
-    ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(begin: const Offset(1, 1), end: const Offset(1.02, 1.02), duration: 2.seconds);
+    ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(
+      begin: const Offset(1, 1),
+      end: const Offset(1.02, 1.02),
+      duration: 2.seconds,
+    );
   }
+}
 
-  Widget _buildQuickActions() {
-    return Row(
+class _QuickActionsGrid extends StatelessWidget {
+  const _QuickActionsGrid();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildActionCard('Applications', '18 Active', Iconsax.document),
-        _buildActionCard('Universities', '24 Shortlisted', Iconsax.building),
-        _buildActionCard('Documents', '10 Uploaded', Iconsax.folder),
-        _buildActionCard('Planner', '5 Tasks', Iconsax.calendar),
+        _ActionCard(title: 'Applications', subtitle: '18 Active', icon: Iconsax.document, route: '/applications'),
+        _ActionCard(title: 'Universities', subtitle: '24 Shortlisted', icon: Iconsax.building, route: '/universities'),
+        _ActionCard(title: 'Documents', subtitle: '10 Uploaded', icon: Iconsax.folder, route: '/documents'),
+        _ActionCard(title: 'Planner', subtitle: '5 Tasks', icon: Iconsax.calendar, route: '/planner'),
       ],
     );
   }
+}
 
-  Widget _buildActionCard(String title, String subtitle, IconData icon) {
+class _ActionCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final String route;
+
+  const _ActionCard({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.route,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 4),
@@ -174,7 +214,7 @@ class DashboardScreen extends ConsumerWidget {
           color: Colors.transparent,
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
-            onTap: () {},
+            onTap: () => context.push(route),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Column(
@@ -204,26 +244,44 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildStatistics(BuildContext context, WidgetRef ref) {
+class _StatisticsOverview extends ConsumerWidget {
+  const _StatisticsOverview();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final stats = ref.watch(dashboardStatsProvider);
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          _buildStatCard('Applications', stats.applications.toString(), '+10.2%'),
-          _buildStatCard('Offers Received', stats.offersReceived.toString(), '+2 New'),
-          _buildStatCard('Profile Strength', '${stats.profileStrength}%', '+8.55%'),
+          _StatCard(title: 'Applications', value: stats.applications.toString(), trend: '+10.2%'),
+          _StatCard(title: 'Offers Received', value: stats.offersReceived.toString(), trend: '+2 New'),
+          _StatCard(title: 'Profile Strength', value: '${stats.profileStrength}%', trend: '+8.55%'),
           GestureDetector(
             onTap: () => context.push('/scholarships'),
-            child: _buildStatCard('Scholarships', stats.scholarships.toString(), '+1 New'),
+            child: _StatCard(title: 'Scholarships', value: stats.scholarships.toString(), trend: '+1 New'),
           ),
         ],
       ),
     );
   }
+}
 
-  Widget _buildStatCard(String title, String value, String trend) {
+class _StatCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String trend;
+
+  const _StatCard({
+    required this.title,
+    required this.value,
+    required this.trend,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: 140,
       margin: const EdgeInsets.only(right: 16),
@@ -253,8 +311,13 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildAdmissionProgress() {
+class _AdmissionProgressChart extends StatelessWidget {
+  const _AdmissionProgressChart();
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -289,9 +352,7 @@ class DashboardScreen extends ConsumerWidget {
                     },
                   ),
                 ),
-                leftTitles: const AxisTitles(
-                  sideTitles: SideTitles(showTitles: false),
-                ),
+                leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
               ),
@@ -311,8 +372,13 @@ class DashboardScreen extends ConsumerWidget {
       ],
     ).animate().fade(duration: 500.ms).slideY(begin: 0.1, curve: Curves.easeOutQuad);
   }
+}
 
-  Widget _buildDeadlines(WidgetRef ref) {
+class _UpcomingDeadlinesList extends ConsumerWidget {
+  const _UpcomingDeadlinesList();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final deadlines = ref.watch(upcomingDeadlinesProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -329,14 +395,21 @@ class DashboardScreen extends ConsumerWidget {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24)),
           child: Column(
-            children: deadlines.map((d) => _buildDeadlineItem(d)).toList(),
+            children: deadlines.map((d) => _DeadlineItem(deadline: d)).toList(),
           ),
         ),
       ],
     ).animate().fade(duration: 500.ms, delay: 100.ms).slideY(begin: 0.1);
   }
+}
 
-  Widget _buildDeadlineItem(Deadline deadline) {
+class _DeadlineItem extends StatelessWidget {
+  final Deadline deadline;
+
+  const _DeadlineItem({required this.deadline});
+
+  @override
+  Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
@@ -361,8 +434,13 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildRecentApplications(WidgetRef ref) {
+class _RecentApplicationsList extends ConsumerWidget {
+  const _RecentApplicationsList();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     final applications = ref.watch(recentApplicationsProvider);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,12 +453,19 @@ class DashboardScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 16),
-        ...applications.map((app) => _buildApplicationCard(app)),
+        ...applications.map((app) => _ApplicationStatusCard(app: app)),
       ],
     ).animate().fade(duration: 500.ms, delay: 200.ms).slideY(begin: 0.1);
   }
+}
 
-  Widget _buildApplicationCard(ApplicationStatus app) {
+class _ApplicationStatusCard extends StatelessWidget {
+  final ApplicationStatus app;
+
+  const _ApplicationStatusCard({required this.app});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -409,8 +494,13 @@ class DashboardScreen extends ConsumerWidget {
       ),
     );
   }
+}
 
-  Widget _buildAIInsights() {
+class _AiInsightBanner extends StatelessWidget {
+  const _AiInsightBanner();
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -434,11 +524,11 @@ class DashboardScreen extends ConsumerWidget {
                   children: [
                     Text('AI Insight', style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-                        child: Text('Beta', style: AppTypography.caption.copyWith(color: AppColors.primary, fontSize: 10)),
-                      ).animate(onPlay: (controller) => controller.repeat(reverse: true)).fade(begin: 0.5, end: 1.0, duration: 1.seconds),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                      child: Text('Beta', style: AppTypography.caption.copyWith(color: AppColors.primary, fontSize: 10)),
+                    ).animate(onPlay: (controller) => controller.repeat(reverse: true)).fade(begin: 0.5, end: 1.0, duration: 1.seconds),
                   ],
                 ),
                 const SizedBox(height: 4),
