@@ -56,7 +56,7 @@ class SyncService {
       await FirebaseService.firestore.enableNetwork();
       _setState(SyncState.online);
     } catch (e) {
-      debugPrint('Sync Error: \$e');
+      debugPrint('Sync Error: $e');
       _setState(SyncState.error);
     }
   }
