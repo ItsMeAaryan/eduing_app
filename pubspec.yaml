@@ -58,6 +58,11 @@ dependencies:
   pdf: ^3.11.1
   printing: ^5.13.2
   speech_to_text: ^7.0.0
+  figma_squircle: ^0.6.3
+  gap: ^3.0.1
+  flutter_svg: ^2.1.0
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:
