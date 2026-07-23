@@ -12,7 +12,7 @@ subprojects {
 
 subprojects {
     afterEvaluate { subproject ->
-        if (subproject.plugins.hasPlugin('com.android.library') || subproject.plugins.hasPlugin('com.android.application')) {
+        if (subproject.hasProperty("android")) {
             subproject.android {
                 compileSdkVersion 34
                 compileOptions {
