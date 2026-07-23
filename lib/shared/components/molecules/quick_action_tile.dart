@@ -8,12 +8,14 @@ import '../../../core/theme/app_duration.dart';
 
 class QuickActionTile extends StatefulWidget {
   final String label;
+  final String? subtitle;
   final IconData icon;
   final VoidCallback onTap;
 
   const QuickActionTile({
     super.key,
     required this.label,
+    this.subtitle,
     required this.icon,
     required this.onTap,
   });
@@ -57,7 +59,17 @@ class _QuickActionTileState extends State<QuickActionTile> {
                 widget.label,
                 style: AppTypography.labelMedium.copyWith(color: textColor),
                 textAlign: TextAlign.center,
+                maxLines: 1,
               ),
+              if (widget.subtitle != null) ...[
+                const SizedBox(height: AppSpacing.p4),
+                Text(
+                  widget.subtitle!,
+                  style: AppTypography.caption.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                ),
+              ],
             ],
           ),
         ),
