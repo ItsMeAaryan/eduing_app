@@ -101,7 +101,7 @@ class _DashboardGreeting extends ConsumerWidget {
             AppIconButton(
               icon: Iconsax.notification,
               isFilled: true,
-              onPressed: () {},
+              onPressed: () => context.push('/notifications'),
             ),
             const SizedBox(width: AppSpacing.p12),
             AppAvatar(

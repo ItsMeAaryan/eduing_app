@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/dashboard/screens/dashboard_screen.dart';
 import '../../features/universities/screens/compare_universities_screen.dart';
 import '../../features/universities/screens/universities_screen.dart';
@@ -188,6 +189,10 @@ class AppRouter {
           GoRoute(
             path: '/planner',
             builder: (context, state) => const PlannerDashboardScreen(),
+          ),
+          GoRoute(
+            path: '/notifications',
+            builder: (context, state) => const NotificationsScreen(),
           ),
         ],
       ),
