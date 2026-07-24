@@ -3,8 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:intl/intl.dart';
+
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
+import '../../../core/theme/spacing/app_spacing.dart';
+import '../../../shared/components/molecules/squircle_card.dart';
+
+import '../../../shared/components/atoms/app_icon_button.dart';
 import '../providers/planner_provider.dart';
 import '../models/planner_model.dart';
 
@@ -16,275 +21,224 @@ class PlannerDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen> {
-  int _selectedTabIndex = 0; // 0 for Timeline, 1 for Calendar View
+  final List<String> _milestones = [
+    'Research',
+    'Shortlist',
+    'Applications',
+    'Documents',
+    'Interviews',
+    'Offers',
+    'Visa',
+    'Departure',
+  ];
+  
+  // Mock current milestone index for UI purposes
+  final int _currentMilestoneIndex = 2; // Applications
 
   @override
   Widget build(BuildContext context) {
     final data = ref.watch(plannerProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        title: Text('Student Planner', style: AppTypography.title.copyWith(fontSize: 16)),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Iconsax.search_normal, color: AppColors.textPrimary),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: const Icon(Iconsax.add, color: AppColors.primary),
-            onPressed: () {},
-          ),
-        ],
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {}, 
+        backgroundColor: AppColors.primary,
+        child: const Icon(Iconsax.add, color: Colors.white),
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _buildHeader(data)),
-          SliverToBoxAdapter(child: _buildAIRecommendations(data.aiRecommendations)),
-          SliverToBoxAdapter(child: _buildTabs()),
-          if (_selectedTabIndex == 0) SliverToBoxAdapter(child: _buildTimeline(data)),
-          if (_selectedTabIndex == 1) SliverToBoxAdapter(child: _buildCalendarView(data)),
-          const SliverToBoxAdapter(child: SizedBox(height: 100)), // padding for bottom nav
-        ],
+      body: SafeArea(
+        bottom: false,
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(child: _buildHeader(isDark)),
+            SliverToBoxAdapter(child: _buildMilestoneRoadmap(isDark)),
+            SliverToBoxAdapter(child: _buildAIRecommendations(data.aiRecommendations, isDark)),
+            SliverToBoxAdapter(child: _buildAgenda(data, isDark)),
+            const SliverToBoxAdapter(child: SizedBox(height: 120)),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildHeader(PlannerDashboardData data) {
-    return Container(
-      margin: const EdgeInsets.all(24),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Column(
+  Widget _buildHeader(bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.p24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildStatItem(data.pendingTasks.toString(), 'Pending', AppColors.warning),
-              _buildStatItem(data.completedTasks.toString(), 'Completed', AppColors.success),
-              _buildStatItem(data.upcomingDeadlines.length.toString(), 'Deadlines', AppColors.error),
+              Text('Journey', style: AppTypography.display),
+              const SizedBox(height: AppSpacing.p4),
+              Text('Your admission roadmap.', style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
             ],
           ),
-          const SizedBox(height: 24),
-          Row(
-            children: [
-              const Icon(Iconsax.magic_star, color: AppColors.primary, size: 20),
-              const SizedBox(width: 8),
-              Text('AI Priority Score: ', style: AppTypography.label),
-              Text('${data.aiPriorityScore}/100', style: AppTypography.label.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
-            ],
+          AppIconButton(
+            icon: Iconsax.calendar_1,
+            isFilled: true,
+            backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+            onPressed: () {},
           ),
         ],
       ),
-    ).animate().fade().slideY(begin: 0.1);
-  }
-
-  Widget _buildStatItem(String value, String label, Color color) {
-    return Column(
-      children: [
-        Text(value, style: AppTypography.headline.copyWith(color: color, fontSize: 24)),
-        const SizedBox(height: 4),
-        Text(label, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-      ],
     );
   }
 
-  Widget _buildAIRecommendations(List<AIPlannerRecommendation> recommendations) {
+  Widget _buildMilestoneRoadmap(bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Row(
-            children: [
-              const Icon(Iconsax.magic_star, color: AppColors.primary, size: 20),
-              const SizedBox(width: 8),
-              Text('Smart Recommendations', style: AppTypography.title),
-            ],
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+          child: Text('Current Milestone', style: AppTypography.titleLarge),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: AppSpacing.p16),
         SizedBox(
-          height: 140,
+          height: 120,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            itemCount: recommendations.length,
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+            itemCount: _milestones.length,
             itemBuilder: (context, index) {
-              final rec = recommendations[index];
-              return Container(
-                width: 260,
-                margin: const EdgeInsets.only(right: 16),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: AppColors.aiGradient,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 10, offset: const Offset(0, 5)),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(8)),
-                          child: Text(rec.priority, style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+              final isCompleted = index < _currentMilestoneIndex;
+              final isActive = index == _currentMilestoneIndex;
+              final milestone = _milestones[index];
+
+              return Row(
+                children: [
+                  Column(
+                    children: [
+                      Container(
+                        width: isActive ? 56 : 48,
+                        height: isActive ? 56 : 48,
+                        decoration: BoxDecoration(
+                          color: isCompleted ? AppColors.success 
+                               : isActive ? AppColors.primary 
+                               : (isDark ? AppColors.darkSurface : AppColors.surface),
+                          shape: BoxShape.circle,
+                          border: isActive ? Border.all(color: AppColors.primary.withOpacity(0.3), width: 4) : null,
+                          boxShadow: isActive ? [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 8))] : null,
                         ),
-                        Text(rec.estimatedEffort, style: AppTypography.caption.copyWith(color: Colors.white70)),
-                      ],
+                        child: Icon(
+                          isCompleted ? Iconsax.tick_circle : (isActive ? Iconsax.routing_2 : Iconsax.location_add),
+                          color: isCompleted || isActive ? Colors.white : AppColors.textSecondary,
+                          size: isActive ? 24 : 20,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.p12),
+                      Text(
+                        milestone,
+                        style: AppTypography.labelMedium.copyWith(
+                          color: isActive ? AppColors.primary : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (index < _milestones.length - 1)
+                    Container(
+                      width: 40,
+                      height: 2,
+                      margin: const EdgeInsets.only(bottom: 28),
+                      color: isCompleted ? AppColors.success : (isDark ? AppColors.darkBorder : AppColors.border),
                     ),
-                    const SizedBox(height: 12),
-                    Expanded(child: Text(rec.suggestion, style: AppTypography.label.copyWith(color: Colors.white, fontWeight: FontWeight.bold), maxLines: 2)),
-                  ],
-                ),
+                ],
               );
             },
           ),
         ),
       ],
-    ).animate().fade(delay: 100.ms).slideY(begin: 0.1);
+    ).animate().fade().slideY(begin: 0.1);
   }
 
-  Widget _buildTabs() {
+  Widget _buildAIRecommendations(List<AIPlannerRecommendation> recommendations, bool isDark) {
+    if (recommendations.isEmpty) return const SizedBox.shrink();
+    
     return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Container(
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            _buildTabItem(0, 'Timeline'),
-            _buildTabItem(1, 'Calendar'),
-          ],
-        ),
-      ),
-    ).animate().fade(delay: 200.ms);
-  }
-
-  Widget _buildTabItem(int index, String title) {
-    final isSelected = _selectedTabIndex == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedTabIndex = index),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-            boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)] : null,
-          ),
-          child: Center(
-            child: Text(title, style: AppTypography.label.copyWith(color: isSelected ? AppColors.textPrimary : AppColors.textSecondary, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTimeline(PlannerDashboardData data) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.only(top: AppSpacing.p32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Today\'s Agenda', style: AppTypography.title),
-          const SizedBox(height: 16),
-          if (data.todayAgenda.isEmpty)
-            Text('No events today.', style: AppTypography.body.copyWith(color: AppColors.textSecondary)),
-          ...data.todayAgenda.map((e) => _buildEventCard(e)),
-          const SizedBox(height: 24),
-          Text('Upcoming Deadlines', style: AppTypography.title),
-          const SizedBox(height: 16),
-          ...data.upcomingDeadlines.map((e) => _buildEventCard(e)),
-        ],
-      ),
-    ).animate().fade(delay: 300.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildCalendarView(PlannerDashboardData data) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: Column(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+            child: Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Icon(Iconsax.arrow_left_2, size: 20),
-                    Text(DateFormat('MMMM yyyy').format(DateTime.now()), style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
-                    const Icon(Iconsax.arrow_right_3, size: 20),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Mock calendar grid
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 7,
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                  ),
-                  itemCount: 31,
-                  itemBuilder: (context, index) {
-                    final isToday = index + 1 == DateTime.now().day;
-                    final hasEvent = data.allEvents.any((e) => e.date.day == index + 1);
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: isToday ? AppColors.primary : Colors.transparent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              '${index + 1}',
-                              style: AppTypography.caption.copyWith(color: isToday ? Colors.white : AppColors.textPrimary, fontWeight: isToday ? FontWeight.bold : FontWeight.normal),
-                            ),
-                            if (hasEvent && !isToday)
-                              Container(margin: const EdgeInsets.only(top: 2), width: 4, height: 4, decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle)),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                const Icon(Iconsax.magic_star, color: AppColors.primary, size: 20),
+                const SizedBox(width: AppSpacing.p8),
+                Text('Copilot Suggestions', style: AppTypography.titleLarge),
               ],
             ),
           ),
-          const SizedBox(height: 24),
-          Text('All Events', style: AppTypography.title),
-          const SizedBox(height: 16),
-          ...data.allEvents.map((e) => _buildEventCard(e)),
+          const SizedBox(height: AppSpacing.p16),
+          SizedBox(
+            height: 160,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+              itemCount: recommendations.length,
+              itemBuilder: (context, index) {
+                final rec = recommendations[index];
+                return Container(
+                  width: 280,
+                  margin: const EdgeInsets.only(right: AppSpacing.p16),
+                  padding: const EdgeInsets.all(AppSpacing.p20),
+                  decoration: BoxDecoration(
+                    gradient: AppColors.aiGradient,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 10)),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p12, vertical: AppSpacing.p4),
+                            decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(12)),
+                            child: Text(rec.priority, style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                          ),
+                          Text(rec.estimatedEffort, style: AppTypography.caption.copyWith(color: Colors.white70)),
+                        ],
+                      ),
+                      const Spacer(),
+                      Text(rec.suggestion, style: AppTypography.titleMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold), maxLines: 3, overflow: TextOverflow.ellipsis),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
-    ).animate().fade(delay: 300.ms).slideY(begin: 0.1);
+    ).animate().fade(delay: 100.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildEventCard(PlannerEvent event) {
+  Widget _buildAgenda(PlannerDashboardData data, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.p24, AppSpacing.p40, AppSpacing.p24, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Action Items', style: AppTypography.titleLarge),
+          const SizedBox(height: AppSpacing.p16),
+          if (data.todayAgenda.isEmpty && data.upcomingDeadlines.isEmpty)
+            _buildEmptyState(isDark)
+          else ...[
+            ...data.todayAgenda.map((e) => _buildEventCard(e, isDark)),
+            ...data.upcomingDeadlines.map((e) => _buildEventCard(e, isDark)),
+          ]
+        ],
+      ),
+    ).animate().fade(delay: 200.ms).slideY(begin: 0.1);
+  }
+
+  Widget _buildEventCard(PlannerEvent event, bool isDark) {
     Color getEventColor() {
       switch (event.type) {
         case EventType.application: return AppColors.primary;
@@ -297,59 +251,77 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
       }
     }
 
-    return GestureDetector(
-      onTap: () => ref.read(plannerProvider.notifier).toggleTaskCompletion(event.id),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: event.isCompleted ? Colors.grey.shade200 : getEventColor().withOpacity(0.3)),
-          boxShadow: event.isCompleted ? [] : [BoxShadow(color: getEventColor().withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.p16),
+      child: SquircleCard(
+        padding: const EdgeInsets.all(AppSpacing.p20),
+        onTap: () => ref.read(plannerProvider.notifier).toggleTaskCompletion(event.id),
         child: Row(
           children: [
             Container(
-              width: 24,
-              height: 24,
+              width: 28,
+              height: 28,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: event.isCompleted ? AppColors.success : Colors.transparent,
-                border: Border.all(color: event.isCompleted ? AppColors.success : Colors.grey.shade400),
+                border: Border.all(color: event.isCompleted ? AppColors.success : (isDark ? AppColors.darkBorder : AppColors.border), width: 2),
               ),
-              child: event.isCompleted ? const Icon(Iconsax.tick_circle, color: Colors.white, size: 16) : null,
+              child: event.isCompleted ? const Icon(Iconsax.tick_circle, color: Colors.white, size: 18) : null,
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppSpacing.p16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     event.title,
-                    style: AppTypography.label.copyWith(
-                      fontWeight: FontWeight.bold,
+                    style: AppTypography.titleMedium.copyWith(
                       decoration: event.isCompleted ? TextDecoration.lineThrough : null,
-                      color: event.isCompleted ? AppColors.textSecondary : AppColors.textPrimary,
+                      color: event.isCompleted ? AppColors.textSecondary : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(event.description, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                  const SizedBox(height: AppSpacing.p4),
+                  Text(event.description, style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
                 ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(DateFormat('MMM d').format(event.date), style: AppTypography.label.copyWith(color: getEventColor(), fontWeight: FontWeight.bold)),
+                Text(DateFormat('MMM d').format(event.date), style: AppTypography.labelMedium.copyWith(color: getEventColor(), fontWeight: FontWeight.bold)),
                 if (event.type == EventType.application || event.type == EventType.scholarship)
                   Container(
-                    margin: const EdgeInsets.only(top: 4),
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: AppColors.error.withOpacity(0.1), borderRadius: BorderRadius.circular(4)),
-                    child: Text('Deadline', style: AppTypography.caption.copyWith(color: AppColors.error, fontSize: 10)),
+                    margin: const EdgeInsets.only(top: AppSpacing.p8),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p8, vertical: AppSpacing.p4),
+                    decoration: BoxDecoration(color: AppColors.error.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                    child: Text('Deadline', style: AppTypography.caption.copyWith(color: AppColors.error)),
                   ),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(bool isDark) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.p32),
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(color: isDark ? AppColors.darkSurface : AppColors.surface, shape: BoxShape.circle),
+              child: const Icon(Iconsax.calendar_tick, size: 48, color: AppColors.primary),
+            ),
+            const SizedBox(height: AppSpacing.p24),
+            Text('You\'re All Caught Up', style: AppTypography.titleLarge),
+            const SizedBox(height: AppSpacing.p8),
+            Text(
+              'No pending tasks for this milestone. Check your AI recommendations for next steps.',
+              textAlign: TextAlign.center,
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
             ),
           ],
         ),
