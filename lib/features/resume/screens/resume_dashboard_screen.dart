@@ -4,8 +4,13 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
+
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
+import '../../../core/theme/spacing/app_spacing.dart';
+import '../../../shared/components/molecules/squircle_card.dart';
+import '../../../shared/components/atoms/app_icon_button.dart';
+import '../../../shared/components/atoms/app_button.dart';
 import '../providers/resume_provider.dart';
 import '../models/resume_model.dart';
 
@@ -17,6 +22,20 @@ class ResumeDashboardScreen extends ConsumerStatefulWidget {
 }
 
 class _ResumeDashboardScreenState extends ConsumerState<ResumeDashboardScreen> {
+  final Map<String, bool> _expandedSections = {
+    'personal': true,
+    'education': false,
+    'experience': false,
+    'projects': false,
+    'skills': false,
+  };
+
+  void _toggleSection(String key) {
+    setState(() {
+      _expandedSections[key] = !(_expandedSections[key] ?? false);
+    });
+  }
+
   void _showEditPersonalDialog(UserResume resume) {
     final nameCtrl = TextEditingController(text: resume.fullName);
     final emailCtrl = TextEditingController(text: resume.email);
@@ -27,32 +46,37 @@ class _ResumeDashboardScreenState extends ConsumerState<ResumeDashboardScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Theme.of(context).cardColor,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      backgroundColor: Colors.transparent,
       builder: (ctx) {
-        return Padding(
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return Container(
           padding: EdgeInsets.only(
-            left: 24, right: 24, top: 24,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            left: AppSpacing.p24, right: AppSpacing.p24, top: AppSpacing.p24,
+            bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.p24,
+          ),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.darkSurface : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           ),
           child: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text('Edit Personal Details & Summary', style: AppTypography.headline),
-                const SizedBox(height: 16),
-                TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Full Name')),
-                const SizedBox(height: 12),
-                TextField(controller: emailCtrl, decoration: const InputDecoration(labelText: 'Email Address')),
-                const SizedBox(height: 12),
-                TextField(controller: phoneCtrl, decoration: const InputDecoration(labelText: 'Phone Number')),
-                const SizedBox(height: 12),
-                TextField(controller: locationCtrl, decoration: const InputDecoration(labelText: 'Location')),
-                const SizedBox(height: 12),
-                TextField(controller: summaryCtrl, maxLines: 3, decoration: const InputDecoration(labelText: 'Summary Statement')),
-                const SizedBox(height: 20),
-                ElevatedButton(
+                Text('Personal Info & Summary', style: AppTypography.titleLarge),
+                const SizedBox(height: AppSpacing.p24),
+                TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Full Name', border: OutlineInputBorder())),
+                const SizedBox(height: AppSpacing.p12),
+                TextField(controller: emailCtrl, decoration: const InputDecoration(labelText: 'Email Address', border: OutlineInputBorder())),
+                const SizedBox(height: AppSpacing.p12),
+                TextField(controller: phoneCtrl, decoration: const InputDecoration(labelText: 'Phone Number', border: OutlineInputBorder())),
+                const SizedBox(height: AppSpacing.p12),
+                TextField(controller: locationCtrl, decoration: const InputDecoration(labelText: 'Location', border: OutlineInputBorder())),
+                const SizedBox(height: AppSpacing.p12),
+                TextField(controller: summaryCtrl, maxLines: 4, decoration: const InputDecoration(labelText: 'Summary Statement', border: OutlineInputBorder())),
+                const SizedBox(height: AppSpacing.p24),
+                AppButton(
+                  text: 'Save Details',
                   onPressed: () {
                     ref.read(resumeProvider.notifier).updatePersonalInfo(
                           fullName: nameCtrl.text,
@@ -63,7 +87,6 @@ class _ResumeDashboardScreenState extends ConsumerState<ResumeDashboardScreen> {
                         );
                     ctx.pop();
                   },
-                  child: const Text('Save Details'),
                 ),
               ],
             ),
@@ -76,187 +99,224 @@ class _ResumeDashboardScreenState extends ConsumerState<ResumeDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final resume = ref.watch(resumeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Column(
-          children: [
-            const Text('Resume Builder'),
-            Text('Last updated ${resume.lastUpdated}', style: AppTypography.caption.copyWith(color: AppColors.textSecondary, fontSize: 10)),
-          ],
-        ),
-        leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left),
-          onPressed: () => context.pop(),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Iconsax.eye, color: AppColors.primary),
-            onPressed: () => context.push('/resume/preview'),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 100),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
         child: Column(
           children: [
-            _buildScoreCard(resume),
-            _buildEditorSections(resume),
+            _buildHeader(context, resume, isDark),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 120),
+                child: Column(
+                  children: [
+                    _buildHeroScoreCard(resume, isDark),
+                    _buildInteractiveForm(resume, isDark),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => context.push('/resume/preview'),
+        backgroundColor: AppColors.primary,
+        icon: const Icon(Iconsax.eye, color: Colors.white),
+        label: Text('Preview Resume', style: AppTypography.labelLarge.copyWith(color: Colors.white)),
       ),
     );
   }
 
-  Widget _buildScoreCard(UserResume resume) {
+  Widget _buildHeader(BuildContext context, UserResume resume, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.p24),
+      child: Row(
+        children: [
+          AppIconButton(
+            icon: Iconsax.arrow_left_2,
+            isFilled: true,
+            backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+            onPressed: () => context.pop(),
+          ),
+          const SizedBox(width: AppSpacing.p16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Resume Builder', style: AppTypography.titleLarge),
+                Text('Last updated ${resume.lastUpdated}', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+              ],
+            ),
+          ),
+          AppIconButton(
+            icon: Iconsax.magic_star,
+            isFilled: true,
+            backgroundColor: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary,
+            onPressed: () async {
+              final router = GoRouter.of(context);
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Analyzing resume with AI...')));
+              await ref.read(resumeProvider.notifier).runAIReview();
+              if (mounted) router.push('/resume/review');
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroScoreCard(UserResume resume, bool isDark) {
     return Container(
-      margin: const EdgeInsets.all(20),
-      padding: const EdgeInsets.all(20),
+      width: double.infinity,
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p8),
+      padding: const EdgeInsets.all(AppSpacing.p32),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+        gradient: AppColors.primaryGradient,
+        borderRadius: BorderRadius.circular(32),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 16, offset: const Offset(0, 8)),
+          BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 24, offset: const Offset(0, 12)),
         ],
       ),
       child: Column(
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
             children: [
-              _buildCircularScore('Completion', resume.completionPercentage),
-              _buildCircularScore('ATS Score', resume.atsReadiness / 100.0),
-              _buildCircularScore('AI Score', resume.aiResumeScore / 100.0, color: AppColors.primary),
+              Text('${resume.atsReadiness}', style: AppTypography.display.copyWith(color: Colors.white, fontSize: 64)),
+              Text('%', style: AppTypography.headline.copyWith(color: Colors.white)),
             ],
           ),
-          const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () async {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Analyzing resume with AI...')),
-                );
-                await ref.read(resumeProvider.notifier).runAIReview();
-                if (mounted) {
-                  context.push('/resume/review');
-                }
-              },
-              icon: const Icon(Iconsax.magic_star, color: Colors.white, size: 20),
-              label: const Text('Review with AI & Generate Score'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-            ),
+          Text('ATS Compatibility Score', style: AppTypography.labelLarge.copyWith(color: Colors.white70)),
+          const SizedBox(height: AppSpacing.p24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildMetricBadge('Completion', '${(resume.completionPercentage * 100).toInt()}%'),
+              _buildMetricBadge('AI Score', '${resume.aiResumeScore}'),
+              _buildMetricBadge('Format', 'Perfect'),
+            ],
           ),
         ],
       ),
     ).animate().fade().slideY(begin: 0.05);
   }
 
-  Widget _buildCircularScore(String label, double value, {Color color = AppColors.success}) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 56,
-          height: 56,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              CircularProgressIndicator(
-                value: value,
-                strokeWidth: 6,
-                backgroundColor: color.withOpacity(0.15),
-                valueColor: AlwaysStoppedAnimation(color),
-              ),
-              Center(
-                child: Text(
-                  '${(value * 100).toInt()}%',
-                  style: AppTypography.label.copyWith(fontWeight: FontWeight.bold, fontSize: 13),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(label, style: AppTypography.caption),
-      ],
-    );
-  }
-
-  Widget _buildEditorSections(UserResume resume) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+  Widget _buildMetricBadge(String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Resume Sections', style: AppTypography.subheading),
-          const SizedBox(height: 12),
-          _buildSectionTile(
-            title: 'Personal Info & Summary',
-            subtitle: '${resume.fullName} • ${resume.email}',
-            icon: Iconsax.user,
-            isDone: resume.fullName.isNotEmpty,
-            onTap: () => _showEditPersonalDialog(resume),
-          ),
-          _buildSectionTile(
-            title: 'Education',
-            subtitle: '${resume.education.length} entries added',
-            icon: Iconsax.teacher,
-            isDone: resume.education.isNotEmpty,
-            onTap: () => context.push('/resume/preview'),
-          ),
-          _buildSectionTile(
-            title: 'Work & Research Experience',
-            subtitle: '${resume.experience.length} entries added',
-            icon: Iconsax.briefcase,
-            isDone: resume.experience.isNotEmpty,
-            onTap: () => context.push('/resume/preview'),
-          ),
-          _buildSectionTile(
-            title: 'Skills & Competencies',
-            subtitle: '${resume.skills.length} skills listed',
-            icon: Iconsax.code,
-            isDone: resume.skills.isNotEmpty,
-            onTap: () => context.push('/resume/preview'),
-          ),
-          _buildSectionTile(
-            title: 'Projects & Publications',
-            subtitle: '${resume.projects.length} projects listed',
-            icon: Iconsax.folder_open,
-            isDone: resume.projects.isNotEmpty,
-            onTap: () => context.push('/resume/preview'),
-          ),
+          Text(value, style: AppTypography.titleLarge.copyWith(color: Colors.white)),
+          Text(label, style: AppTypography.caption.copyWith(color: Colors.white70)),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTile({
+  Widget _buildInteractiveForm(UserResume resume, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
+      child: Column(
+        children: [
+          _buildAccordionSection(
+            key: 'personal',
+            title: 'Personal Info & Summary',
+            subtitle: resume.fullName.isNotEmpty ? resume.fullName : 'Add your details',
+            icon: Iconsax.user,
+            isDone: resume.fullName.isNotEmpty,
+            onAction: () => _showEditPersonalDialog(resume),
+          ),
+          _buildAccordionSection(
+            key: 'education',
+            title: 'Education',
+            subtitle: '${resume.education.length} entries added',
+            icon: Iconsax.teacher,
+            isDone: resume.education.isNotEmpty,
+            onAction: () => context.push('/resume/preview'),
+          ),
+          _buildAccordionSection(
+            key: 'experience',
+            title: 'Experience',
+            subtitle: '${resume.experience.length} entries added',
+            icon: Iconsax.briefcase,
+            isDone: resume.experience.isNotEmpty,
+            onAction: () => context.push('/resume/preview'),
+          ),
+          _buildAccordionSection(
+            key: 'projects',
+            title: 'Projects',
+            subtitle: '${resume.projects.length} entries added',
+            icon: Iconsax.folder_open,
+            isDone: resume.projects.isNotEmpty,
+            onAction: () => context.push('/resume/preview'),
+          ),
+          _buildAccordionSection(
+            key: 'skills',
+            title: 'Skills',
+            subtitle: '${resume.skills.length} skills added',
+            icon: Iconsax.code,
+            isDone: resume.skills.isNotEmpty,
+            onAction: () => context.push('/resume/preview'),
+          ),
+        ],
+      ),
+    ).animate().fade(delay: 100.ms).slideY(begin: 0.1);
+  }
+
+  Widget _buildAccordionSection({
+    required String key,
     required String title,
     required String subtitle,
     required IconData icon,
     required bool isDone,
-    required VoidCallback onTap,
+    required VoidCallback onAction,
   }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: ListTile(
-        onTap: onTap,
-        leading: CircleAvatar(
-          backgroundColor: AppColors.primary.withOpacity(0.1),
-          child: Icon(icon, color: AppColors.primary, size: 20),
-        ),
-        title: Text(title, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle, style: AppTypography.caption),
-        trailing: Icon(
-          isDone ? Iconsax.tick_circle : Iconsax.arrow_right_3,
-          color: isDone ? AppColors.success : AppColors.textSecondary,
+    final isExpanded = _expandedSections[key] ?? false;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.p12),
+      child: SquircleCard(
+        padding: const EdgeInsets.all(AppSpacing.p8),
+        child: Column(
+          children: [
+            ListTile(
+              onTap: () => _toggleSection(key),
+              leading: Container(
+                padding: const EdgeInsets.all(AppSpacing.p12),
+                decoration: BoxDecoration(
+                  color: isDone ? AppColors.success.withOpacity(0.1) : AppColors.primary.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, color: isDone ? AppColors.success : AppColors.primary, size: 20),
+              ),
+              title: Text(title, style: AppTypography.titleMedium),
+              subtitle: Text(subtitle, style: AppTypography.labelMedium.copyWith(color: AppColors.textSecondary)),
+              trailing: Icon(isExpanded ? Iconsax.arrow_up_2 : Iconsax.arrow_down_1, color: AppColors.textSecondary),
+            ),
+            if (isExpanded)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(72, 0, AppSpacing.p24, AppSpacing.p16),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: AppButton(
+                        text: isDone ? 'Edit Section' : 'Add Detail',
+                        variant: isDone ? AppButtonVariant.outline : AppButtonVariant.primary,
+                        onPressed: onAction,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
         ),
       ),
     );
