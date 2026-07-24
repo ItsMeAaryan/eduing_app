@@ -3,9 +3,14 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:ui';
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
+import '../../../core/theme/spacing/app_spacing.dart';
 import '../../../shared/models/university_model.dart';
+import '../../../shared/components/molecules/squircle_card.dart';
+import '../../../shared/components/atoms/app_button.dart';
+import '../../../shared/components/atoms/app_icon_button.dart';
 import '../providers/universities_provider.dart';
 import '../../applications/providers/applications_provider.dart';
 
@@ -19,64 +24,70 @@ class UniversityDetailsScreen extends ConsumerWidget {
     final universities = ref.watch(universitiesProvider);
     final university = universities.firstWhere(
       (u) => u.id == universityId,
-      orElse: () => universities.first, // fallback
+      orElse: () => universities.first,
     );
-    final notifier = ref.read(universitiesProvider.notifier);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           CustomScrollView(
             slivers: [
-              _buildSliverAppBar(context, university, notifier),
+              _buildSliverAppBar(context, university, ref, isDark),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 100), // Space for bottom bar
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.p24, AppSpacing.p24, AppSpacing.p24, 120),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildHeaderInfo(university),
-                      _buildAIMatchCard(university),
-                      _buildAboutSection(university),
-                      _buildCourses(university),
-                      _buildStatistics(university),
-                      _buildFacilities(university),
-                      _buildGallery(university),
-                      _buildPlacements(university),
-                      _buildScholarships(university),
-                      _buildAdmissionTimeline(),
-                      _buildReviews(),
-                      _buildAIInsights(),
+                      _buildHeaderInfo(university, isDark),
+                      const SizedBox(height: AppSpacing.p32),
+                      _buildBentoGrid(university, isDark),
+                      const SizedBox(height: AppSpacing.p32),
+                      _buildPrograms(university, isDark),
+                      const SizedBox(height: AppSpacing.p32),
+                      _buildFacilities(university, isDark),
+                      const SizedBox(height: AppSpacing.p32),
+                      _buildAIInsights(university, isDark),
                     ],
                   ),
                 ),
               ),
             ],
           ),
-          _buildBottomActionBar(context, university, ref),
+          _buildFloatingActionBar(context, university, ref, isDark),
         ],
       ),
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context, University university, UniversitiesNotifier notifier) {
+  Widget _buildSliverAppBar(BuildContext context, University university, WidgetRef ref, bool isDark) {
+    final notifier = ref.read(universitiesProvider.notifier);
     return SliverAppBar(
-      expandedHeight: 300,
+      expandedHeight: 360,
       pinned: true,
-      backgroundColor: AppColors.background,
-      leading: IconButton(
-        icon: const Icon(Iconsax.arrow_left_2),
-        onPressed: () => Navigator.of(context).pop(),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      elevation: 0,
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 8.0),
+        child: AppIconButton(
+          icon: Iconsax.arrow_left_2,
+          isFilled: true,
+          backgroundColor: isDark ? AppColors.darkSurface.withOpacity(0.8) : Colors.white.withOpacity(0.8),
+          onPressed: () => context.pop(),
+        ),
       ),
       actions: [
-        IconButton(
-          icon: Icon(university.isFavorite ? Iconsax.heart5 : Iconsax.heart),
-          color: university.isFavorite ? AppColors.error : AppColors.textSecondary,
-          onPressed: () => notifier.toggleFavorite(university.id),
-        ),
-        IconButton(
-          icon: const Icon(Iconsax.share),
-          onPressed: () {},
+        Padding(
+          padding: const EdgeInsets.only(right: 16.0),
+          child: AppIconButton(
+            icon: university.isFavorite ? Iconsax.heart5 : Iconsax.heart,
+            color: university.isFavorite ? AppColors.error : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+            isFilled: true,
+            backgroundColor: isDark ? AppColors.darkSurface.withOpacity(0.8) : Colors.white.withOpacity(0.8),
+            onPressed: () => notifier.toggleFavorite(university.id),
+          ),
         ),
       ],
       flexibleSpace: FlexibleSpaceBar(
@@ -97,10 +108,11 @@ class UniversityDetailsScreen extends ConsumerWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.4),
                     Colors.transparent,
-                    Colors.black.withOpacity(0.8),
+                    Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+                    Theme.of(context).scaffoldBackgroundColor,
                   ],
+                  stops: const [0.4, 0.8, 1.0],
                 ),
               ),
             ),
@@ -110,561 +122,247 @@ class UniversityDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeaderInfo(University university) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(
-                radius: 32,
-                backgroundColor: Colors.white,
-                backgroundImage: NetworkImage(university.logoUrl),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      university.name,
-                      style: AppTypography.headline.copyWith(fontSize: 24),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        const Icon(Iconsax.location, size: 16, color: AppColors.textSecondary),
-                        const SizedBox(width: 4),
-                        Expanded(
-                          child: Text(
-                            university.location,
-                            style: AppTypography.body.copyWith(color: AppColors.textSecondary),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+  Widget _buildHeaderInfo(University university, bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border, width: 2),
+                image: DecorationImage(
+                  image: NetworkImage(university.logoUrl),
+                  fit: BoxFit.cover,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: [
-              _buildTag(university.nirfRanking, AppColors.primary),
-              _buildTag(university.accreditation, AppColors.success),
-              _buildTag(university.type, AppColors.textSecondary),
-            ],
-          ),
-        ],
-      ),
+            ),
+            const SizedBox(width: AppSpacing.p20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    university.name,
+                    style: AppTypography.display.copyWith(fontWeight: FontWeight.w800, letterSpacing: -1),
+                  ),
+                  const SizedBox(height: AppSpacing.p8),
+                  Text(
+                    university.location,
+                    style: AppTypography.titleMedium.copyWith(color: AppColors.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.p24),
+        Text(
+          university.description,
+          style: AppTypography.bodyLarge.copyWith(height: 1.6, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+        ),
+      ],
     ).animate().fade().slideY(begin: 0.1);
   }
 
-  Widget _buildTag(String text, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withOpacity(0.2)),
-      ),
-      child: Text(
-        text,
-        style: AppTypography.caption.copyWith(color: color, fontWeight: FontWeight.bold),
-      ),
-    );
-  }
-
-  Widget _buildAIMatchCard(University university) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: AppColors.aiGradient,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Icon(Iconsax.magic_star, color: Colors.white, size: 20),
-              const SizedBox(width: 8),
-              Text('AI Match Analysis', style: AppTypography.label.copyWith(color: Colors.white)),
-              const Spacer(),
-              Text('${university.aiMatch}% Match', style: AppTypography.title.copyWith(color: Colors.white)),
-            ],
-          ),
-          const SizedBox(height: 24),
-          _buildAIProgressRow('Admission Probability', university.admissionProbability),
-          const SizedBox(height: 12),
-          _buildAIProgressRow('Career ROI', university.roiScore),
-          const SizedBox(height: 12),
-          _buildAIProgressRow('Placement Confidence', university.placementScore),
-          const SizedBox(height: 12),
-          _buildAIProgressRow('Scholarship Probability', university.scholarshipProbability),
-          const SizedBox(height: 12),
-          _buildAIProgressRow('Hostel Compatibility', university.hostelCompatibility),
-          const SizedBox(height: 12),
-          _buildAIProgressRow('International Opportunities', university.internationalOpportunities),
-        ],
-      ),
+  Widget _buildBentoGrid(University university, bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('At a Glance', style: AppTypography.titleLarge),
+        const SizedBox(height: AppSpacing.p16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildBentoBox(
+                isDark,
+                icon: Iconsax.global,
+                title: 'Global Rank',
+                value: '#${university.nirfRanking}',
+                valueColor: AppColors.primary,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.p16),
+            Expanded(
+              child: _buildBentoBox(
+                isDark,
+                icon: Iconsax.percentage_circle,
+                title: 'Acceptance',
+                value: '${university.admissionProbability}%',
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.p16),
+        Row(
+          children: [
+            Expanded(
+              child: _buildBentoBox(
+                isDark,
+                icon: Iconsax.wallet_money,
+                title: 'Avg. Tuition',
+                value: university.fees,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.p16),
+            Expanded(
+              child: _buildBentoBox(
+                isDark,
+                icon: Iconsax.profile_2user,
+                title: 'Students',
+                value: university.studentCount,
+              ),
+            ),
+          ],
+        ),
+      ],
     ).animate().fade(delay: 100.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildAIProgressRow(String label, double value) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: Text(label, style: AppTypography.caption.copyWith(color: Colors.white70)),
-        ),
-        Expanded(
-          flex: 3,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: value / 100,
-              backgroundColor: Colors.white24,
-              color: Colors.white,
-              minHeight: 6,
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        SizedBox(
-          width: 32,
-          child: Text('${value.toInt()}%', style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
-        ),
-      ],
+  Widget _buildBentoBox(bool isDark, {required IconData icon, required String title, required String value, Color? valueColor}) {
+    return SquircleCard(
+      padding: const EdgeInsets.all(AppSpacing.p20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppColors.textSecondary, size: 24),
+          const SizedBox(height: AppSpacing.p16),
+          Text(title, style: AppTypography.labelMedium.copyWith(color: AppColors.textSecondary)),
+          const SizedBox(height: AppSpacing.p4),
+          Text(value, style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.bold, color: valueColor)),
+        ],
+      ),
     );
   }
 
-  Widget _buildAboutSection(University university) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('About', style: AppTypography.title),
-          const SizedBox(height: 12),
-          Text(
-            university.description,
-            style: AppTypography.body.copyWith(color: AppColors.textSecondary, height: 1.6),
-          ),
-          const SizedBox(height: 8),
-          Text('Read More', style: AppTypography.label.copyWith(color: AppColors.primary)),
-        ],
-      ),
+  Widget _buildPrograms(University university, bool isDark) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Programs Offered', style: AppTypography.titleLarge),
+        const SizedBox(height: AppSpacing.p16),
+        Wrap(
+          spacing: AppSpacing.p12,
+          runSpacing: AppSpacing.p12,
+          children: university.coursesList.map((course) {
+            return Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkSurface : AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
+              ),
+              child: Text(course, style: AppTypography.labelMedium),
+            );
+          }).toList(),
+        ),
+      ],
     ).animate().fade(delay: 200.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildCourses(University university) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+  Widget _buildFacilities(University university, bool isDark) {
+    return SquircleCard(
+      padding: const EdgeInsets.all(AppSpacing.p24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Courses', style: AppTypography.title),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: university.coursesList.map((course) {
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(100),
-                  border: Border.all(color: Colors.grey.shade200),
-                ),
-                child: Text(course, style: AppTypography.label),
-              );
-            }).toList(),
-          ),
+          Text('Campus Facilities', style: AppTypography.titleLarge),
+          const SizedBox(height: AppSpacing.p20),
+          ...university.facilities.map((f) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.p12),
+            child: Row(
+              children: [
+                const Icon(Iconsax.verify, color: AppColors.success, size: 20),
+                const SizedBox(width: AppSpacing.p12),
+                Text(f, style: AppTypography.bodyMedium),
+              ],
+            ),
+          )),
         ],
       ),
     ).animate().fade(delay: 300.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildStatistics(University university) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
+  Widget _buildAIInsights(University university, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.p24),
+      decoration: BoxDecoration(
+        gradient: AppColors.aiGradient,
+        borderRadius: BorderRadius.circular(32),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Statistics', style: AppTypography.title),
-          const SizedBox(height: 16),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 1.5,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
+          Row(
             children: [
-              _buildStatCard('Students', university.studentCount),
-              _buildStatCard('Faculty', '1.2K+'),
-              _buildStatCard('Research Papers', '10K+'),
-              _buildStatCard('Patents', '250+'),
+              const Icon(Iconsax.magic_star, color: Colors.white, size: 24),
+              const SizedBox(width: AppSpacing.p12),
+              Text('AI Analysis', style: AppTypography.titleLarge.copyWith(color: Colors.white)),
+              const Spacer(),
+              Text('${university.aiMatch}% Match', style: AppTypography.titleLarge.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
             ],
+          ),
+          const SizedBox(height: AppSpacing.p24),
+          Text(
+            'Based on your profile, this university is a strong match. Your academics align with their acceptance criteria, and their programs match your career goals.',
+            style: AppTypography.bodyMedium.copyWith(color: Colors.white.withOpacity(0.9), height: 1.5),
           ),
         ],
       ),
     ).animate().fade(delay: 400.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildStatCard(String title, String value) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4)),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(title, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-          const SizedBox(height: 8),
-          Text(value, style: AppTypography.title),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFacilities(University university) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Facilities', style: AppTypography.title),
-          const SizedBox(height: 16),
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: university.facilities.map((facility) {
-              return Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Iconsax.tick_circle, color: AppColors.success, size: 16),
-                  const SizedBox(width: 8),
-                  Text(facility, style: AppTypography.body),
-                ],
-              );
-            }).toList(),
-          ),
-        ],
-      ),
-    ).animate().fade(delay: 500.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildGallery(University university) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Text('Gallery', style: AppTypography.title),
-          ),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 150,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              itemCount: 4,
-              itemBuilder: (context, index) {
-                return Container(
-                  width: 200,
-                  margin: const EdgeInsets.only(right: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: const Icon(Iconsax.gallery, color: Colors.grey),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    ).animate().fade(delay: 600.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildPlacements(University university) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Placements', style: AppTypography.title),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(20),
+  Widget _buildFloatingActionBar(BuildContext context, University university, WidgetRef ref, bool isDark) {
+    return Positioned(
+      bottom: AppSpacing.p24,
+      left: AppSpacing.p24,
+      right: AppSpacing.p24,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: Container(
+            padding: const EdgeInsets.all(AppSpacing.p16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: (isDark ? AppColors.darkSurface : AppColors.surface).withOpacity(0.8),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.2)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
+                ),
+              ],
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Column(
-                  children: [
-                    Text('Average', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-                    const SizedBox(height: 4),
-                    Text(university.fees, style: AppTypography.title.copyWith(color: AppColors.primary)),
-                  ],
-                ),
-                Container(width: 1, height: 40, color: Colors.grey.shade200),
-                Column(
-                  children: [
-                    Text('Highest', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-                    const SizedBox(height: 4),
-                    Text('₹1.2 Cr', style: AppTypography.title.copyWith(color: AppColors.success)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ).animate().fade(delay: 700.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildScholarships(University university) {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Scholarships', style: AppTypography.title),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Merit Scholarship', style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Text('Up to 50% waiver on tuition fees for students above 90% in academics.', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-                const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {},
-                  child: Text('View Details', style: AppTypography.button.copyWith(color: AppColors.primary)),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ).animate().fade(delay: 800.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildAdmissionTimeline() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Admission Timeline', style: AppTypography.title),
-          const SizedBox(height: 16),
-          _buildTimelineItem('Registration Opens', '01 Jan 2025', true),
-          _buildTimelineItem('Exam Date', '15 Apr 2025', false),
-          _buildTimelineItem('Counselling', '20 May 2025', false),
-        ],
-      ),
-    ).animate().fade(delay: 900.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildTimelineItem(String title, String date, bool isPast) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Row(
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(
-              color: isPast ? AppColors.primary : Colors.grey.shade300,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(title, style: AppTypography.label),
-                Text(date, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReviews() {
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Student Reviews', style: AppTypography.title),
-          const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const CircleAvatar(
-                      radius: 20,
-                      backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=12'),
-                    ),
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('John Doe', style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
-                        Text('Computer Science • 3rd Year', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  '"The coding culture here is fantastic. Lots of hackathons and great placements."',
-                  style: AppTypography.body.copyWith(fontStyle: FontStyle.italic),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ).animate().fade(delay: 1000.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildAIInsights() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(gradient: AppColors.aiGradient, borderRadius: BorderRadius.circular(16)),
-            child: const Icon(Iconsax.magic_star, color: Colors.white),
-          ).animate(onPlay: (controller) => controller.repeat(reverse: true)).shimmer(),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('AI Recommendation', style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Text(
-                  'This university aligns extremely well with your academic profile. You have a high probability of admission.',
-                  style: AppTypography.body.copyWith(color: AppColors.textSecondary),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    ).animate().fade(delay: 1100.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildBottomActionBar(BuildContext context, University university, WidgetRef ref) {
-    return Positioned(
-      bottom: 0,
-      left: 0,
-      right: 0,
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 20,
-              offset: const Offset(0, -10),
-            ),
-          ],
-        ),
-        child: SafeArea(
-          top: false,
-          child: Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
+                AppIconButton(
+                  icon: Iconsax.arrange_square,
+                  isFilled: true,
+                  backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
                   onPressed: () => context.push('/compare', extra: [university.id, university.id == '1' ? '2' : '1']),
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    side: BorderSide(color: Colors.grey.shade300),
-                  ),
-                  child: Text('Compare', style: AppTypography.button.copyWith(color: AppColors.textPrimary)),
                 ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                flex: 2,
-                child: ElevatedButton(
-                  onPressed: () {
-                    ref.read(applicationsNotifierProvider.notifier).createApplication(
-                      universityName: university.name,
-                      course: university.course,
-                      deadline: '01 Dec 2025',
-                    );
-                    context.go('/applications');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                const SizedBox(width: AppSpacing.p16),
+                Expanded(
+                  child: AppButton(
+                    text: 'Start Application',
+                    icon: Iconsax.document_text,
+                    onPressed: () {
+                      ref.read(applicationsNotifierProvider.notifier).createApplication(
+                        universityName: university.name,
+                        course: university.course,
+                        deadline: '01 Dec 2025',
+                      );
+                      context.go('/applications');
+                    },
                   ),
-                  child: Text('Apply Now', style: AppTypography.button.copyWith(color: Colors.white)),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
