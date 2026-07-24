@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax/iconsax.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
+import '../../../core/theme/spacing/app_spacing.dart';
+import '../../../shared/components/molecules/squircle_card.dart';
+import '../../../shared/components/atoms/app_button.dart';
 import '../providers/auth_provider.dart';
 
 enum AuthMode { login, register, forgotPassword }
@@ -88,6 +92,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   Widget build(BuildContext context) {
     final state = ref.watch(authControllerProvider);
     final isLoading = state.isLoading;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
@@ -98,139 +103,170 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24.0),
-              child: Form(
-                key: _formKey,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p40),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Icon(Iconsax.book_1, size: 64, color: AppColors.primary),
-                    const SizedBox(height: 24),
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.all(AppSpacing.p24),
+                        decoration: BoxDecoration(
+                          gradient: AppColors.aiGradient,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 30, offset: const Offset(0, 15)),
+                          ],
+                        ),
+                        child: const Icon(Iconsax.book_1, size: 64, color: Colors.white),
+                      ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
+                    ),
+                    const SizedBox(height: AppSpacing.p40),
                     Text(
                       _mode == AuthMode.login ? 'Welcome back'
                           : _mode == AuthMode.register ? 'Create an account'
                           : 'Reset Password',
-                      style: AppTypography.headline,
+                      style: AppTypography.display.copyWith(fontSize: 32),
                       textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
+                    ).animate().fade(delay: 100.ms).slideY(begin: 0.1),
+                    const SizedBox(height: AppSpacing.p12),
                     Text(
                       _mode == AuthMode.login ? 'Sign in to access your dashboard'
                           : _mode == AuthMode.register ? 'Join EDUING today'
                           : 'Enter your email to receive a reset link',
-                      style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+                      style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
                       textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 40),
+                    ).animate().fade(delay: 200.ms).slideY(begin: 0.1),
+                    const SizedBox(height: AppSpacing.p40),
 
-                    if (_mode == AuthMode.register) ...[
-                      TextFormField(
-                        controller: _fullNameController,
-                        decoration: _inputDecoration('Full Name', Iconsax.user),
-                        validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
+                    SquircleCard(
+                      padding: const EdgeInsets.all(AppSpacing.p32),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            if (_mode == AuthMode.register) ...[
+                              TextFormField(
+                                controller: _fullNameController,
+                                style: AppTypography.bodyMedium,
+                                decoration: _inputDecoration('Full Name', Iconsax.user, isDark),
+                                validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
+                              ),
+                              const SizedBox(height: AppSpacing.p20),
+                            ],
 
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: _inputDecoration('Email Address', Iconsax.sms),
-                      validator: (v) => (v == null || !emailRegex.hasMatch(v.trim())) ? 'Enter a valid email' : null,
-                    ),
-                    const SizedBox(height: 16),
-
-                    if (_mode != AuthMode.forgotPassword) ...[
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: _obscurePassword,
-                        decoration: _inputDecoration(
-                          'Password',
-                          Iconsax.lock,
-                          suffixIcon: IconButton(
-                            icon: Icon(_obscurePassword ? Iconsax.eye_slash : Iconsax.eye, color: AppColors.textSecondary),
-                            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-                          ),
-                        ),
-                        validator: (v) => (v == null || v.length < 6) ? 'Password must be at least 6 characters' : null,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-
-                    if (_mode == AuthMode.register) ...[
-                      TextFormField(
-                        controller: _confirmPasswordController,
-                        obscureText: _obscureConfirmPassword,
-                        decoration: _inputDecoration(
-                          'Confirm Password',
-                          Iconsax.lock,
-                          suffixIcon: IconButton(
-                            icon: Icon(_obscureConfirmPassword ? Iconsax.eye_slash : Iconsax.eye, color: AppColors.textSecondary),
-                            onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
-                          ),
-                        ),
-                        validator: (v) => v != _passwordController.text ? 'Passwords do not match' : null,
-                      ),
-                      const SizedBox(height: 16),
-                    ],
-
-                    if (_mode == AuthMode.login)
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: TextButton(
-                          onPressed: () => setState(() => _mode = AuthMode.forgotPassword),
-                          child: Text('Forgot Password?', style: AppTypography.label.copyWith(color: AppColors.primary)),
-                        ),
-                      ),
-
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: isLoading ? null : _submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        elevation: 0,
-                      ),
-                      child: isLoading
-                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : Text(
-                              _mode == AuthMode.login ? 'Sign In'
-                                  : _mode == AuthMode.register ? 'Sign Up'
-                                  : 'Send Reset Link',
-                              style: AppTypography.button.copyWith(color: Colors.white),
+                            TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              style: AppTypography.bodyMedium,
+                              decoration: _inputDecoration('Email Address', Iconsax.sms, isDark),
+                              validator: (v) => (v == null || !emailRegex.hasMatch(v.trim())) ? 'Enter a valid email' : null,
                             ),
-                    ),
+                            const SizedBox(height: AppSpacing.p20),
 
-                    if (_mode == AuthMode.login) ...[
-                      const SizedBox(height: 16),
-                      OutlinedButton.icon(
-                        onPressed: isLoading
-                            ? null
-                            : () async {
-                                final repo = ref.read(authRepositoryProvider);
-                                try {
-                                  final credential = await repo.signInWithGoogle();
-                                  if (!context.mounted) return;
-                                  if (credential != null) {
-                                    context.go('/');
-                                  }
-                                } catch (e) {
-                                  if (context.mounted) _showError('Google Sign-In: $e');
-                                }
-                              },
-                        icon: const Icon(Iconsax.login, color: AppColors.primary),
-                        label: Text('Continue with Google', style: AppTypography.button.copyWith(color: AppColors.textPrimary)),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          side: BorderSide(color: Colors.grey.shade300),
+                            if (_mode != AuthMode.forgotPassword) ...[
+                              TextFormField(
+                                controller: _passwordController,
+                                obscureText: _obscurePassword,
+                                style: AppTypography.bodyMedium,
+                                decoration: _inputDecoration(
+                                  'Password',
+                                  Iconsax.lock,
+                                  isDark,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(_obscurePassword ? Iconsax.eye_slash : Iconsax.eye, color: AppColors.textSecondary),
+                                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                  ),
+                                ),
+                                validator: (v) => (v == null || v.length < 6) ? 'Password must be at least 6 characters' : null,
+                              ),
+                              const SizedBox(height: AppSpacing.p20),
+                            ],
+
+                            if (_mode == AuthMode.register) ...[
+                              TextFormField(
+                                controller: _confirmPasswordController,
+                                obscureText: _obscureConfirmPassword,
+                                style: AppTypography.bodyMedium,
+                                decoration: _inputDecoration(
+                                  'Confirm Password',
+                                  Iconsax.lock,
+                                  isDark,
+                                  suffixIcon: IconButton(
+                                    icon: Icon(_obscureConfirmPassword ? Iconsax.eye_slash : Iconsax.eye, color: AppColors.textSecondary),
+                                    onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                                  ),
+                                ),
+                                validator: (v) => v != _passwordController.text ? 'Passwords do not match' : null,
+                              ),
+                              const SizedBox(height: AppSpacing.p20),
+                            ],
+
+                            if (_mode == AuthMode.login)
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed: () => setState(() => _mode = AuthMode.forgotPassword),
+                                  child: Text('Forgot Password?', style: AppTypography.labelMedium.copyWith(color: AppColors.primary)),
+                                ),
+                              ),
+
+                            const SizedBox(height: AppSpacing.p32),
+                            
+                            SizedBox(
+                              width: double.infinity,
+                              child: AppButton(
+                                text: _mode == AuthMode.login ? 'Sign In'
+                                    : _mode == AuthMode.register ? 'Sign Up'
+                                    : 'Send Reset Link',
+                                isLoading: isLoading,
+                                onPressed: _submit,
+                              ),
+                            ),
+
+                            if (_mode == AuthMode.login) ...[
+                              const SizedBox(height: AppSpacing.p24),
+                              Row(
+                                children: [
+                                  Expanded(child: Divider(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5))),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16),
+                                    child: Text('OR', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                                  ),
+                                  Expanded(child: Divider(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5))),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.p24),
+                              SizedBox(
+                                width: double.infinity,
+                                child: AppButton(
+                                  text: 'Continue with Google',
+                                  icon: Iconsax.global, // Using global as a placeholder for Google icon
+                                  variant: AppButtonVariant.secondary,
+                                  isLoading: isLoading,
+                                  onPressed: () async {
+                                    final repo = ref.read(authRepositoryProvider);
+                                    try {
+                                      final credential = await repo.signInWithGoogle();
+                                      if (!context.mounted) return;
+                                      if (credential != null) {
+                                        context.go('/');
+                                      }
+                                    } catch (e) {
+                                      if (context.mounted) _showError('Google Sign-In: $e');
+                                    }
+                                  },
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
-                    ],
+                    ).animate().fade(delay: 300.ms).slideY(begin: 0.1),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.p40),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -238,7 +274,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           _mode == AuthMode.login ? 'Don\'t have an account?'
                               : _mode == AuthMode.register ? 'Already have an account?'
                               : 'Remember your password?',
-                          style: AppTypography.body.copyWith(color: AppColors.textSecondary),
+                          style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
                         ),
                         TextButton(
                           onPressed: () {
@@ -248,11 +284,11 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           },
                           child: Text(
                             _mode == AuthMode.login ? 'Sign Up' : 'Sign In',
-                            style: AppTypography.label.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
+                            style: AppTypography.labelLarge.copyWith(color: AppColors.primary),
                           ),
                         ),
                       ],
-                    ),
+                    ).animate().fade(delay: 400.ms),
                   ],
                 ),
               ),
@@ -263,24 +299,25 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon, {Widget? suffixIcon}) {
+  InputDecoration _inputDecoration(String label, IconData icon, bool isDark, {Widget? suffixIcon}) {
     return InputDecoration(
       labelText: label,
+      labelStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
       prefixIcon: Icon(icon, color: AppColors.textSecondary),
       suffixIcon: suffixIcon,
       filled: true,
-      fillColor: Theme.of(context).cardColor,
+      fillColor: isDark ? const Color(0xFF1E1E1E) : Colors.grey.shade50,
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide.none,
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: BorderSide(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: const BorderSide(color: AppColors.primary),
+        borderSide: const BorderSide(color: AppColors.primary, width: 2),
       ),
       errorBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
