@@ -5,6 +5,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
+import '../../../core/theme/spacing/app_spacing.dart';
+import '../../../shared/components/molecules/squircle_card.dart';
+import '../../../shared/components/atoms/app_icon_button.dart';
+import '../../../shared/components/atoms/app_avatar.dart';
 import '../providers/profile_provider.dart';
 import '../models/profile_model.dart';
 
@@ -21,69 +25,83 @@ class _ProfileDashboardScreenState extends ConsumerState<ProfileDashboardScreen>
   @override
   Widget build(BuildContext context) {
     final data = ref.watch(profileProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        title: Text('Student Profile', style: AppTypography.title.copyWith(color: Colors.white, fontSize: 16)),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Iconsax.edit, color: Colors.white),
-            onPressed: () {},
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(context, isDark),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildHero(data, isDark),
+                    _buildApplicationSummary(data, isDark),
+                    _buildAIInsights(data, isDark),
+                    _buildTabs(isDark),
+                    if (_selectedTabIndex == 0) _buildAcademicPortfolio(data, isDark),
+                    if (_selectedTabIndex == 1) _buildPreferences(data, isDark),
+                    if (_selectedTabIndex == 2) _buildAchievements(data, isDark),
+                    const SizedBox(height: 120),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.p24),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text('Student Profile', style: AppTypography.titleLarge),
           ),
-          IconButton(
-            icon: const Icon(Iconsax.setting_2, color: Colors.white),
+          AppIconButton(
+            icon: Iconsax.setting_2,
+            isFilled: true,
+            backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
             onPressed: () => context.push('/settings'),
           ),
         ],
       ),
-      body: CustomScrollView(
-        slivers: [
-          SliverToBoxAdapter(child: _buildHero(data)),
-          SliverToBoxAdapter(child: _buildApplicationSummary(data)),
-          SliverToBoxAdapter(child: _buildAIInsights(data)),
-          SliverToBoxAdapter(child: _buildTabs()),
-          if (_selectedTabIndex == 0) SliverToBoxAdapter(child: _buildAcademicPortfolio(data)),
-          if (_selectedTabIndex == 1) SliverToBoxAdapter(child: _buildPreferences(data)),
-          if (_selectedTabIndex == 2) SliverToBoxAdapter(child: _buildAchievements(data)),
-          const SliverToBoxAdapter(child: SizedBox(height: 100)), // Bottom nav padding
-        ],
-      ),
     );
   }
 
-  Widget _buildHero(ProfileData data) {
+  Widget _buildHero(ProfileData data, bool isDark) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(left: 24, right: 24, bottom: 32, top: 16),
-      decoration: const BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.only(bottomLeft: Radius.circular(32), bottomRight: Radius.circular(32)),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p8),
+      padding: const EdgeInsets.all(AppSpacing.p32),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
+        ],
+        border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
       ),
       child: Column(
         children: [
-          CircleAvatar(
-            radius: 50,
-            backgroundColor: Colors.white,
-            child: CircleAvatar(
-              radius: 46,
-              backgroundImage: NetworkImage(data.photoUrl),
-            ),
-          ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
-          const SizedBox(height: 16),
-          Text(data.name, style: AppTypography.headline.copyWith(color: Colors.white)),
-          const SizedBox(height: 4),
-          Text('${data.educationLevel} • ${data.targetDegree}', style: AppTypography.body.copyWith(color: Colors.white70)),
-          const SizedBox(height: 24),
+          AppAvatar(imageUrl: data.photoUrl, size: 100).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
+          const SizedBox(height: AppSpacing.p24),
+          Text(data.name, style: AppTypography.display.copyWith(fontSize: 28)),
+          const SizedBox(height: AppSpacing.p8),
+          Text('${data.educationLevel} • ${data.targetDegree}', style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+          const SizedBox(height: AppSpacing.p32),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildHeroStat('Completion', '${data.profileCompletionPercentage}%', Iconsax.profile_circle),
-              Container(width: 1, height: 40, color: Colors.white24),
-              _buildHeroStat('Readiness', '${data.aiReadinessScore}%', Iconsax.magic_star),
+              _buildHeroStat('Completion', '${data.profileCompletionPercentage}%', Iconsax.profile_circle, AppColors.primary),
+              Container(width: 1, height: 40, color: (isDark ? AppColors.darkBorder : AppColors.border)),
+              _buildHeroStat('Readiness', '${data.aiReadinessScore}%', Iconsax.magic_star, Colors.amber),
             ],
           ),
         ],
@@ -91,43 +109,43 @@ class _ProfileDashboardScreenState extends ConsumerState<ProfileDashboardScreen>
     );
   }
 
-  Widget _buildHeroStat(String label, String value, IconData icon) {
+  Widget _buildHeroStat(String label, String value, IconData icon, Color color) {
     return Column(
       children: [
         Row(
           children: [
-            Icon(icon, color: Colors.white, size: 16),
-            const SizedBox(width: 8),
-            Text(value, style: AppTypography.title.copyWith(color: Colors.white)),
+            Icon(icon, color: color, size: 20),
+            const SizedBox(width: AppSpacing.p8),
+            Text(value, style: AppTypography.titleLarge.copyWith(color: color)),
           ],
         ),
-        const SizedBox(height: 4),
-        Text(label, style: AppTypography.caption.copyWith(color: Colors.white70)),
+        const SizedBox(height: AppSpacing.p4),
+        Text(label, style: AppTypography.labelMedium.copyWith(color: AppColors.textSecondary)),
       ],
     );
   }
 
-  Widget _buildApplicationSummary(ProfileData data) {
+  Widget _buildApplicationSummary(ProfileData data, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.p24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Application Summary', style: AppTypography.title),
-          const SizedBox(height: 16),
+          Text('Application Summary', style: AppTypography.titleLarge),
+          const SizedBox(height: AppSpacing.p16),
           Row(
             children: [
               _buildSummaryCard('Apps Submitted', data.applicationsSubmitted.toString(), Iconsax.document_upload, AppColors.primary),
-              const SizedBox(width: 12),
+              const SizedBox(width: AppSpacing.p12),
               _buildSummaryCard('Saved Aid', data.scholarshipsSaved.toString(), Iconsax.wallet_money, AppColors.success),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.p12),
           Row(
             children: [
-              _buildSummaryCard('Resume Score', '${data.resumeScore}%', Iconsax.document_text, AppColors.secondary),
-              const SizedBox(width: 12),
-              _buildSummaryCard('Interview Score', '${data.interviewScore}%', Iconsax.video, AppColors.warning),
+              _buildSummaryCard('Resume Score', '${data.resumeScore}%', Iconsax.document_text, Colors.indigo),
+              const SizedBox(width: AppSpacing.p12),
+              _buildSummaryCard('Interview Score', '${data.interviewScore}%', Iconsax.video, Colors.purple),
             ],
           ),
         ],
@@ -137,21 +155,19 @@ class _ProfileDashboardScreenState extends ConsumerState<ProfileDashboardScreen>
 
   Widget _buildSummaryCard(String title, String value, IconData icon, Color color) {
     return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))],
-        ),
+      child: SquircleCard(
+        padding: const EdgeInsets.all(AppSpacing.p20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(height: 12),
-            Text(value, style: AppTypography.headline.copyWith(fontSize: 20)),
-            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.p8),
+              decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+              child: Icon(icon, color: color, size: 20),
+            ),
+            const SizedBox(height: AppSpacing.p16),
+            Text(value, style: AppTypography.display.copyWith(fontSize: 28)),
+            const SizedBox(height: AppSpacing.p4),
             Text(title, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
           ],
         ),
@@ -159,27 +175,30 @@ class _ProfileDashboardScreenState extends ConsumerState<ProfileDashboardScreen>
     );
   }
 
-  Widget _buildAIInsights(ProfileData data) {
+  Widget _buildAIInsights(ProfileData data, bool isDark) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+      padding: const EdgeInsets.all(AppSpacing.p32),
       decoration: BoxDecoration(
         gradient: AppColors.aiGradient,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 24, offset: const Offset(0, 10)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Iconsax.magic_star, color: Colors.white, size: 24).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(),
-              const SizedBox(width: 12),
-              Text('AI Profile Insights', style: AppTypography.title.copyWith(color: Colors.white)),
+              const Icon(Iconsax.magic_star, color: Colors.white, size: 28).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(),
+              const SizedBox(width: AppSpacing.p12),
+              Text('AI Profile Insights', style: AppTypography.titleLarge.copyWith(color: Colors.white)),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppSpacing.p24),
           ...data.aiInsights.map((insight) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(bottom: AppSpacing.p16),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -187,8 +206,8 @@ class _ProfileDashboardScreenState extends ConsumerState<ProfileDashboardScreen>
                   padding: EdgeInsets.only(top: 6),
                   child: CircleAvatar(radius: 4, backgroundColor: Colors.white54),
                 ),
-                const SizedBox(width: 12),
-                Expanded(child: Text(insight, style: AppTypography.body.copyWith(color: Colors.white))),
+                const SizedBox(width: AppSpacing.p16),
+                Expanded(child: Text(insight, style: AppTypography.bodyMedium.copyWith(color: Colors.white, height: 1.5))),
               ],
             ),
           )),
@@ -197,45 +216,45 @@ class _ProfileDashboardScreenState extends ConsumerState<ProfileDashboardScreen>
     ).animate().fade(delay: 200.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildTabs() {
+  Widget _buildTabs(bool isDark) {
     return Padding(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppSpacing.p24),
       child: Container(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(AppSpacing.p8),
         decoration: BoxDecoration(
-          color: Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(12),
+          color: isDark ? AppColors.darkSurface : AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
         ),
         child: Row(
           children: [
-            _buildTabItem(0, 'Academic'),
-            _buildTabItem(1, 'Preferences'),
-            _buildTabItem(2, 'Achievements'),
+            _buildTabItem(0, 'Academic', isDark),
+            _buildTabItem(1, 'Preferences', isDark),
+            _buildTabItem(2, 'Achievements', isDark),
           ],
         ),
       ),
     ).animate().fade(delay: 300.ms);
   }
 
-  Widget _buildTabItem(int index, String title) {
+  Widget _buildTabItem(int index, String title, bool isDark) {
     final isSelected = _selectedTabIndex == index;
     return Expanded(
       child: GestureDetector(
         onTap: () => setState(() => _selectedTabIndex = index),
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.p12),
           decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
+            color: isSelected ? (isDark ? const Color(0xFF333333) : Colors.white) : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
             boxShadow: isSelected ? [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4)] : null,
           ),
           child: Center(
             child: Text(
               title, 
-              style: AppTypography.label.copyWith(
-                color: isSelected ? AppColors.textPrimary : AppColors.textSecondary,
+              style: AppTypography.labelMedium.copyWith(
+                color: isSelected ? (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary) : AppColors.textSecondary,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 12,
               ),
             ),
           ),
@@ -244,92 +263,88 @@ class _ProfileDashboardScreenState extends ConsumerState<ProfileDashboardScreen>
     );
   }
 
-  Widget _buildAcademicPortfolio(ProfileData data) {
+  Widget _buildAcademicPortfolio(ProfileData data, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
       child: Column(
         children: [
-          _buildInfoRow('Current GPA', data.currentGpa, Iconsax.chart_2),
-          _buildInfoRow('Test Scores', data.standardizedTests, Iconsax.award),
-          _buildInfoRow('Research', data.researchExperience, Iconsax.microscope),
-          _buildInfoRow('Projects', data.projects, Iconsax.cpu),
-          _buildInfoRow('Skills', data.skills, Iconsax.code),
+          _buildInfoRow('Current GPA', data.currentGpa, Iconsax.chart_2, isDark),
+          _buildInfoRow('Test Scores', data.standardizedTests, Iconsax.award, isDark),
+          _buildInfoRow('Research', data.researchExperience, Iconsax.microscope, isDark),
+          _buildInfoRow('Projects', data.projects, Iconsax.cpu, isDark),
+          _buildInfoRow('Skills', data.skills, Iconsax.code, isDark),
         ],
       ),
     ).animate().fade().slideY(begin: 0.1);
   }
 
-  Widget _buildPreferences(ProfileData data) {
+  Widget _buildPreferences(ProfileData data, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
       child: Column(
         children: [
-          _buildInfoRow('Target Countries', data.targetCountries.join(', '), Iconsax.global),
-          _buildInfoRow('Budget', data.budget, Iconsax.wallet),
-          _buildInfoRow('Aid Preference', data.scholarshipPreference, Iconsax.money_tick),
-          _buildInfoRow('Study Mode', data.studyMode, Iconsax.book),
+          _buildInfoRow('Target Countries', data.targetCountries.join(', '), Iconsax.global, isDark),
+          _buildInfoRow('Budget', data.budget, Iconsax.wallet, isDark),
+          _buildInfoRow('Aid Preference', data.scholarshipPreference, Iconsax.money_tick, isDark),
+          _buildInfoRow('Study Mode', data.studyMode, Iconsax.book, isDark),
         ],
       ),
     ).animate().fade().slideY(begin: 0.1);
   }
 
-  Widget _buildAchievements(ProfileData data) {
+  Widget _buildAchievements(ProfileData data, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ...data.achievements.map((ach) => Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: Colors.grey.shade200),
-            ),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+      child: SquircleCard(
+        padding: const EdgeInsets.all(AppSpacing.p24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: data.achievements.map((ach) => Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.p16),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const CircleAvatar(
                   backgroundColor: AppColors.success,
-                  radius: 16,
-                  child: Icon(Iconsax.verify, color: Colors.white, size: 16),
+                  radius: 12,
+                  child: Icon(Iconsax.verify, color: Colors.white, size: 12),
                 ),
-                const SizedBox(width: 16),
-                Expanded(child: Text(ach, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold))),
+                const SizedBox(width: AppSpacing.p16),
+                Expanded(child: Text(ach, style: AppTypography.labelLarge)),
               ],
             ),
-          )),
-        ],
+          )).toList(),
+        ),
       ),
     ).animate().fade().slideY(begin: 0.1);
   }
 
-  Widget _buildInfoRow(String label, String value, IconData icon) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: AppColors.primary, size: 20),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(label, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-                const SizedBox(height: 4),
-                Text(value, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
-              ],
+  Widget _buildInfoRow(String label, String value, IconData icon, bool isDark) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.p12),
+      child: SquircleCard(
+        padding: const EdgeInsets.all(AppSpacing.p20),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.p12),
+              decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
+              child: Icon(icon, color: AppColors.primary, size: 24),
             ),
-          ),
-          const Icon(Iconsax.edit_2, color: AppColors.textSecondary, size: 16),
-        ],
+            const SizedBox(width: AppSpacing.p16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(label, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                  const SizedBox(height: AppSpacing.p4),
+                  Text(value, style: AppTypography.titleMedium),
+                ],
+              ),
+            ),
+            const Icon(Iconsax.edit_2, color: AppColors.textSecondary, size: 20),
+          ],
+        ),
       ),
     );
   }
