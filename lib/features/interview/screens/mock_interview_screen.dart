@@ -159,8 +159,9 @@ class _MockInterviewScreenState extends ConsumerState<MockInterviewScreen> {
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
             decoration: BoxDecoration(
-              color:
-                  _isRecording ? Colors.red.withOpacity(0.2) : Colors.white10,
+              color: _isRecording
+                  ? Colors.red.withValues(alpha: 0.2)
+                  : Colors.white10,
               borderRadius: BorderRadius.circular(100),
               border:
                   Border.all(color: _isRecording ? Colors.red : Colors.white24),
@@ -202,12 +203,12 @@ class _MockInterviewScreenState extends ConsumerState<MockInterviewScreen> {
           horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
       padding: const EdgeInsets.all(AppSpacing.p24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.05),
+        color: Colors.white.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.white12),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.5),
+              color: Colors.black.withValues(alpha: 0.5),
               blurRadius: 20,
               offset: const Offset(0, 10)),
         ],
@@ -241,7 +242,7 @@ class _MockInterviewScreenState extends ConsumerState<MockInterviewScreen> {
           horizontal: AppSpacing.p24, vertical: AppSpacing.p8),
       padding: const EdgeInsets.all(AppSpacing.p24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.02),
+        color: Colors.white.withValues(alpha: 0.02),
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.white12),
       ),
@@ -293,8 +294,9 @@ class _MockInterviewScreenState extends ConsumerState<MockInterviewScreen> {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color:
-                    _isRecording ? Colors.red.withOpacity(0.2) : Colors.white10,
+                color: _isRecording
+                    ? Colors.red.withValues(alpha: 0.2)
+                    : Colors.white10,
                 shape: BoxShape.circle,
                 border: Border.all(
                     color: _isRecording ? Colors.red : Colors.white24,

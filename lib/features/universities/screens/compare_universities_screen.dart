@@ -89,7 +89,7 @@ class CompareUniversitiesScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(100),
             ),
             child: Text(
@@ -174,7 +174,7 @@ class CompareUniversitiesScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8)),
             child: Text('AI Match ${university.aiMatch}%',
                 style: AppTypography.caption.copyWith(
@@ -199,7 +199,7 @@ class CompareUniversitiesScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 20,
               offset: const Offset(0, 10)),
         ],
@@ -443,7 +443,7 @@ class CompareUniversitiesScreen extends ConsumerWidget {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, -10))
           ],

@@ -247,10 +247,10 @@ class SettingsDashboardScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
             color: (isDark ? AppColors.darkBorder : AppColors.border)
-                .withOpacity(0.5)),
+                .withValues(alpha: 0.5)),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 10,
               offset: const Offset(0, 4)),
         ],
@@ -264,7 +264,7 @@ class SettingsDashboardScreen extends ConsumerWidget {
                   height: 1,
                   indent: 64,
                   color: (isDark ? AppColors.darkBorder : AppColors.border)
-                      .withOpacity(0.5)),
+                      .withValues(alpha: 0.5)),
           ],
         ],
       ),
@@ -280,7 +280,8 @@ class SettingsDashboardScreen extends ConsumerWidget {
       leading: Container(
         padding: const EdgeInsets.all(AppSpacing.p12),
         decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
+            color: AppColors.primary.withValues(alpha: 0.1),
+            shape: BoxShape.circle),
         child: Icon(icon, color: AppColors.primary, size: 20),
       ),
       title: Text(title,
@@ -306,13 +307,14 @@ class SettingsDashboardScreen extends ConsumerWidget {
     return SwitchListTile(
       value: value,
       onChanged: onChanged,
-      activeColor: AppColors.primary,
+      activeThumbColor: AppColors.primary,
       contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.p20, vertical: AppSpacing.p4),
       secondary: Container(
         padding: const EdgeInsets.all(AppSpacing.p12),
         decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
+            color: AppColors.primary.withValues(alpha: 0.1),
+            shape: BoxShape.circle),
         child: Icon(icon, color: AppColors.primary, size: 20),
       ),
       title: Text(title,
@@ -331,7 +333,7 @@ class SettingsDashboardScreen extends ConsumerWidget {
       leading: Container(
         padding: const EdgeInsets.all(AppSpacing.p12),
         decoration: BoxDecoration(
-            color: color.withOpacity(0.1), shape: BoxShape.circle),
+            color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
         child: Icon(icon, color: color, size: 20),
       ),
       title:

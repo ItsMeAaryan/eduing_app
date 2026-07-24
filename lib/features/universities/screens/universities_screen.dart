@@ -73,7 +73,7 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
                       border: Border.all(
                           color:
                               (isDark ? AppColors.darkBorder : AppColors.border)
-                                  .withOpacity(0.5)),
+                                  .withValues(alpha: 0.5)),
                     ),
                     child: const Icon(Iconsax.bookmark, size: 20),
                   ),
@@ -125,7 +125,7 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
                                 : (isDark
                                         ? AppColors.darkBorder
                                         : AppColors.border)
-                                    .withOpacity(0.5),
+                                    .withValues(alpha: 0.5),
                           ),
                         ),
                         child: Text(

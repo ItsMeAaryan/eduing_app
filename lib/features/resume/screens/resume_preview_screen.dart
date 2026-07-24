@@ -123,7 +123,7 @@ class ResumePreviewScreen extends ConsumerWidget {
                     color: isSelected
                         ? AppColors.primary
                         : (isDark ? AppColors.darkBorder : AppColors.border)
-                            .withOpacity(0.5)),
+                            .withValues(alpha: 0.5)),
               ),
               child: Center(
                 child: Text(
@@ -159,13 +159,13 @@ class ResumePreviewScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.08),
+                color: Colors.black.withValues(alpha: 0.08),
                 blurRadius: 30,
                 offset: const Offset(0, 15)),
           ],
           border: Border.all(
               color: (isDark ? AppColors.darkBorder : AppColors.border)
-                  .withOpacity(0.5)),
+                  .withValues(alpha: 0.5)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

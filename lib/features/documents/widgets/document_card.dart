@@ -34,10 +34,12 @@ class DocumentCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
+          border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
           boxShadow: [
             BoxShadow(
-              color: isDark ? Colors.black26 : Colors.black.withOpacity(0.04),
+              color: isDark
+                  ? Colors.black26
+                  : Colors.black.withValues(alpha: 0.04),
               blurRadius: 16,
               offset: const Offset(0, 8),
             ),
@@ -49,7 +51,8 @@ class DocumentCard extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: _getCategoryColor(document.category).withOpacity(0.12),
+                color: _getCategoryColor(document.category)
+                    .withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(_getCategoryIcon(document.category),
@@ -92,7 +95,7 @@ class DocumentCard extends StatelessWidget {
                             horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
                           color: _getStatusColor(document.status)
-                              .withOpacity(0.12),
+                              .withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(
@@ -110,7 +113,7 @@ class DocumentCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.error.withOpacity(0.12),
+                            color: AppColors.error.withValues(alpha: 0.12),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(

@@ -83,7 +83,7 @@ class AIResumeReviewScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 30,
               offset: const Offset(0, 15)),
         ],
@@ -147,7 +147,7 @@ class AIResumeReviewScreen extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(
                 horizontal: AppSpacing.p12, vertical: AppSpacing.p4),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text('$score%',
@@ -178,7 +178,7 @@ class AIResumeReviewScreen extends ConsumerWidget {
                     Container(
                       padding: const EdgeInsets.all(AppSpacing.p8),
                       decoration: BoxDecoration(
-                        color: Colors.amber.withOpacity(0.15),
+                        color: Colors.amber.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Iconsax.flash,

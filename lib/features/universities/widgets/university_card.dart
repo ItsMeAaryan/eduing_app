@@ -27,7 +27,7 @@ class AppUniversityCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -199,9 +199,9 @@ class AppUniversityCard extends StatelessWidget {
       runSpacing: 8,
       children: [
         _buildSmallBadge(university.nirfRanking,
-            AppColors.primary.withOpacity(0.1), AppColors.primary),
+            AppColors.primary.withValues(alpha: 0.1), AppColors.primary),
         _buildSmallBadge(university.accreditation,
-            AppColors.success.withOpacity(0.1), AppColors.success),
+            AppColors.success.withValues(alpha: 0.1), AppColors.success),
         _buildSmallBadge(
             university.type, AppColors.background, AppColors.textSecondary),
         _buildSmallBadge(university.established, AppColors.background,
@@ -295,11 +295,11 @@ class AppUniversityCard extends StatelessWidget {
           decoration: BoxDecoration(
             color: isNumber
                 ? Colors.transparent
-                : AppColors.success.withOpacity(0.05),
+                : AppColors.success.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(100),
             border: isNumber
                 ? null
-                : Border.all(color: AppColors.success.withOpacity(0.2)),
+                : Border.all(color: AppColors.success.withValues(alpha: 0.2)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,

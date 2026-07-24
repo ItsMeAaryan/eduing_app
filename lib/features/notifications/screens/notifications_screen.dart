@@ -80,11 +80,12 @@ class NotificationsScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.p24),
             decoration: BoxDecoration(
               color: (isDark ? AppColors.darkSurface : AppColors.surface)
-                  .withOpacity(0.5),
+                  .withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
             child: Icon(Iconsax.notification_status,
-                size: 64, color: AppColors.textSecondary.withOpacity(0.5)),
+                size: 64,
+                color: AppColors.textSecondary.withValues(alpha: 0.5)),
           ),
           const SizedBox(height: AppSpacing.p24),
           Text('All caught up!', style: AppTypography.titleLarge),
@@ -138,15 +139,15 @@ class NotificationsScreen extends ConsumerWidget {
           color: notif.isRead
               ? (isDark ? AppColors.darkSurface : Colors.white)
               : (isDark
-                  ? AppColors.primary.withOpacity(0.05)
-                  : AppColors.primary.withOpacity(0.05)),
+                  ? AppColors.primary.withValues(alpha: 0.05)
+                  : AppColors.primary.withValues(alpha: 0.05)),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: const EdgeInsets.all(AppSpacing.p12),
                 decoration: BoxDecoration(
-                  color: getIconColor().withOpacity(0.1),
+                  color: getIconColor().withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(getIcon(), color: getIconColor(), size: 24),
@@ -194,7 +195,8 @@ class NotificationsScreen extends ConsumerWidget {
                     Text(
                       timeAgo,
                       style: AppTypography.caption.copyWith(
-                          color: AppColors.textSecondary.withOpacity(0.7)),
+                          color:
+                              AppColors.textSecondary.withValues(alpha: 0.7)),
                     ),
                   ],
                 ),

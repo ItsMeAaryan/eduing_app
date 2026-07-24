@@ -129,7 +129,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                                color: AppColors.primary.withOpacity(0.3),
+                                color: AppColors.primary.withValues(alpha: 0.3),
                                 blurRadius: 30,
                                 offset: const Offset(0, 15)),
                           ],
@@ -277,7 +277,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                           color: (isDark
                                                   ? AppColors.darkBorder
                                                   : AppColors.border)
-                                              .withOpacity(0.5))),
+                                              .withValues(alpha: 0.5))),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: AppSpacing.p16),
@@ -290,7 +290,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                           color: (isDark
                                                   ? AppColors.darkBorder
                                                   : AppColors.border)
-                                              .withOpacity(0.5))),
+                                              .withValues(alpha: 0.5))),
                                 ],
                               ),
                               const SizedBox(height: AppSpacing.p24),
@@ -382,7 +382,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         borderRadius: BorderRadius.circular(16),
         borderSide: BorderSide(
             color: (isDark ? AppColors.darkBorder : AppColors.border)
-                .withOpacity(0.5)),
+                .withValues(alpha: 0.5)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),

@@ -179,7 +179,7 @@ class _ResumeDashboardScreenState extends ConsumerState<ResumeDashboardScreen> {
           AppIconButton(
             icon: Iconsax.magic_star,
             isFilled: true,
-            backgroundColor: AppColors.primary.withOpacity(0.1),
+            backgroundColor: AppColors.primary.withValues(alpha: 0.1),
             color: AppColors.primary,
             onPressed: () async {
               final router = GoRouter.of(context);
@@ -205,7 +205,7 @@ class _ResumeDashboardScreenState extends ConsumerState<ResumeDashboardScreen> {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 24,
               offset: const Offset(0, 12)),
         ],
@@ -246,7 +246,7 @@ class _ResumeDashboardScreenState extends ConsumerState<ResumeDashboardScreen> {
       padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.15),
+        color: Colors.white.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -334,8 +334,8 @@ class _ResumeDashboardScreenState extends ConsumerState<ResumeDashboardScreen> {
                 padding: const EdgeInsets.all(AppSpacing.p12),
                 decoration: BoxDecoration(
                   color: isDone
-                      ? AppColors.success.withOpacity(0.1)
-                      : AppColors.primary.withOpacity(0.1),
+                      ? AppColors.success.withValues(alpha: 0.1)
+                      : AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon,

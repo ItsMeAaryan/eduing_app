@@ -79,15 +79,15 @@ class CopilotHomeScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(AppSpacing.p8),
                   decoration: BoxDecoration(
                     color: (isDark ? AppColors.darkSurface : Colors.white)
-                        .withOpacity(0.8),
+                        .withValues(alpha: 0.8),
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(
                         color:
                             (isDark ? AppColors.darkBorder : AppColors.border)
-                                .withOpacity(0.2)),
+                                .withValues(alpha: 0.2)),
                     boxShadow: [
                       BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withValues(alpha: 0.1),
                           blurRadius: 20,
                           offset: const Offset(0, 10)),
                     ],
@@ -144,7 +144,7 @@ class CopilotHomeScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 30,
               offset: const Offset(0, 15)),
         ],
@@ -168,8 +168,8 @@ class CopilotHomeScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.p24),
           Text(
             'Your intelligent study abroad assistant is ready to help draft SOPs, evaluate resumes, and prepare for interviews.',
-            style: AppTypography.bodyMedium
-                .copyWith(color: Colors.white.withOpacity(0.9), height: 1.5),
+            style: AppTypography.bodyMedium.copyWith(
+                color: Colors.white.withValues(alpha: 0.9), height: 1.5),
           ),
         ],
       ),
@@ -253,7 +253,7 @@ class CopilotHomeScreen extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(AppSpacing.p12),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 24),

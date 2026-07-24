@@ -60,7 +60,7 @@ class ScholarshipComparisonScreen extends ConsumerWidget {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 20,
               offset: const Offset(0, 10)),
         ],
@@ -107,7 +107,7 @@ class ScholarshipComparisonScreen extends ConsumerWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.05),
+        color: AppColors.primary.withValues(alpha: 0.05),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(

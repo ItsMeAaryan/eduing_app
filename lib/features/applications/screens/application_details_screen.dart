@@ -111,7 +111,7 @@ class _ApplicationDetailsScreenState
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -374,7 +374,7 @@ class _ApplicationDetailsScreenState
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Icon(Iconsax.document,
@@ -464,12 +464,12 @@ class _ApplicationDetailsScreenState
       padding: const EdgeInsets.all(AppSpacing.p16),
       decoration: BoxDecoration(
         color: isDark
-            ? AppColors.darkSurface.withOpacity(0.9)
-            : AppColors.surface.withOpacity(0.9),
+            ? AppColors.darkSurface.withValues(alpha: 0.9)
+            : AppColors.surface.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -514,8 +514,6 @@ class _ApplicationDetailsScreenState
         return StatusType.accepted;
       case ApplicationStatus.rejected:
         return StatusType.rejected;
-      default:
-        return StatusType.inProgress;
     }
   }
 }

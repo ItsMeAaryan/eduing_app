@@ -99,7 +99,7 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
-                    value: category,
+                    initialValue: category,
                     items: _filters
                         .where((f) => f != 'All')
                         .map((c) => DropdownMenuItem(value: c, child: Text(c)))
@@ -342,7 +342,7 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                                       color: (isDark
                                               ? AppColors.darkBackground
                                               : AppColors.background)
-                                          .withOpacity(0.8),
+                                          .withValues(alpha: 0.8),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: Center(
@@ -420,7 +420,7 @@ class _SummaryChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -428,7 +428,7 @@ class _SummaryChip extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Text(
@@ -470,7 +470,7 @@ class _UploadSourceButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withOpacity(0.1)
+              ? AppColors.primary.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(

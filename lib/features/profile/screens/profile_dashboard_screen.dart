@@ -91,13 +91,13 @@ class _ProfileDashboardScreenState
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 20,
               offset: const Offset(0, 10)),
         ],
         border: Border.all(
             color: (isDark ? AppColors.darkBorder : AppColors.border)
-                .withOpacity(0.5)),
+                .withValues(alpha: 0.5)),
       ),
       child: Column(
         children: [
@@ -197,7 +197,7 @@ class _ProfileDashboardScreenState
             Container(
               padding: const EdgeInsets.all(AppSpacing.p8),
               decoration: BoxDecoration(
-                  color: color.withOpacity(0.1), shape: BoxShape.circle),
+                  color: color.withValues(alpha: 0.1), shape: BoxShape.circle),
               child: Icon(icon, color: color, size: 20),
             ),
             const SizedBox(height: AppSpacing.p16),
@@ -221,7 +221,7 @@ class _ProfileDashboardScreenState
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 24,
               offset: const Offset(0, 10)),
         ],
@@ -274,7 +274,7 @@ class _ProfileDashboardScreenState
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
               color: (isDark ? AppColors.darkBorder : AppColors.border)
-                  .withOpacity(0.5)),
+                  .withValues(alpha: 0.5)),
         ),
         child: Row(
           children: [
@@ -302,7 +302,8 @@ class _ProfileDashboardScreenState
             boxShadow: isSelected
                 ? [
                     BoxShadow(
-                        color: Colors.black.withOpacity(0.05), blurRadius: 4)
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 4)
                   ]
                 : null,
           ),
@@ -399,7 +400,7 @@ class _ProfileDashboardScreenState
             Container(
               padding: const EdgeInsets.all(AppSpacing.p12),
               decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle),
               child: Icon(icon, color: AppColors.primary, size: 24),
             ),

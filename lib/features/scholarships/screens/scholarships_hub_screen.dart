@@ -80,7 +80,7 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-              color: AppColors.primary.withOpacity(0.3),
+              color: AppColors.primary.withValues(alpha: 0.3),
               blurRadius: 20,
               offset: const Offset(0, 10)),
         ],
@@ -221,7 +221,7 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                                color: AppColors.success.withOpacity(0.1),
+                                color: AppColors.success.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(8)),
                             child: Text(rec.type,
                                 style: AppTypography.caption.copyWith(
@@ -284,7 +284,7 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, 10)),
           ],
@@ -296,7 +296,7 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
               children: [
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: AppColors.primary.withOpacity(0.1),
+                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                   child: const Icon(Iconsax.bank, color: AppColors.primary),
                 ),
                 const SizedBox(width: 16),

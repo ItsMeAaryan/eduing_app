@@ -1,0 +1,675 @@
+9e2e869 - 2026-07-24 - feat(ui): redesign authentication screen with premium squircle aesthetic
+ lib/features/auth/screens/auth_screen.dart | 267 ++++++++++++++++-------------
+ 1 file changed, 152 insertions(+), 115 deletions(-)
+
+7e0f4cf - 2026-07-24 - feat(ui): redesign settings module with premium squircle aesthetic
+ .../screens/settings_dashboard_screen.dart         | 265 ++++++++++++---------
+ 1 file changed, 154 insertions(+), 111 deletions(-)
+
+e515e86 - 2026-07-24 - feat(ui): redesign profile module with premium squircle aesthetic
+ .../profile/screens/profile_dashboard_screen.dart  | 325 +++++++++++----------
+ 1 file changed, 170 insertions(+), 155 deletions(-)
+
+a0044c7 - 2026-07-24 - feat(ui): add notifications module with premium squircle design
+ lib/core/router/app_router.dart                    |   5 +
+ .../dashboard/screens/dashboard_screen.dart        |   2 +-
+ .../notifications/models/notification_item.dart    |  35 ++++
+ .../providers/notifications_provider.dart          |  57 +++++++
+ .../screens/notifications_screen.dart              | 189 +++++++++++++++++++++
+ 5 files changed, 287 insertions(+), 1 deletion(-)
+
+4a8ff54 - 2026-07-24 - feat(ui): redesign interview coach with premium dark camera recording UI
+ .../screens/interview_dashboard_screen.dart        | 179 +++++++++----
+ .../interview/screens/interview_report_screen.dart | 207 +++++++++------
+ .../interview/screens/mock_interview_screen.dart   | 288 +++++++++++++++------
+ .../screens/question_practice_screen.dart          | 104 +++++---
+ 4 files changed, 541 insertions(+), 237 deletions(-)
+
+02d190b - 2026-07-24 - feat(ui): redesign resume builder as premium interactive form
+ .../resume/screens/ai_resume_review_screen.dart    | 221 ++++++++-----
+ .../resume/screens/resume_dashboard_screen.dart    | 342 ++++++++++++---------
+ .../resume/screens/resume_preview_screen.dart      | 291 ++++++++++--------
+ 3 files changed, 495 insertions(+), 359 deletions(-)
+
+faa4dc0 - 2026-07-24 - feat(ui): redesign sop builder as premium distraction-free workspace
+ lib/features/sop/screens/ai_sop_review_screen.dart | 223 ++++++----
+ lib/features/sop/screens/sop_dashboard_screen.dart | 481 ++++++++++-----------
+ lib/features/sop/screens/sop_preview_screen.dart   | 154 ++++---
+ 3 files changed, 454 insertions(+), 404 deletions(-)
+
+31279a7 - 2026-07-24 - feat(ui): redesign ai copilot as premium admission strategist
+ lib/features/copilot/screens/chat_screen.dart      | 227 +++++++++++------
+ .../copilot/screens/copilot_home_screen.dart       | 275 +++++++++++++--------
+ 2 files changed, 329 insertions(+), 173 deletions(-)
+
+21896f2 - 2026-07-24 - feat(ui): redesign document vault into premium secure workspace
+ .../documents/screens/document_preview_screen.dart | 287 ++++++------
+ .../documents/screens/documents_screen.dart        | 488 +++++++++++----------
+ 2 files changed, 421 insertions(+), 354 deletions(-)
+
+9601d64 - 2026-07-24 - feat(ui): redesign planner module as admission journey roadmap
+ .../planner/screens/planner_dashboard_screen.dart  | 454 ++++++++++-----------
+ 1 file changed, 213 insertions(+), 241 deletions(-)
+
+2bea7e2 - 2026-07-24 - feat(ui): redesign universities module as apple-like bento layout
+ .../universities/screens/universities_screen.dart  | 342 +++++----
+ .../screens/university_details_screen.dart         | 768 +++++++--------------
+ 2 files changed, 389 insertions(+), 721 deletions(-)
+
+9e513ef - 2026-07-24 - feat(ui): redesign applications module as premium workspace
+ .../screens/application_details_screen.dart        | 479 ++++++++++++++++-----
+ .../applications/screens/applications_screen.dart  | 366 +++++++++-------
+ 2 files changed, 583 insertions(+), 262 deletions(-)
+
+b74aad1 - 2026-07-23 - refactor(ui): elevate dashboard to flagship production quality
+ .../dashboard/screens/dashboard_screen.dart        | 374 ++++++++++++---------
+ .../components/molecules/quick_action_tile.dart    |  12 +
+ .../organisms/premium_application_card.dart        | 211 ++++++++----
+ 3 files changed, 374 insertions(+), 223 deletions(-)
+
+20a8437 - 2026-07-23 - feat(ui): redesign dashboard with premium design system components
+ .../dashboard/screens/dashboard_screen.dart        | 551 +++++++--------------
+ lib/shared/components/molecules/metric_item.dart   |  30 ++
+ 2 files changed, 215 insertions(+), 366 deletions(-)
+
+3800507 - 2026-07-23 - feat(dev): create interactive design system component gallery
+ .../component_gallery_screen.dart                  | 277 +++++++++++++++++++++
+ lib/shared/components/organisms/empty_state.dart   |  60 +++++
+ lib/shared/components/organisms/planner_card.dart  |  55 ++++
+ .../components/organisms/university_card.dart      |  75 ++++++
+ 4 files changed, 467 insertions(+)
+
+0b665c4 - 2026-07-23 - feat(ui): build reusable premium design system components
+ lib/shared/components/atoms/app_avatar.dart        |  87 ++++++++++
+ lib/shared/components/atoms/app_button.dart        | 189 +++++++++++++++++++++
+ lib/shared/components/atoms/app_chip.dart          |  62 +++++++
+ lib/shared/components/atoms/app_divider.dart       |  33 ++++
+ lib/shared/components/atoms/app_icon_button.dart   |  81 +++++++++
+ lib/shared/components/atoms/app_text_field.dart    |  86 ++++++++++
+ lib/shared/components/atoms/progress_bar.dart      |  63 +++++++
+ lib/shared/components/atoms/search_field.dart      |  22 +++
+ lib/shared/components/atoms/shimmer_block.dart     |  41 +++++
+ lib/shared/components/atoms/status_pill.dart       |  82 +++++++++
+ lib/shared/components/molecules/metric_item.dart   |  45 +++++
+ .../components/molecules/quick_action_tile.dart    |  70 ++++++++
+ lib/shared/components/molecules/squircle_card.dart |  57 +++++++
+ .../organisms/admission_progress_card.dart         | 104 ++++++++++++
+ .../organisms/floating_bottom_navigation.dart      | 141 +++++++++++++++
+ .../organisms/premium_application_card.dart        | 140 +++++++++++++++
+ 16 files changed, 1303 insertions(+)
+
+31c07b2 - 2026-07-23 - feat(design): implement phase 1 design tokens and foundation
+ lib/core/theme/app_animation.dart             |  19 ++++
+ lib/core/theme/app_blur.dart                  |   6 +
+ lib/core/theme/app_border.dart                |  11 ++
+ lib/core/theme/app_duration.dart              |   7 ++
+ lib/core/theme/app_elevation.dart             |   9 ++
+ lib/core/theme/app_opacity.dart               |  10 ++
+ lib/core/theme/app_radius.dart                |  25 +++++
+ lib/core/theme/app_shadow.dart                |  58 ++++++++++
+ lib/core/theme/app_theme.dart                 |  59 +++++++++-
+ lib/core/theme/colors/app_colors.dart         |  47 +++++---
+ lib/core/theme/spacing/app_spacing.dart       |   2 -
+ lib/core/theme/typography/app_typography.dart |  36 ++++--
+ pubspec.lock                                  | 152 ++++++++++++++++++++++++++
+ pubspec.yaml                                  |   5 +
+ 14 files changed, 415 insertions(+), 31 deletions(-)
+
+2f66ee3 - 2026-07-23 - release(rc1): prepare production build artifacts
+9448182 - 2026-07-23 - chore(cleanup): consolidate design tokens and verify clean codebase
+9bff7dc - 2026-07-23 - perf(ui): standardize Material 3 widgets and layout constness
+38c2364 - 2026-07-23 - refactor(dashboard): extract reusable dashboard sub-widgets
+ .../dashboard/screens/dashboard_screen.dart        | 176 ++++++++++++++++-----
+ 1 file changed, 133 insertions(+), 43 deletions(-)
+
+008b619 - 2026-07-23 - fix(sync): fix error logging interpolation in sync service
+ lib/core/services/sync/sync_service.dart | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+13df2a0 - 2026-07-23 - fix(ai): fix string interpolation and prompt formatting in Gemini service
+ lib/core/services/ai/gemini_ai_service.dart | 50 +++++++++++++++--------------
+ 1 file changed, 26 insertions(+), 24 deletions(-)
+
+e2b4db8 - 2026-07-23 - refactor(router): remove dead placeholder screen code
+ lib/core/router/app_router.dart | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+ff503a6 - 2026-07-23 - chore(dependencies): remove unused packages
+ pubspec.lock | 40 ----------------------------------------
+ pubspec.yaml |  6 ------
+ 2 files changed, 46 deletions(-)
+
+92c3a8f - 2026-07-23 - fix(android): resolve Gradle configuration exception loop and desugaring dependencies
+ android/app/build.gradle | 7 ++++++-
+ android/build.gradle     | 2 +-
+ android/settings.gradle  | 2 +-
+ 3 files changed, 8 insertions(+), 3 deletions(-)
+
+d15adf6 - 2026-07-22 - docs(audit): document architecture audit and release specifications
+ docs/EDUING_PRODUCTION_AUDIT.html | 480 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 480 insertions(+)
+
+9dc42bb - 2026-07-22 - test(auth): add unit test coverage for authentication validation
+ test/features/auth/auth_test.dart | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
+
+2332b9b - 2026-07-22 - chore(dependencies): update pubspec dependencies and package constraints
+ pubspec.lock | 286 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ pubspec.yaml |   9 +-
+ 2 files changed, 291 insertions(+), 4 deletions(-)
+
+d49e335 - 2026-07-22 - refactor(main): clean application entry point and provider scopes
+ lib/main.dart | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
+
+32f6d1b - 2026-07-22 - feat(scholarships): optimize scholarship comparison and hub navigation
+ lib/features/scholarships/screens/scholarship_comparison_screen.dart | 3 ++-
+ lib/features/scholarships/screens/scholarship_details_screen.dart    | 3 ++-
+ lib/features/scholarships/screens/scholarships_hub_screen.dart       | 2 +-
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+a43be45 - 2026-07-22 - feat(interview): refine mock speech evaluation and practice screens
+ lib/features/interview/models/interview_model.dart | 169 ++++++++++-----
+ .../interview/providers/interview_provider.dart    | 174 ++++++++-------
+ .../repositories/interview_repository.dart         |  21 +-
+ .../screens/interview_dashboard_screen.dart        | 241 +++++----------------
+ .../interview/screens/interview_report_screen.dart | 214 ++++++------------
+ .../interview/screens/mock_interview_screen.dart   | 240 +++++++++++---------
+ .../screens/question_practice_screen.dart          | 185 ++++------------
+ .../interview/services/speech_audio_service.dart   |  40 ++++
+ 8 files changed, 550 insertions(+), 734 deletions(-)
+
+9b994ac - 2026-07-22 - feat(sop): improve AI SOP generator and repository review logic
+ lib/features/sop/models/sop_model.dart             | 181 ++++++++---
+ lib/features/sop/providers/sop_provider.dart       | 216 ++++++++++---
+ lib/features/sop/repositories/sop_repository.dart  |  21 +-
+ lib/features/sop/screens/ai_sop_review_screen.dart | 193 ++++--------
+ lib/features/sop/screens/sop_dashboard_screen.dart | 335 +++++++++++++--------
+ lib/features/sop/screens/sop_preview_screen.dart   | 105 +++----
+ 6 files changed, 654 insertions(+), 397 deletions(-)
+
+73aac40 - 2026-07-22 - feat(resume): enhance AI resume review and PDF generation workflow
+ lib/features/resume/models/resume_model.dart       | 215 ++++++++++++++----
+ lib/features/resume/providers/resume_provider.dart | 180 +++++++++++----
+ .../resume/repositories/resume_repository.dart     |  21 +-
+ .../resume/screens/ai_resume_review_screen.dart    | 184 +++++----------
+ .../resume/screens/resume_dashboard_screen.dart    | 209 ++++++++++++-----
+ .../resume/screens/resume_preview_screen.dart      | 250 +++++++++++----------
+ .../resume/services/resume_pdf_service.dart        | 124 ++++++++++
+ 7 files changed, 791 insertions(+), 392 deletions(-)
+
+d167bb3 - 2026-07-22 - feat(copilot): optimize prompt suggestions and streaming updates
+ lib/features/copilot/models/chat_message.dart      |  47 ++++
+ .../copilot/providers/copilot_provider.dart        | 109 ++++++---
+ .../copilot/repositories/copilot_repository.dart   |  25 ++
+ lib/features/copilot/screens/chat_screen.dart      | 195 ++++++++-------
+ .../copilot/screens/copilot_home_screen.dart       | 261 +++++++++------------
+ .../copilot/screens/copilot_settings_screen.dart   |  95 ++------
+ 6 files changed, 389 insertions(+), 343 deletions(-)
+
+6ac8dfa - 2026-07-22 - feat(documents): improve upload workflow and extract document card widgets
+ lib/features/documents/models/document_model.dart  | 100 ++++
+ .../documents/providers/documents_provider.dart    | 168 ++++---
+ .../repositories/documents_repository.dart         |  21 +-
+ .../documents/screens/document_preview_screen.dart | 229 ++++++---
+ .../documents/screens/documents_screen.dart        | 545 ++++++++++++---------
+ .../services/document_storage_service.dart         | 157 ++++++
+ lib/features/documents/widgets/document_card.dart  |  87 +++-
+ 7 files changed, 898 insertions(+), 409 deletions(-)
+
+e0778fe - 2026-07-22 - refactor(applications): simplify application tracking and state management
+ .../models/university_application.dart             | 147 +++--
+ .../providers/applications_provider.dart           | 214 +++++---
+ .../repositories/applications_repository.dart      |  19 +-
+ .../screens/application_details_screen.dart        | 599 ++++++---------------
+ .../applications/screens/applications_screen.dart  | 312 +++++------
+ 5 files changed, 555 insertions(+), 736 deletions(-)
+
+483418a - 2026-07-22 - feat(universities): refine university comparison and repository filtering
+ .../providers/universities_provider.dart           | 38 ++++++++++++-
+ .../repositories/universities_repository.dart      | 13 +++--
+ .../screens/compare_universities_screen.dart       |  6 +-
+ .../universities/screens/universities_screen.dart  | 61 ++++++++++++--------
+ .../screens/university_details_screen.dart         |  6 +-
+ lib/shared/models/university_model.dart            | 66 ++++++++++++++++++++++
+ 6 files changed, 158 insertions(+), 32 deletions(-)
+
+6d92ec0 - 2026-07-22 - refactor(auth): simplify authentication flow and repository logic
+ .../auth/repositories/auth_repository.dart         |  21 ++
+ lib/features/auth/screens/auth_screen.dart         | 267 ++++++++++++---------
+ 2 files changed, 179 insertions(+), 109 deletions(-)
+
+fa06e78 - 2026-07-22 - chore(project): clean application router and Firebase configuration
+ lib/core/router/app_router.dart | 29 ++++++++++++++++++++++
+ lib/firebase_options.dart       | 54 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 83 insertions(+)
+
+ecf2ec6 - 2026-07-22 - refactor(core): consolidate AI service interfaces and Firebase services
+ lib/core/repositories/base_repository.dart       | 12 ++++++--
+ lib/core/services/ai/ai_service.dart             |  1 +
+ lib/core/services/ai/gemini_ai_service.dart      | 11 +++++++
+ lib/core/services/ai/gemini_service.dart         | 39 ------------------------
+ lib/core/services/firebase/firebase_service.dart |  6 +++-
+ 5 files changed, 27 insertions(+), 42 deletions(-)
+
+b50280c - 2026-07-22 - style(ui): standardize theme tokens and design system
+ lib/core/theme/app_theme.dart                 | 27 +++++++++++++++++++++++++++
+ lib/core/theme/colors/app_colors.dart         |  6 ++++++
+ lib/core/theme/typography/app_typography.dart |  5 +++++
+ 3 files changed, 38 insertions(+)
+
+8ce195b - 2026-07-22 - build(android): clean Gradle and AGP build configuration
+ android/app/build.gradle                         | 19 +++++++------------
+ android/build.gradle                             | 18 +++++++++++++++++-
+ android/gradle.properties                        |  2 ++
+ android/gradle/wrapper/gradle-wrapper.properties |  2 +-
+ android/settings.gradle                          |  5 +++--
+ 5 files changed, 30 insertions(+), 16 deletions(-)
+
+9c60c7e - 2026-07-22 - chore: clean project structure and optimize repository
+ linux/.gitignore                                   |   1 -
+ linux/CMakeLists.txt                               | 145 -----
+ linux/flutter/CMakeLists.txt                       |  88 ---
+ linux/flutter/generated_plugin_registrant.cc       |  23 -
+ linux/flutter/generated_plugin_registrant.h        |  15 -
+ linux/flutter/generated_plugins.cmake              |  26 -
+ linux/main.cc                                      |   6 -
+ linux/my_application.cc                            | 124 ----
+ linux/my_application.h                             |  18 -
+ macos/.gitignore                                   |   7 -
+ macos/Flutter/Flutter-Debug.xcconfig               |   1 -
+ macos/Flutter/Flutter-Release.xcconfig             |   1 -
+ macos/Flutter/GeneratedPluginRegistrant.swift      |  52 --
+ macos/Runner.xcodeproj/project.pbxproj             | 705 ---------------------
+ .../xcshareddata/IDEWorkspaceChecks.plist          |   8 -
+ .../xcshareddata/xcschemes/Runner.xcscheme         |  98 ---
+ macos/Runner.xcworkspace/contents.xcworkspacedata  |   7 -
+ .../xcshareddata/IDEWorkspaceChecks.plist          |   8 -
+ macos/Runner/AppDelegate.swift                     |   9 -
+ .../AppIcon.appiconset/Contents.json               |  68 --
+ .../AppIcon.appiconset/app_icon_1024.png           | Bin 102994 -> 0 bytes
+ .../AppIcon.appiconset/app_icon_128.png            | Bin 5680 -> 0 bytes
+ .../AppIcon.appiconset/app_icon_16.png             | Bin 520 -> 0 bytes
+ .../AppIcon.appiconset/app_icon_256.png            | Bin 14142 -> 0 bytes
+ .../AppIcon.appiconset/app_icon_32.png             | Bin 1066 -> 0 bytes
+ .../AppIcon.appiconset/app_icon_512.png            | Bin 36406 -> 0 bytes
+ .../AppIcon.appiconset/app_icon_64.png             | Bin 2218 -> 0 bytes
+ macos/Runner/Base.lproj/MainMenu.xib               | 343 ----------
+ macos/Runner/Configs/AppInfo.xcconfig              |  14 -
+ macos/Runner/Configs/Debug.xcconfig                |   2 -
+ macos/Runner/Configs/Release.xcconfig              |   2 -
+ macos/Runner/Configs/Warnings.xcconfig             |  13 -
+ macos/Runner/DebugProfile.entitlements             |  12 -
+ macos/Runner/Info.plist                            |  32 -
+ macos/Runner/MainFlutterWindow.swift               |  15 -
+ macos/Runner/Release.entitlements                  |   8 -
+ macos/RunnerTests/RunnerTests.swift                |  12 -
+ pubspec.lock                                       | 666 +------------------
+ pubspec.yaml                                       |  32 +-
+ test/widget_test.dart                              |  30 -
+ web/favicon.png                                    | Bin 917 -> 0 bytes
+ web/icons/Icon-192.png                             | Bin 5292 -> 0 bytes
+ web/icons/Icon-512.png                             | Bin 8252 -> 0 bytes
+ web/icons/Icon-maskable-192.png                    | Bin 5594 -> 0 bytes
+ web/icons/Icon-maskable-512.png                    | Bin 20998 -> 0 bytes
+ web/index.html                                     |  38 --
+ web/manifest.json                                  |  35 -
+ windows/.gitignore                                 |  17 -
+ windows/CMakeLists.txt                             | 108 ----
+ windows/flutter/CMakeLists.txt                     | 109 ----
+ windows/flutter/generated_plugin_registrant.cc     |  41 --
+ windows/flutter/generated_plugin_registrant.h      |  15 -
+ windows/flutter/generated_plugins.cmake            |  34 -
+ windows/runner/CMakeLists.txt                      |  40 --
+ windows/runner/Runner.rc                           | 121 ----
+ windows/runner/flutter_window.cpp                  |  71 ---
+ windows/runner/flutter_window.h                    |  33 -
+ windows/runner/main.cpp                            |  43 --
+ windows/runner/resource.h                          |  16 -
+ windows/runner/resources/app_icon.ico              | Bin 33772 -> 0 bytes
+ windows/runner/runner.exe.manifest                 |  14 -
+ windows/runner/utils.cpp                           |  65 --
+ windows/runner/utils.h                             |  19 -
+ windows/runner/win32_window.cpp                    | 288 ---------
+ windows/runner/win32_window.h                      | 102 ---
+ 65 files changed, 6 insertions(+), 3794 deletions(-)
+
+3245f31 - 2026-07-21 - chore: final adjustments
+ commit.sh | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 66 insertions(+)
+
+b04313f - 2026-07-21 - docs: finalize release documentation
+ APP_FLOW.md         | 108 +++++++++++++++++++++++++++++
+ ARCHITECTURE.md     |  42 ++++++++++++
+ CHANGELOG.md        | 190 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ CONTRIBUTING.md     |  16 +++++
+ PROJECT_PROGRESS.md | 132 ++++++++++++++++++++++++++++++++++++
+ RELEASE.md          |  39 +++++++++++
+ TESTING.md          |  19 ++++++
+ 7 files changed, 546 insertions(+)
+
+4beb6f4 - 2026-07-21 - feat(dashboard): refine dashboard layout
+ lib/features/dashboard/screens/dashboard_screen.dart | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+294bf53 - 2026-07-21 - chore(deps): update dependencies and platforms
+ linux/flutter/generated_plugin_registrant.cc   |   4 +
+ linux/flutter/generated_plugins.cmake          |   1 +
+ macos/Flutter/GeneratedPluginRegistrant.swift  |  26 ++
+ pubspec.lock                                   | 440 +++++++++++++++++++++++++
+ pubspec.yaml                                   |  15 +
+ windows/flutter/generated_plugin_registrant.cc |  21 ++
+ windows/flutter/generated_plugins.cmake        |   8 +
+ 7 files changed, 515 insertions(+)
+
+51084b2 - 2026-07-21 - build(android): enable release optimizations
+ android/app/build.gradle | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+c9e548a - 2026-07-21 - test(settings): add settings model tests
+ .../settings/models/settings_model_test.dart       | 35 ++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
+77c6381 - 2026-07-21 - ci: configure github actions pipeline
+ .github/workflows/flutter.yml | 40 ++++++++++++++++++++++++++++++++++++++++
+ CI_CD.md                      | 15 +++++++++++++++
+ 2 files changed, 55 insertions(+)
+
+6543593 - 2026-07-21 - feat(security): add firestore and storage rules
+ firestore.rules | 32 ++++++++++++++++++++++++++++++++
+ storage.rules   | 16 ++++++++++++++++
+ 2 files changed, 48 insertions(+)
+
+6d79f9e - 2026-07-21 - feat(notification): implement FCM notification service
+ lib/core/providers/notification_provider.dart      |  19 +++
+ lib/core/router/app_router.dart                    | 127 ++++++++++++++++++++-
+ .../notifications/background_task_service.dart     |  56 +++++++++
+ .../notifications/notification_service.dart        | 100 ++++++++++++++++
+ lib/main.dart                                      |  14 ++-
+ 5 files changed, 313 insertions(+), 3 deletions(-)
+
+2f0266f - 2026-07-21 - feat(sync): add offline synchronization layer
+ lib/core/providers/sync_provider.dart    | 14 +++++++
+ lib/core/services/sync/sync_service.dart | 68 ++++++++++++++++++++++++++++++++
+ lib/shared/widgets/main_layout.dart      | 24 ++++++++---
+ lib/shared/widgets/sync_indicator.dart   | 65 ++++++++++++++++++++++++++++++
+ 4 files changed, 166 insertions(+), 5 deletions(-)
+
+fc6dc29 - 2026-07-21 - feat(ai): integrate Gemini AI review service
+ lib/core/providers/ai_provider.dart                |   9 +
+ lib/core/services/ai/ai_service.dart               |  14 ++
+ lib/core/services/ai/gemini_ai_service.dart        | 166 ++++++++++++++
+ lib/core/services/ai/gemini_service.dart           |  39 ++++
+ lib/core/services/ai/models/ai_responses.dart      | 146 ++++++++++++
+ lib/features/copilot/models/chat_message.dart      |  51 +++++
+ .../copilot/providers/copilot_provider.dart        |  95 ++++++++
+ lib/features/copilot/screens/chat_screen.dart      | 199 ++++++++++++++++
+ .../copilot/screens/copilot_home_screen.dart       | 253 +++++++++++++++++++++
+ .../copilot/screens/copilot_settings_screen.dart   | 119 ++++++++++
+ lib/features/interview/models/interview_model.dart | 111 +++++++++
+ .../interview/providers/interview_provider.dart    |  87 +++++++
+ .../repositories/interview_repository.dart         |  16 ++
+ .../screens/interview_dashboard_screen.dart        | 248 ++++++++++++++++++++
+ .../interview/screens/interview_report_screen.dart | 236 +++++++++++++++++++
+ .../interview/screens/mock_interview_screen.dart   | 133 +++++++++++
+ .../screens/question_practice_screen.dart          | 175 ++++++++++++++
+ lib/features/resume/models/resume_model.dart       |  72 ++++++
+ lib/features/resume/providers/resume_provider.dart |  59 +++++
+ .../resume/repositories/resume_repository.dart     |  16 ++
+ .../resume/screens/ai_resume_review_screen.dart    | 237 +++++++++++++++++++
+ .../resume/screens/resume_dashboard_screen.dart    | 171 ++++++++++++++
+ .../resume/screens/resume_preview_screen.dart      | 178 +++++++++++++++
+ lib/features/sop/models/sop_model.dart             |  81 +++++++
+ lib/features/sop/providers/sop_provider.dart       |  59 +++++
+ lib/features/sop/repositories/sop_repository.dart  |  16 ++
+ lib/features/sop/screens/ai_sop_review_screen.dart | 237 +++++++++++++++++++
+ lib/features/sop/screens/sop_dashboard_screen.dart | 236 +++++++++++++++++++
+ lib/features/sop/screens/sop_preview_screen.dart   |  86 +++++++
+ 29 files changed, 3545 insertions(+)
+
+0b9b37a - 2026-07-21 - feat(storage): integrate firebase storage uploads and document vault
+ lib/core/providers/storage_provider.dart           |  43 ++++
+ lib/core/repositories/storage_repository.dart      |  48 ++++
+ lib/features/documents/models/document_model.dart  |  47 ++++
+ .../documents/providers/documents_provider.dart    |  80 ++++++
+ .../repositories/documents_repository.dart         |  16 ++
+ .../documents/screens/document_preview_screen.dart | 174 +++++++++++++
+ .../documents/screens/documents_screen.dart        | 284 +++++++++++++++++++++
+ lib/features/documents/widgets/document_card.dart  | 124 +++++++++
+ 8 files changed, 816 insertions(+)
+
+24a3ac9 - 2026-07-21 - feat(settings): add settings dashboard
+ lib/features/settings/models/settings_model.dart   | 153 +++++++++++++++++
+ .../settings/providers/settings_provider.dart      |  70 ++++++++
+ .../settings/repositories/settings_repository.dart |  17 ++
+ .../screens/settings_dashboard_screen.dart         | 185 +++++++++++++++++++++
+ 4 files changed, 425 insertions(+)
+
+0ec1960 - 2026-07-21 - feat(profile): implement user profile module
+ lib/features/profile/models/profile_model.dart     | 119 ++++++++
+ .../profile/providers/profile_provider.dart        |  57 ++++
+ .../profile/repositories/profile_repository.dart   |  16 +
+ .../profile/screens/profile_dashboard_screen.dart  | 336 +++++++++++++++++++++
+ 4 files changed, 528 insertions(+)
+
+a74c701 - 2026-07-21 - feat(planner): add planner management
+ lib/features/planner/models/planner_model.dart     |  73 +++++
+ .../planner/providers/planner_provider.dart        | 115 +++++++
+ .../planner/repositories/planner_repository.dart   |  16 +
+ .../planner/screens/planner_dashboard_screen.dart  | 359 +++++++++++++++++++++
+ 4 files changed, 563 insertions(+)
+
+ad48389 - 2026-07-21 - feat(scholarship): implement scholarship hub
+ .../scholarships/models/scholarship_model.dart     | 101 +++++++
+ .../providers/scholarships_provider.dart           | 136 +++++++++
+ .../repositories/scholarships_repository.dart      |  16 ++
+ .../screens/scholarship_comparison_screen.dart     | 122 ++++++++
+ .../screens/scholarship_details_screen.dart        | 277 ++++++++++++++++++
+ .../screens/scholarships_hub_screen.dart           | 312 +++++++++++++++++++++
+ 6 files changed, 964 insertions(+)
+
+aab9165 - 2026-07-21 - feat(application): implement application tracking
+ .../models/university_application.dart             |  40 ++
+ .../providers/applications_provider.dart           |  28 ++
+ .../repositories/applications_repository.dart      |  16 +
+ .../screens/application_details_screen.dart        | 512 +++++++++++++++++++++
+ .../applications/widgets/application_card.dart     |  28 +-
+ 5 files changed, 613 insertions(+), 11 deletions(-)
+
+ade2d38 - 2026-07-21 - feat(university): build university comparison
+ .../repositories/universities_repository.dart            | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+c35898f - 2026-07-21 - refactor(repository): introduce generic base repository
+ lib/core/repositories/base_repository.dart | 52 ++++++++++++++++++++++++++++++
+ 1 file changed, 52 insertions(+)
+
+71509a1 - 2026-07-21 - feat(firebase): add firebase initialization service
+ lib/core/services/firebase/firebase_service.dart | 37 ++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
+
+5eb1142 - 2026-07-21 - feat(auth): implement firebase authentication flow
+ lib/features/auth/providers/auth_provider.dart     |  72 ++++++
+ .../auth/repositories/auth_repository.dart         | 102 +++++++++
+ lib/features/auth/screens/auth_screen.dart         | 242 +++++++++++++++++++++
+ 3 files changed, 416 insertions(+)
+
+b17ff9a - 2026-07-20 - docs: add changelog and project progress tracking
+ CHANGELOG.md        | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ PROJECT_PROGRESS.md | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ README.md           | 16 +++++++++++++++
+ 3 files changed, 131 insertions(+)
+
+a4b8d26 - 2026-07-20 - feat: implement applications module
+ .../models/university_application.dart             |  53 ++++
+ .../providers/applications_provider.dart           |  75 ++++++
+ .../applications/screens/applications_screen.dart  | 204 +++++++++++++++
+ .../applications/widgets/application_card.dart     | 285 +++++++++++++++++++++
+ 4 files changed, 617 insertions(+)
+
+e428440 - 2026-07-20 - feat: implement AI university comparison
+ .../screens/compare_universities_screen.dart       | 419 +++++++++++++++++++++
+ 1 file changed, 419 insertions(+)
+
+f6aabc6 - 2026-07-20 - feat: add university details experience
+ .../screens/university_details_screen.dart         | 669 +++++++++++++++++++++
+ 1 file changed, 669 insertions(+)
+
+532cf38 - 2026-07-20 - feat: implement universities module
+ .../providers/universities_provider.dart           | 103 ++++++
+ .../universities/screens/universities_screen.dart  | 229 +++++++++++++
+ lib/features/universities/widgets/filter_chip.dart |  41 +++
+ .../universities/widgets/university_card.dart      | 363 +++++++++++++++++++++
+ lib/shared/models/university_model.dart            | 121 +++++++
+ 5 files changed, 857 insertions(+)
+
+d0f89cc - 2026-07-20 - feat: implement dashboard module
+ .../dashboard/providers/dashboard_provider.dart    |  73 ++++
+ .../dashboard/screens/dashboard_screen.dart        | 449 +++++++++++++++++++++
+ lib/shared/models/dashboard_data.dart              |  50 +++
+ 3 files changed, 572 insertions(+)
+
+815c5be - 2026-07-20 - feat: configure navigation with GoRouter
+ lib/core/router/app_router.dart     |  70 +++++++++++++++++
+ lib/shared/widgets/main_layout.dart | 149 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 219 insertions(+)
+
+076a962 - 2026-07-20 - feat: implement design system and app theme
+ lib/core/theme/app_theme.dart                 | 31 ++++++++++++++++++++
+ lib/core/theme/colors/app_colors.dart         | 31 ++++++++++++++++++++
+ lib/core/theme/spacing/app_spacing.dart       | 15 ++++++++++
+ lib/core/theme/typography/app_typography.dart | 41 +++++++++++++++++++++++++++
+ 4 files changed, 118 insertions(+)
+
+aa77e58 - 2026-07-20 - feat: add clean architecture and project structure
+ .metadata     | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ lib/main.dart | 23 +++++++++++++++++++++++
+ 2 files changed, 68 insertions(+)
+
+c5f4cd4 - 2026-07-20 - feat: initialize Flutter project
+ .gitignore                                         |   43 +
+ analysis_options.yaml                              |   28 +
+ android/.gitignore                                 |   13 +
+ android/app/build.gradle                           |   44 +
+ android/app/src/debug/AndroidManifest.xml          |    7 +
+ android/app/src/main/AndroidManifest.xml           |   45 +
+ .../kotlin/com/eduing/eduing_app/MainActivity.kt   |    5 +
+ .../main/res/drawable-v21/launch_background.xml    |   12 +
+ .../src/main/res/drawable/launch_background.xml    |   12 +
+ .../app/src/main/res/mipmap-hdpi/ic_launcher.png   |  Bin 0 -> 544 bytes
+ .../app/src/main/res/mipmap-mdpi/ic_launcher.png   |  Bin 0 -> 442 bytes
+ .../app/src/main/res/mipmap-xhdpi/ic_launcher.png  |  Bin 0 -> 721 bytes
+ .../app/src/main/res/mipmap-xxhdpi/ic_launcher.png |  Bin 0 -> 1031 bytes
+ .../src/main/res/mipmap-xxxhdpi/ic_launcher.png    |  Bin 0 -> 1443 bytes
+ android/app/src/main/res/values-night/styles.xml   |   18 +
+ android/app/src/main/res/values/styles.xml         |   18 +
+ android/app/src/profile/AndroidManifest.xml        |    7 +
+ android/build.gradle                               |   18 +
+ android/gradle.properties                          |    3 +
+ android/gradle/wrapper/gradle-wrapper.properties   |    5 +
+ android/settings.gradle                            |   25 +
+ ios/.gitignore                                     |   34 +
+ ios/Flutter/AppFrameworkInfo.plist                 |   26 +
+ ios/Flutter/Debug.xcconfig                         |    1 +
+ ios/Flutter/Release.xcconfig                       |    1 +
+ ios/Runner.xcodeproj/project.pbxproj               |  616 +++++++++
+ .../project.xcworkspace/contents.xcworkspacedata   |    7 +
+ .../xcshareddata/IDEWorkspaceChecks.plist          |    8 +
+ .../xcshareddata/WorkspaceSettings.xcsettings      |    8 +
+ .../xcshareddata/xcschemes/Runner.xcscheme         |   98 ++
+ ios/Runner.xcworkspace/contents.xcworkspacedata    |    7 +
+ .../xcshareddata/IDEWorkspaceChecks.plist          |    8 +
+ .../xcshareddata/WorkspaceSettings.xcsettings      |    8 +
+ ios/Runner/AppDelegate.swift                       |   13 +
+ .../AppIcon.appiconset/Contents.json               |  122 ++
+ .../AppIcon.appiconset/Icon-App-1024x1024@1x.png   |  Bin 0 -> 10932 bytes
+ .../AppIcon.appiconset/Icon-App-20x20@1x.png       |  Bin 0 -> 295 bytes
+ .../AppIcon.appiconset/Icon-App-20x20@2x.png       |  Bin 0 -> 406 bytes
+ .../AppIcon.appiconset/Icon-App-20x20@3x.png       |  Bin 0 -> 450 bytes
+ .../AppIcon.appiconset/Icon-App-29x29@1x.png       |  Bin 0 -> 282 bytes
+ .../AppIcon.appiconset/Icon-App-29x29@2x.png       |  Bin 0 -> 462 bytes
+ .../AppIcon.appiconset/Icon-App-29x29@3x.png       |  Bin 0 -> 704 bytes
+ .../AppIcon.appiconset/Icon-App-40x40@1x.png       |  Bin 0 -> 406 bytes
+ .../AppIcon.appiconset/Icon-App-40x40@2x.png       |  Bin 0 -> 586 bytes
+ .../AppIcon.appiconset/Icon-App-40x40@3x.png       |  Bin 0 -> 862 bytes
+ .../AppIcon.appiconset/Icon-App-60x60@2x.png       |  Bin 0 -> 862 bytes
+ .../AppIcon.appiconset/Icon-App-60x60@3x.png       |  Bin 0 -> 1674 bytes
+ .../AppIcon.appiconset/Icon-App-76x76@1x.png       |  Bin 0 -> 762 bytes
+ .../AppIcon.appiconset/Icon-App-76x76@2x.png       |  Bin 0 -> 1226 bytes
+ .../AppIcon.appiconset/Icon-App-83.5x83.5@2x.png   |  Bin 0 -> 1418 bytes
+ .../LaunchImage.imageset/Contents.json             |   23 +
+ .../LaunchImage.imageset/LaunchImage.png           |  Bin 0 -> 68 bytes
+ .../LaunchImage.imageset/LaunchImage@2x.png        |  Bin 0 -> 68 bytes
+ .../LaunchImage.imageset/LaunchImage@3x.png        |  Bin 0 -> 68 bytes
+ .../Assets.xcassets/LaunchImage.imageset/README.md |    5 +
+ ios/Runner/Base.lproj/LaunchScreen.storyboard      |   37 +
+ ios/Runner/Base.lproj/Main.storyboard              |   26 +
+ ios/Runner/Info.plist                              |   49 +
+ ios/Runner/Runner-Bridging-Header.h                |    1 +
+ ios/RunnerTests/RunnerTests.swift                  |   12 +
+ linux/.gitignore                                   |    1 +
+ linux/CMakeLists.txt                               |  145 +++
+ linux/flutter/CMakeLists.txt                       |   88 ++
+ linux/flutter/generated_plugin_registrant.cc       |   19 +
+ linux/flutter/generated_plugin_registrant.h        |   15 +
+ linux/flutter/generated_plugins.cmake              |   25 +
+ linux/main.cc                                      |    6 +
+ linux/my_application.cc                            |  124 ++
+ linux/my_application.h                             |   18 +
+ macos/.gitignore                                   |    7 +
+ macos/Flutter/Flutter-Debug.xcconfig               |    1 +
+ macos/Flutter/Flutter-Release.xcconfig             |    1 +
+ macos/Flutter/GeneratedPluginRegistrant.swift      |   26 +
+ macos/Runner.xcodeproj/project.pbxproj             |  705 +++++++++++
+ .../xcshareddata/IDEWorkspaceChecks.plist          |    8 +
+ .../xcshareddata/xcschemes/Runner.xcscheme         |   98 ++
+ macos/Runner.xcworkspace/contents.xcworkspacedata  |    7 +
+ .../xcshareddata/IDEWorkspaceChecks.plist          |    8 +
+ macos/Runner/AppDelegate.swift                     |    9 +
+ .../AppIcon.appiconset/Contents.json               |   68 +
+ .../AppIcon.appiconset/app_icon_1024.png           |  Bin 0 -> 102994 bytes
+ .../AppIcon.appiconset/app_icon_128.png            |  Bin 0 -> 5680 bytes
+ .../AppIcon.appiconset/app_icon_16.png             |  Bin 0 -> 520 bytes
+ .../AppIcon.appiconset/app_icon_256.png            |  Bin 0 -> 14142 bytes
+ .../AppIcon.appiconset/app_icon_32.png             |  Bin 0 -> 1066 bytes
+ .../AppIcon.appiconset/app_icon_512.png            |  Bin 0 -> 36406 bytes
+ .../AppIcon.appiconset/app_icon_64.png             |  Bin 0 -> 2218 bytes
+ macos/Runner/Base.lproj/MainMenu.xib               |  343 +++++
+ macos/Runner/Configs/AppInfo.xcconfig              |   14 +
+ macos/Runner/Configs/Debug.xcconfig                |    2 +
+ macos/Runner/Configs/Release.xcconfig              |    2 +
+ macos/Runner/Configs/Warnings.xcconfig             |   13 +
+ macos/Runner/DebugProfile.entitlements             |   12 +
+ macos/Runner/Info.plist                            |   32 +
+ macos/Runner/MainFlutterWindow.swift               |   15 +
+ macos/Runner/Release.entitlements                  |    8 +
+ macos/RunnerTests/RunnerTests.swift                |   12 +
+ pubspec.lock                                       | 1319 ++++++++++++++++++++
+ pubspec.yaml                                       |  128 ++
+ test/widget_test.dart                              |   30 +
+ web/favicon.png                                    |  Bin 0 -> 917 bytes
+ web/icons/Icon-192.png                             |  Bin 0 -> 5292 bytes
+ web/icons/Icon-512.png                             |  Bin 0 -> 8252 bytes
+ web/icons/Icon-maskable-192.png                    |  Bin 0 -> 5594 bytes
+ web/icons/Icon-maskable-512.png                    |  Bin 0 -> 20998 bytes
+ web/index.html                                     |   38 +
+ web/manifest.json                                  |   35 +
+ windows/.gitignore                                 |   17 +
+ windows/CMakeLists.txt                             |  108 ++
+ windows/flutter/CMakeLists.txt                     |  109 ++
+ windows/flutter/generated_plugin_registrant.cc     |   20 +
+ windows/flutter/generated_plugin_registrant.h      |   15 +
+ windows/flutter/generated_plugins.cmake            |   26 +
+ windows/runner/CMakeLists.txt                      |   40 +
+ windows/runner/Runner.rc                           |  121 ++
+ windows/runner/flutter_window.cpp                  |   71 ++
+ windows/runner/flutter_window.h                    |   33 +
+ windows/runner/main.cpp                            |   43 +
+ windows/runner/resource.h                          |   16 +
+ windows/runner/resources/app_icon.ico              |  Bin 0 -> 33772 bytes
+ windows/runner/runner.exe.manifest                 |   14 +
+ windows/runner/utils.cpp                           |   65 +
+ windows/runner/utils.h                             |   19 +
+ windows/runner/win32_window.cpp                    |  288 +++++
+ windows/runner/win32_window.h                      |  102 ++
+ 125 files changed, 5902 insertions(+)

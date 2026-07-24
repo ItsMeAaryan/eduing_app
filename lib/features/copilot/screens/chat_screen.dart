@@ -135,9 +135,9 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
       padding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.1),
+        color: AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(100),
-        border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -184,7 +184,7 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
                   borderRadius: BorderRadius.circular(100),
                   border: Border.all(
                       color: (isDark ? AppColors.darkBorder : AppColors.border)
-                          .withOpacity(0.5)),
+                          .withValues(alpha: 0.5)),
                 ),
                 child: Text(s,
                     style: AppTypography.labelMedium
@@ -239,13 +239,13 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
                 boxShadow: isAI
                     ? [
                         BoxShadow(
-                            color: Colors.black.withOpacity(0.02),
+                            color: Colors.black.withValues(alpha: 0.02),
                             blurRadius: 10,
                             offset: const Offset(0, 4))
                       ]
                     : [
                         BoxShadow(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                             blurRadius: 16,
                             offset: const Offset(0, 8))
                       ],
@@ -315,7 +315,7 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
         border: Border(
             top: BorderSide(
                 color: (isDark ? AppColors.darkBorder : AppColors.border)
-                    .withOpacity(0.5))),
+                    .withValues(alpha: 0.5))),
       ),
       child: Row(
         children: [

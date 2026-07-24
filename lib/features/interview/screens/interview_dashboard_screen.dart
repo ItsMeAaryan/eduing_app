@@ -87,7 +87,7 @@ class InterviewDashboardScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.15),
+              color: Colors.black.withValues(alpha: 0.15),
               blurRadius: 30,
               offset: const Offset(0, 15)),
         ],
@@ -99,13 +99,13 @@ class InterviewDashboardScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.p24),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.05),
+              color: Colors.white.withValues(alpha: 0.05),
             ),
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.p24),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
               ),
               child: const Icon(Iconsax.camera, color: Colors.white, size: 48)
                   .animate(onPlay: (c) => c.repeat())
@@ -168,7 +168,7 @@ class InterviewDashboardScreen extends ConsumerWidget {
                         width: 48,
                         height: 48,
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           shape: BoxShape.circle,
                         ),
                         child: Center(

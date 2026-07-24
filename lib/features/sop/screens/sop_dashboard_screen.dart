@@ -81,12 +81,12 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
           padding: const EdgeInsets.all(AppSpacing.p16),
           decoration: BoxDecoration(
             color: (isDark ? AppColors.darkSurface : Colors.white)
-                .withOpacity(0.9),
+                .withValues(alpha: 0.9),
             borderRadius: BorderRadius.circular(32),
-            border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
             boxShadow: [
               BoxShadow(
-                  color: AppColors.primary.withOpacity(0.2),
+                  color: AppColors.primary.withValues(alpha: 0.2),
                   blurRadius: 24,
                   offset: const Offset(0, 10)),
             ],
@@ -140,7 +140,7 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.p16),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -221,7 +221,7 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
                             Theme.of(context).scaffoldBackgroundColor,
                             Theme.of(context)
                                 .scaffoldBackgroundColor
-                                .withOpacity(0),
+                                .withValues(alpha: 0),
                           ],
                         ),
                       ),
@@ -241,7 +241,7 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
                             Theme.of(context).scaffoldBackgroundColor,
                             Theme.of(context)
                                 .scaffoldBackgroundColor
-                                .withOpacity(0),
+                                .withValues(alpha: 0),
                           ],
                         ),
                       ),
@@ -299,7 +299,7 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
           AppIconButton(
             icon: Iconsax.tick_circle,
             isFilled: true,
-            backgroundColor: AppColors.success.withOpacity(0.1),
+            backgroundColor: AppColors.success.withValues(alpha: 0.1),
             color: AppColors.success,
             onPressed: _saveContent,
           ),

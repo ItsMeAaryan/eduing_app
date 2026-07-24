@@ -77,8 +77,8 @@ class UniversityDetailsScreen extends ConsumerWidget {
           icon: Iconsax.arrow_left_2,
           isFilled: true,
           backgroundColor: isDark
-              ? AppColors.darkSurface.withOpacity(0.8)
-              : Colors.white.withOpacity(0.8),
+              ? AppColors.darkSurface.withValues(alpha: 0.8)
+              : Colors.white.withValues(alpha: 0.8),
           onPressed: () => context.pop(),
         ),
       ),
@@ -92,8 +92,8 @@ class UniversityDetailsScreen extends ConsumerWidget {
                 : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
             isFilled: true,
             backgroundColor: isDark
-                ? AppColors.darkSurface.withOpacity(0.8)
-                : Colors.white.withOpacity(0.8),
+                ? AppColors.darkSurface.withValues(alpha: 0.8)
+                : Colors.white.withValues(alpha: 0.8),
             onPressed: () => notifier.toggleFavorite(university.id),
           ),
         ),
@@ -118,7 +118,9 @@ class UniversityDetailsScreen extends ConsumerWidget {
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+                    Theme.of(context)
+                        .scaffoldBackgroundColor
+                        .withValues(alpha: 0.5),
                     Theme.of(context).scaffoldBackgroundColor,
                   ],
                   stops: const [0.4, 0.8, 1.0],
@@ -281,7 +283,7 @@ class UniversityDetailsScreen extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
                     color: (isDark ? AppColors.darkBorder : AppColors.border)
-                        .withOpacity(0.5)),
+                        .withValues(alpha: 0.5)),
               ),
               child: Text(course, style: AppTypography.labelMedium),
             );
@@ -341,8 +343,8 @@ class UniversityDetailsScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.p24),
           Text(
             'Based on your profile, this university is a strong match. Your academics align with their acceptance criteria, and their programs match your career goals.',
-            style: AppTypography.bodyMedium
-                .copyWith(color: Colors.white.withOpacity(0.9), height: 1.5),
+            style: AppTypography.bodyMedium.copyWith(
+                color: Colors.white.withValues(alpha: 0.9), height: 1.5),
           ),
         ],
       ),
@@ -363,14 +365,14 @@ class UniversityDetailsScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.p16),
             decoration: BoxDecoration(
               color: (isDark ? AppColors.darkSurface : AppColors.surface)
-                  .withOpacity(0.8),
+                  .withValues(alpha: 0.8),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                   color: (isDark ? AppColors.darkBorder : AppColors.border)
-                      .withOpacity(0.2)),
+                      .withValues(alpha: 0.2)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),

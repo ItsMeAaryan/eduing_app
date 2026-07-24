@@ -105,7 +105,7 @@ class _ComponentGalleryScreenState extends State<ComponentGalleryScreen> {
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.withOpacity(0.2)),
+            border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
           ),
         ),
         const SizedBox(height: AppSpacing.p8),

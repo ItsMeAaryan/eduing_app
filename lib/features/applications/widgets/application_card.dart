@@ -32,7 +32,7 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 20,
                   offset: const Offset(0, 10)),
             ],
@@ -87,8 +87,8 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Colors.black.withOpacity(0.2),
-                Colors.black.withOpacity(0.6)
+                Colors.black.withValues(alpha: 0.2),
+                Colors.black.withValues(alpha: 0.6)
               ],
             ),
           ),
@@ -212,9 +212,9 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.05),
+            color: AppColors.primary.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.primary.withOpacity(0.1)),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
           ),
           child: Row(
             children: [

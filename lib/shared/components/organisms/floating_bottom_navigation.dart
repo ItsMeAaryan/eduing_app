@@ -19,8 +19,8 @@ class FloatingBottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final navColor = isDark
-        ? AppColors.darkSurface.withOpacity(0.8)
-        : AppColors.surface.withOpacity(0.85);
+        ? AppColors.darkSurface.withValues(alpha: 0.8)
+        : AppColors.surface.withValues(alpha: 0.85);
 
     return SafeArea(
       child: Container(
@@ -109,8 +109,8 @@ class _NavItem extends StatelessWidget {
     final inactiveColor =
         isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
     final activeBg = isDark
-        ? AppColors.primary.withOpacity(0.2)
-        : AppColors.primary.withOpacity(0.1);
+        ? AppColors.primary.withValues(alpha: 0.2)
+        : AppColors.primary.withValues(alpha: 0.1);
 
     return GestureDetector(
       onTap: onTap,

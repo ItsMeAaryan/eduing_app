@@ -45,7 +45,7 @@ class AppTheme {
         thickness: 1,
         space: 1,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
         margin: EdgeInsets.zero,
@@ -96,7 +96,7 @@ class AppTheme {
         thickness: 1,
         space: 1,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.darkSurface,
         elevation: 0,
         margin: EdgeInsets.zero,

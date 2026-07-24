@@ -130,13 +130,15 @@ class _PlannerDashboardScreenState
                           shape: BoxShape.circle,
                           border: isActive
                               ? Border.all(
-                                  color: AppColors.primary.withOpacity(0.3),
+                                  color:
+                                      AppColors.primary.withValues(alpha: 0.3),
                                   width: 4)
                               : null,
                           boxShadow: isActive
                               ? [
                                   BoxShadow(
-                                      color: AppColors.primary.withOpacity(0.3),
+                                      color: AppColors.primary
+                                          .withValues(alpha: 0.3),
                                       blurRadius: 16,
                                       offset: const Offset(0, 8))
                                 ]
@@ -225,7 +227,7 @@ class _PlannerDashboardScreenState
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
-                          color: AppColors.primary.withOpacity(0.2),
+                          color: AppColors.primary.withValues(alpha: 0.2),
                           blurRadius: 20,
                           offset: const Offset(0, 10)),
                     ],
@@ -373,7 +375,7 @@ class _PlannerDashboardScreenState
                     padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.p8, vertical: AppSpacing.p4),
                     decoration: BoxDecoration(
-                        color: AppColors.error.withOpacity(0.1),
+                        color: AppColors.error.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8)),
                     child: Text('Deadline',
                         style: AppTypography.caption

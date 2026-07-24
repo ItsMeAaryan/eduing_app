@@ -133,7 +133,7 @@ class _HeroCommandCenter extends ConsumerWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
@@ -155,7 +155,7 @@ class _HeroCommandCenter extends ConsumerWidget {
                     Text(
                       'Admission Readiness',
                       style: AppTypography.labelMedium
-                          .copyWith(color: Colors.white.withOpacity(0.8)),
+                          .copyWith(color: Colors.white.withValues(alpha: 0.8)),
                     ),
                     const SizedBox(height: AppSpacing.p4),
                     Text(
@@ -169,9 +169,10 @@ class _HeroCommandCenter extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.p12, vertical: AppSpacing.p8),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.15),
+                    color: Colors.white.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withOpacity(0.2)),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.2)),
                   ),
                   child: Row(
                     children: [
@@ -192,7 +193,7 @@ class _HeroCommandCenter extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.p16),
               decoration: BoxDecoration(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(
@@ -203,8 +204,8 @@ class _HeroCommandCenter extends ConsumerWidget {
                       children: [
                         Text(
                           'Next Priority',
-                          style: AppTypography.caption
-                              .copyWith(color: Colors.white.withOpacity(0.7)),
+                          style: AppTypography.caption.copyWith(
+                              color: Colors.white.withValues(alpha: 0.7)),
                         ),
                         const SizedBox(height: AppSpacing.p4),
                         Text(

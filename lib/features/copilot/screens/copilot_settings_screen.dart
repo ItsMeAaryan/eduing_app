@@ -29,7 +29,8 @@ class CopilotSettingsScreen extends StatelessWidget {
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                    color: Theme.of(context).dividerColor.withOpacity(0.1)),
+                    color:
+                        Theme.of(context).dividerColor.withValues(alpha: 0.1)),
               ),
               child: Column(
                 children: [

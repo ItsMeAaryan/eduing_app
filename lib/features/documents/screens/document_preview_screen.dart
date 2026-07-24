@@ -212,7 +212,7 @@ class DocumentPreviewScreen extends ConsumerWidget {
                   padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.p12, vertical: AppSpacing.p8),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -247,7 +247,7 @@ class DocumentPreviewScreen extends ConsumerWidget {
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
             BoxShadow(
-                color: AppColors.primary.withOpacity(0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
                 blurRadius: 20,
                 offset: const Offset(0, 10)),
           ],
@@ -283,8 +283,8 @@ class DocumentPreviewScreen extends ConsumerWidget {
               analysis.recommendations.isNotEmpty
                   ? analysis.recommendations.first
                   : 'Document legibility and resolution satisfy standard university submission guidelines.',
-              style: AppTypography.bodyMedium
-                  .copyWith(color: Colors.white.withOpacity(0.9), height: 1.5),
+              style: AppTypography.bodyMedium.copyWith(
+                  color: Colors.white.withValues(alpha: 0.9), height: 1.5),
             ),
           ],
         ),

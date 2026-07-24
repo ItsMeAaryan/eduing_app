@@ -75,8 +75,8 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.2),
-                    Colors.black.withOpacity(0.8)
+                    Colors.black.withValues(alpha: 0.2),
+                    Colors.black.withValues(alpha: 0.8)
                   ],
                 ),
               ),
@@ -307,7 +307,7 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 20,
                 offset: const Offset(0, -10))
           ],
