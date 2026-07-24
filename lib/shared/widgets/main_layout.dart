@@ -32,7 +32,7 @@ class FloatingBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String location = GoRouterState.of(context).uri.toString();
-    
+
     int currentIndex = 0;
     if (location.startsWith('/universities')) currentIndex = 1;
     if (location.startsWith('/applications')) currentIndex = 2;

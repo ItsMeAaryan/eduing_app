@@ -40,13 +40,16 @@ class QuestionPracticeScreen extends StatelessWidget {
             _buildHeader(context, isDark),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.p24, 0, AppSpacing.p24, 100),
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.p24, 0, AppSpacing.p24, 100),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      question?.question ?? 'Tell me about yourself and your academic goals.',
-                      style: AppTypography.display.copyWith(fontSize: 32, color: AppColors.primary),
+                      question?.question ??
+                          'Tell me about yourself and your academic goals.',
+                      style: AppTypography.display
+                          .copyWith(fontSize: 32, color: AppColors.primary),
                     ),
                     const SizedBox(height: AppSpacing.p32),
                     SquircleCard(
@@ -56,15 +59,19 @@ class QuestionPracticeScreen extends StatelessWidget {
                         children: [
                           Row(
                             children: [
-                              const Icon(Iconsax.task_square, color: AppColors.primary, size: 20),
+                              const Icon(Iconsax.task_square,
+                                  color: AppColors.primary, size: 20),
                               const SizedBox(width: AppSpacing.p12),
-                              Text('Suggested Response Structure', style: AppTypography.titleMedium),
+                              Text('Suggested Response Structure',
+                                  style: AppTypography.titleMedium),
                             ],
                           ),
                           const SizedBox(height: AppSpacing.p16),
                           Text(
-                            question?.suggestedStructure ?? '1. Brief introduction\n2. Key academic highlights\n3. Why this program fits career goals',
-                            style: AppTypography.bodyMedium.copyWith(height: 1.8),
+                            question?.suggestedStructure ??
+                                '1. Brief introduction\n2. Key academic highlights\n3. Why this program fits career goals',
+                            style:
+                                AppTypography.bodyMedium.copyWith(height: 1.8),
                           ),
                         ],
                       ),

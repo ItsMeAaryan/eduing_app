@@ -5,7 +5,8 @@ class ProfileRepository extends BaseRepository<Map<String, dynamic>> {
   ProfileRepository() : super('profile');
 
   @override
-  Map<String, dynamic> fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  Map<String, dynamic> fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> doc) {
     return doc.data() ?? {};
   }
 

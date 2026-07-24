@@ -31,7 +31,8 @@ class AIRecommendation {
         'isCompleted': isCompleted,
       };
 
-  factory AIRecommendation.fromMap(Map<String, dynamic> map) => AIRecommendation(
+  factory AIRecommendation.fromMap(Map<String, dynamic> map) =>
+      AIRecommendation(
         text: map['text'] ?? '',
         priority: map['priority'] ?? 'Medium',
         estimatedImpact: map['estimatedImpact'] ?? '',
@@ -55,10 +56,19 @@ class AIResumeReview {
     this.formattingScore = 88,
     this.skillsCoverage = 82,
     this.recommendations = const [
-      AIRecommendation(text: 'Add quantifiable metrics to work experience bullets.', priority: 'High', estimatedImpact: '+8% ATS Score'),
-      AIRecommendation(text: 'Include relevant technical keywords for target program.', priority: 'Medium', estimatedImpact: '+5% ATS Score'),
+      AIRecommendation(
+          text: 'Add quantifiable metrics to work experience bullets.',
+          priority: 'High',
+          estimatedImpact: '+8% ATS Score'),
+      AIRecommendation(
+          text: 'Include relevant technical keywords for target program.',
+          priority: 'Medium',
+          estimatedImpact: '+5% ATS Score'),
     ],
-    this.strengths = const ['Clean layout formatting', 'Clear academic highlights'],
+    this.strengths = const [
+      'Clean layout formatting',
+      'Clear academic highlights'
+    ],
   });
 
   Map<String, dynamic> toMap() => {
@@ -202,7 +212,8 @@ class UserResume {
       skills: List<String>.from(map['skills'] ?? []),
       projects: List<String>.from(map['projects'] ?? []),
       lastUpdated: map['lastUpdated'] ?? 'Today',
-      completionPercentage: (map['completionPercentage'] as num?)?.toDouble() ?? 0.8,
+      completionPercentage:
+          (map['completionPercentage'] as num?)?.toDouble() ?? 0.8,
       atsReadiness: map['atsReadiness'] ?? 85,
       aiResumeScore: map['aiResumeScore'] ?? 88,
       review: AIResumeReview.fromMap(map['review'] as Map<String, dynamic>?),

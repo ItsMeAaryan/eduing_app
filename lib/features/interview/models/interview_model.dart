@@ -33,7 +33,8 @@ class InterviewQuestion {
         'isBookmarked': isBookmarked,
       };
 
-  factory InterviewQuestion.fromMap(Map<String, dynamic> map) => InterviewQuestion(
+  factory InterviewQuestion.fromMap(Map<String, dynamic> map) =>
+      InterviewQuestion(
         id: map['id'] ?? '',
         category: map['category'] ?? 'General',
         question: map['question'] ?? '',
@@ -66,7 +67,8 @@ class AIInterviewRecommendation {
         'isCompleted': isCompleted,
       };
 
-  factory AIInterviewRecommendation.fromMap(Map<String, dynamic> map) => AIInterviewRecommendation(
+  factory AIInterviewRecommendation.fromMap(Map<String, dynamic> map) =>
+      AIInterviewRecommendation(
         text: map['text'] ?? '',
         priority: map['priority'] ?? 'Medium',
         estimatedImpact: map['estimatedImpact'] ?? '',
@@ -90,10 +92,21 @@ class AIInterviewReport {
     this.technicalKnowledge = 90,
     this.clarity = 85,
     this.recommendations = const [
-      AIInterviewRecommendation(text: 'Structure answers using the STAR method (Situation, Task, Action, Result).', priority: 'High', estimatedImpact: '+10% Communication'),
-      AIInterviewRecommendation(text: 'Elaborate on specific research methodologies during technical questions.', priority: 'Medium', estimatedImpact: '+5% Technical'),
+      AIInterviewRecommendation(
+          text:
+              'Structure answers using the STAR method (Situation, Task, Action, Result).',
+          priority: 'High',
+          estimatedImpact: '+10% Communication'),
+      AIInterviewRecommendation(
+          text:
+              'Elaborate on specific research methodologies during technical questions.',
+          priority: 'Medium',
+          estimatedImpact: '+5% Technical'),
     ],
-    this.strengths = const ['Clear vocal articulation', 'Strong explanation of project achievements'],
+    this.strengths = const [
+      'Clear vocal articulation',
+      'Strong explanation of project achievements'
+    ],
   });
 
   Map<String, dynamic> toMap() => {
@@ -115,7 +128,8 @@ class AIInterviewReport {
       technicalKnowledge: map['technicalKnowledge'] ?? 90,
       clarity: map['clarity'] ?? 85,
       recommendations: (map['recommendations'] as List<dynamic>?)
-              ?.map((r) => AIInterviewRecommendation.fromMap(r as Map<String, dynamic>))
+              ?.map((r) =>
+                  AIInterviewRecommendation.fromMap(r as Map<String, dynamic>))
               .toList() ??
           const [],
       strengths: List<String>.from(map['strengths'] ?? []),
@@ -149,12 +163,14 @@ class InterviewSession {
         'report': report.toMap(),
       };
 
-  factory InterviewSession.fromMap(Map<String, dynamic> map, String docId) => InterviewSession(
+  factory InterviewSession.fromMap(Map<String, dynamic> map, String docId) =>
+      InterviewSession(
         id: docId,
         date: map['date'] ?? 'Today',
         questionTitle: map['questionTitle'] ?? 'Mock Question',
         userTranscript: map['userTranscript'] ?? '',
         score: map['score'] ?? 85,
-        report: AIInterviewReport.fromMap(map['report'] as Map<String, dynamic>?),
+        report:
+            AIInterviewReport.fromMap(map['report'] as Map<String, dynamic>?),
       );
 }

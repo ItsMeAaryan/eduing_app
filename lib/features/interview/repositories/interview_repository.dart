@@ -19,7 +19,9 @@ class InterviewRepository extends BaseRepository<InterviewSession> {
     final col = getUserCollection();
     if (col == null) return Stream.value([]);
     return col.orderBy('date', descending: true).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => InterviewSession.fromMap(doc.data(), doc.id)).toList();
+      return snapshot.docs
+          .map((doc) => InterviewSession.fromMap(doc.data(), doc.id))
+          .toList();
     });
   }
 }

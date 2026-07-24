@@ -73,7 +73,11 @@ Upon completing my degree, I plan to lead research initiatives in ethical AI dep
   }
 
   Future<void> updateContent(String newContent) async {
-    final words = newContent.trim().split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
+    final words = newContent
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .length;
     state = state.copyWith(
       fullContent: newContent,
       wordCount: words,
@@ -83,7 +87,8 @@ Upon completing my degree, I plan to lead research initiatives in ethical AI dep
     await _autoSave();
   }
 
-  Future<void> updateTarget({required String university, required String program}) async {
+  Future<void> updateTarget(
+      {required String university, required String program}) async {
     state = state.copyWith(
       universityName: university,
       targetProgram: program,
@@ -132,7 +137,8 @@ Provide an improved version with enhanced vocabulary and academic tone.
   }
 
   Future<File> exportSopPdf() async {
-    final pdf = pw.Document(title: '${state.universityName} - Statement of Purpose');
+    final pdf =
+        pw.Document(title: '${state.universityName} - Statement of Purpose');
 
     pdf.addPage(
       pw.Page(
@@ -144,12 +150,16 @@ Provide an improved version with enhanced vocabulary and academic tone.
             children: [
               pw.Text(
                 'STATEMENT OF PURPOSE',
-                style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.indigo900),
+                style: pw.TextStyle(
+                    fontSize: 18,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.indigo900),
               ),
               pw.SizedBox(height: 4),
               pw.Text(
                 'Target: ${state.targetProgram} — ${state.universityName}',
-                style: const pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
+                style:
+                    const pw.TextStyle(fontSize: 11, color: PdfColors.grey700),
               ),
               pw.Divider(thickness: 1),
               pw.SizedBox(height: 12),
@@ -164,14 +174,16 @@ Provide an improved version with enhanced vocabulary and academic tone.
     );
 
     final dir = await getTemporaryDirectory();
-    final file = File('${dir.path}/SOP_${state.universityName.replaceAll(' ', '_')}.pdf');
+    final file = File(
+        '${dir.path}/SOP_${state.universityName.replaceAll(' ', '_')}.pdf');
     await file.writeAsBytes(await pdf.save());
     return file;
   }
 
   Future<void> shareSopPdf() async {
     final file = await exportSopPdf();
-    await Share.shareXFiles([XFile(file.path)], text: 'Sharing Statement of Purpose for ${state.universityName}');
+    await Share.shareXFiles([XFile(file.path)],
+        text: 'Sharing Statement of Purpose for ${state.universityName}');
   }
 
   Future<void> printSopPdf() async {

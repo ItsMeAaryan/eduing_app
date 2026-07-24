@@ -141,7 +141,8 @@ class AppDocument {
       previewUrl: map['previewUrl'] ?? '',
       storagePath: map['storagePath'],
       localPath: map['localPath'],
-      aiAnalysis: DocumentAIAnalysis.fromMap(map['aiAnalysis'] as Map<String, dynamic>?),
+      aiAnalysis: DocumentAIAnalysis.fromMap(
+          map['aiAnalysis'] as Map<String, dynamic>?),
     );
   }
 }

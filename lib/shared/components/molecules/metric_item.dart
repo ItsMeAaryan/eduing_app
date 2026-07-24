@@ -26,26 +26,35 @@ class MetricItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (icon != null) ...[
-          Icon(icon, size: 20, color: labelColor ?? (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)),
+          Icon(icon,
+              size: 20,
+              color: labelColor ??
+                  (isDark
+                      ? AppColors.darkTextSecondary
+                      : AppColors.textSecondary)),
           const SizedBox(height: AppSpacing.p8),
         ],
         Text(
           label,
           style: AppTypography.labelMedium.copyWith(
-            color: labelColor ?? (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+            color: labelColor ??
+                (isDark
+                    ? AppColors.darkTextSecondary
+                    : AppColors.textSecondary),
           ),
         ),
         const SizedBox(height: AppSpacing.p4),
         Text(
           value,
           style: AppTypography.titleLarge.copyWith(
-            color: valueColor ?? (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+            color: valueColor ??
+                (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
             fontWeight: FontWeight.bold,
           ),
         ),

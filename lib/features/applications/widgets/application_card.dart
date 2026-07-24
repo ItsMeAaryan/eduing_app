@@ -24,39 +24,42 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
     final uni = app.university;
 
     return GestureDetector(
-      onTap: () => context.push('/application/${app.id}'),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildHeader(app, uni),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCourseInfo(app),
-                const SizedBox(height: 16),
-                _buildProgress(app),
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Divider(height: 1, color: Color(0xFFF1F5F9)),
-                ),
-                _buildFooter(app),
-                if (_isExpanded) _buildExpandedTimeline(app),
-              ],
-            ),
+        onTap: () => context.push('/application/${app.id}'),
+        child: Container(
+          margin: const EdgeInsets.only(bottom: 24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10)),
+            ],
           ),
-        ],
-      ),
-    )).animate().fade().slideY(begin: 0.1);
+          child: Column(
+            children: [
+              _buildHeader(app, uni),
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildCourseInfo(app),
+                    const SizedBox(height: 16),
+                    _buildProgress(app),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Divider(height: 1, color: Color(0xFFF1F5F9)),
+                    ),
+                    _buildFooter(app),
+                    if (_isExpanded) _buildExpandedTimeline(app),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        )).animate().fade().slideY(begin: 0.1);
   }
 
   Widget _buildHeader(UniversityApplication app, dynamic uni) {
@@ -71,7 +74,8 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
               height: 120,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(height: 120, color: Colors.grey.shade200),
+              errorBuilder: (_, __, ___) =>
+                  Container(height: 120, color: Colors.grey.shade200),
             ),
           ),
         ),
@@ -82,7 +86,10 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
-              colors: [Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.6)],
+              colors: [
+                Colors.black.withOpacity(0.2),
+                Colors.black.withOpacity(0.6)
+              ],
             ),
           ),
         ),
@@ -97,7 +104,10 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
             ),
             child: Text(
               app.statusDisplay.toUpperCase(),
-              style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 10),
+              style: AppTypography.caption.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 10),
             ),
           ),
         ),
@@ -122,11 +132,13 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
                 children: [
                   Text(
                     uni.name,
-                    style: AppTypography.label.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: AppTypography.label.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     'App ID: ${app.id.toUpperCase()}',
-                    style: AppTypography.caption.copyWith(color: Colors.white70),
+                    style:
+                        AppTypography.caption.copyWith(color: Colors.white70),
                   ),
                 ],
               ),
@@ -145,18 +157,26 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Course', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+              Text('Course',
+                  style: AppTypography.caption
+                      .copyWith(color: AppColors.textSecondary)),
               const SizedBox(height: 4),
-              Text(app.course, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
+              Text(app.course,
+                  style: AppTypography.label
+                      .copyWith(fontWeight: FontWeight.bold)),
             ],
           ),
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text('Deadline', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+            Text('Deadline',
+                style: AppTypography.caption
+                    .copyWith(color: AppColors.textSecondary)),
             const SizedBox(height: 4),
-            Text(app.deadline, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold, color: AppColors.error)),
+            Text(app.deadline,
+                style: AppTypography.label.copyWith(
+                    fontWeight: FontWeight.bold, color: AppColors.error)),
           ],
         ),
       ],
@@ -170,8 +190,12 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Application Progress', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-            Text('${(app.progress * 100).toInt()}%', style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold)),
+            Text('Application Progress',
+                style: AppTypography.caption
+                    .copyWith(color: AppColors.textSecondary)),
+            Text('${(app.progress * 100).toInt()}%',
+                style: AppTypography.caption
+                    .copyWith(fontWeight: FontWeight.bold)),
           ],
         ),
         const SizedBox(height: 8),
@@ -194,12 +218,14 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
           ),
           child: Row(
             children: [
-              const Icon(Iconsax.magic_star, color: AppColors.primary, size: 16),
+              const Icon(Iconsax.magic_star,
+                  color: AppColors.primary, size: 16),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'AI Success Prediction: ${app.aiSuccessPrediction}%',
-                  style: AppTypography.caption.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
+                  style: AppTypography.caption.copyWith(
+                      color: AppColors.primary, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -219,17 +245,22 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
               _isExpanded = !_isExpanded;
             });
           },
-          icon: Icon(_isExpanded ? Iconsax.arrow_up_2 : Iconsax.arrow_down_1, size: 16),
-          label: Text('Timeline', style: AppTypography.button.copyWith(color: AppColors.textPrimary)),
+          icon: Icon(_isExpanded ? Iconsax.arrow_up_2 : Iconsax.arrow_down_1,
+              size: 16),
+          label: Text('Timeline',
+              style:
+                  AppTypography.button.copyWith(color: AppColors.textPrimary)),
         ),
         ElevatedButton(
           onPressed: () {},
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           ),
-          child: Text('Continue', style: AppTypography.button.copyWith(color: Colors.white)),
+          child: Text('Continue',
+              style: AppTypography.button.copyWith(color: Colors.white)),
         ),
       ],
     );
@@ -252,10 +283,17 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
                       width: 16,
                       height: 16,
                       decoration: BoxDecoration(
-                        color: stage.isCompleted ? AppColors.success : (stage.isActive ? AppColors.primary : Colors.grey.shade300),
+                        color: stage.isCompleted
+                            ? AppColors.success
+                            : (stage.isActive
+                                ? AppColors.primary
+                                : Colors.grey.shade300),
                         shape: BoxShape.circle,
                       ),
-                      child: stage.isCompleted ? const Icon(Icons.check, color: Colors.white, size: 10) : null,
+                      child: stage.isCompleted
+                          ? const Icon(Icons.check,
+                              color: Colors.white, size: 10)
+                          : null,
                     ),
                   ],
                 ),
@@ -264,8 +302,14 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(stage.title, style: AppTypography.label.copyWith(fontWeight: stage.isActive ? FontWeight.bold : FontWeight.normal)),
-                      Text(stage.date, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                      Text(stage.title,
+                          style: AppTypography.label.copyWith(
+                              fontWeight: stage.isActive
+                                  ? FontWeight.bold
+                                  : FontWeight.normal)),
+                      Text(stage.date,
+                          style: AppTypography.caption
+                              .copyWith(color: AppColors.textSecondary)),
                     ],
                   ),
                 ),
@@ -279,13 +323,20 @@ class _AppApplicationCardState extends State<AppApplicationCard> {
 
   Color _getStatusColor(ApplicationStatus status) {
     switch (status) {
-      case ApplicationStatus.draft: return AppColors.textSecondary;
-      case ApplicationStatus.submitted: return AppColors.info;
-      case ApplicationStatus.review: return AppColors.warning;
-      case ApplicationStatus.accepted: return AppColors.success;
-      case ApplicationStatus.rejected: return AppColors.error;
-      case ApplicationStatus.interview: return AppColors.primary;
-      case ApplicationStatus.scholarship: return AppColors.secondary;
+      case ApplicationStatus.draft:
+        return AppColors.textSecondary;
+      case ApplicationStatus.submitted:
+        return AppColors.info;
+      case ApplicationStatus.review:
+        return AppColors.warning;
+      case ApplicationStatus.accepted:
+        return AppColors.success;
+      case ApplicationStatus.rejected:
+        return AppColors.error;
+      case ApplicationStatus.interview:
+        return AppColors.primary;
+      case ApplicationStatus.scholarship:
+        return AppColors.secondary;
     }
   }
 }

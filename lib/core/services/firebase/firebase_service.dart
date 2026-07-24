@@ -15,22 +15,23 @@ class FirebaseService {
       await Firebase.initializeApp(
         options: DefaultFirebaseOptions.currentPlatform,
       );
-      
+
       // Setup Analytics
       FirebaseAnalytics analytics = FirebaseAnalytics.instance;
       analytics.logAppOpen();
 
       // Setup Crashlytics
-      FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
+      FlutterError.onError =
+          FirebaseCrashlytics.instance.recordFlutterFatalError;
 
       // Enable offline persistence for Firestore
       FirebaseFirestore.instance.settings = const Settings(
         persistenceEnabled: true,
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
-      
     } catch (e) {
-      debugPrint('Firebase initialization failed (probably missing config): \$e');
+      debugPrint(
+          'Firebase initialization failed (probably missing config): \$e');
     }
   }
 

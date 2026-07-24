@@ -37,7 +37,8 @@ class ResumeNotifier extends StateNotifier<UserResume> {
       email: 'alex.morgan@university.edu',
       phone: '+1 (555) 234-5678',
       location: 'Boston, MA',
-      summary: 'Passionate Computer Science scholar aiming for MS in Artificial Intelligence with hands-on research in deep learning.',
+      summary:
+          'Passionate Computer Science scholar aiming for MS in Artificial Intelligence with hands-on research in deep learning.',
       education: [
         'B.S. in Computer Science, Northeastern University (GPA 3.9/4.0, 2021-2025)',
       ],
@@ -45,7 +46,15 @@ class ResumeNotifier extends StateNotifier<UserResume> {
         'Research Assistant at AI Research Lab - Developed PyTorch vision models (2024-Present)',
         'Software Engineering Intern at Tech Corp - Built REST APIs in Node.js (Summer 2023)',
       ],
-      skills: ['Python', 'Dart', 'Flutter', 'PyTorch', 'TensorFlow', 'PostgreSQL', 'Docker'],
+      skills: [
+        'Python',
+        'Dart',
+        'Flutter',
+        'PyTorch',
+        'TensorFlow',
+        'PostgreSQL',
+        'Docker'
+      ],
       projects: [
         'Edge AI Vision Classifier - Real-time mobile classification with 94% accuracy',
         'EDUING Mobile App - Cross-platform study abroad guidance portal',
@@ -126,12 +135,17 @@ Provide an estimated overall score (out of 100), ATS score (out of 100), and 3 b
       skillsCoverage: 88,
       recommendations: [
         AIRecommendation(
-          text: aiResponse.isNotEmpty ? aiResponse : 'Add quantifiable metrics to experience bullets.',
+          text: aiResponse.isNotEmpty
+              ? aiResponse
+              : 'Add quantifiable metrics to experience bullets.',
           priority: 'High',
           estimatedImpact: '+6% ATS Score',
         ),
       ],
-      strengths: const ['Clear academic background', 'Strong technical skill representation'],
+      strengths: const [
+        'Clear academic background',
+        'Strong technical skill representation'
+      ],
     );
 
     state = state.copyWith(

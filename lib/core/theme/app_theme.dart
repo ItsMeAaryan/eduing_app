@@ -17,21 +17,23 @@ class AppTheme {
         onSurface: AppColors.textPrimary,
       ),
       scaffoldBackgroundColor: AppColors.background,
-      textTheme: GoogleFonts.poppinsTextTheme().copyWith(
-        displayLarge: AppTypography.display,
-        headlineLarge: AppTypography.headline,
-        titleLarge: AppTypography.titleLarge,
-        titleMedium: AppTypography.titleMedium,
-        titleSmall: AppTypography.titleSmall,
-        bodyLarge: AppTypography.bodyLarge,
-        bodyMedium: AppTypography.bodyMedium,
-        bodySmall: AppTypography.bodySmall,
-        labelLarge: AppTypography.labelLarge,
-        labelMedium: AppTypography.labelMedium,
-      ).apply(
-        bodyColor: AppColors.textPrimary,
-        displayColor: AppColors.textPrimary,
-      ),
+      textTheme: GoogleFonts.poppinsTextTheme()
+          .copyWith(
+            displayLarge: AppTypography.display,
+            headlineLarge: AppTypography.headline,
+            titleLarge: AppTypography.titleLarge,
+            titleMedium: AppTypography.titleMedium,
+            titleSmall: AppTypography.titleSmall,
+            bodyLarge: AppTypography.bodyLarge,
+            bodyMedium: AppTypography.bodyMedium,
+            bodySmall: AppTypography.bodySmall,
+            labelLarge: AppTypography.labelLarge,
+            labelMedium: AppTypography.labelMedium,
+          )
+          .apply(
+            bodyColor: AppColors.textPrimary,
+            displayColor: AppColors.textPrimary,
+          ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -66,21 +68,23 @@ class AppTheme {
         onSurface: AppColors.darkTextPrimary,
       ),
       scaffoldBackgroundColor: AppColors.darkBackground,
-      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme).copyWith(
-        displayLarge: AppTypography.display,
-        headlineLarge: AppTypography.headline,
-        titleLarge: AppTypography.titleLarge,
-        titleMedium: AppTypography.titleMedium,
-        titleSmall: AppTypography.titleSmall,
-        bodyLarge: AppTypography.bodyLarge,
-        bodyMedium: AppTypography.bodyMedium,
-        bodySmall: AppTypography.bodySmall,
-        labelLarge: AppTypography.labelLarge,
-        labelMedium: AppTypography.labelMedium,
-      ).apply(
-        bodyColor: AppColors.darkTextPrimary,
-        displayColor: AppColors.darkTextPrimary,
-      ),
+      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme)
+          .copyWith(
+            displayLarge: AppTypography.display,
+            headlineLarge: AppTypography.headline,
+            titleLarge: AppTypography.titleLarge,
+            titleMedium: AppTypography.titleMedium,
+            titleSmall: AppTypography.titleSmall,
+            bodyLarge: AppTypography.bodyLarge,
+            bodyMedium: AppTypography.bodyMedium,
+            bodySmall: AppTypography.bodySmall,
+            labelLarge: AppTypography.labelLarge,
+            labelMedium: AppTypography.labelMedium,
+          )
+          .apply(
+            bodyColor: AppColors.darkTextPrimary,
+            displayColor: AppColors.darkTextPrimary,
+          ),
       appBarTheme: const AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,

@@ -28,20 +28,24 @@ class CopilotSettingsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Theme.of(context).cardColor,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Theme.of(context).dividerColor.withOpacity(0.1)),
+                border: Border.all(
+                    color: Theme.of(context).dividerColor.withOpacity(0.1)),
               ),
               child: Column(
                 children: [
                   ListTile(
-                    leading: const Icon(Iconsax.language_square, color: AppColors.primary),
+                    leading: const Icon(Iconsax.language_square,
+                        color: AppColors.primary),
                     title: Text('Primary Language', style: AppTypography.label),
                     trailing: Text('English', style: AppTypography.caption),
                   ),
                   const Divider(height: 1),
                   ListTile(
                     leading: const Icon(Iconsax.cpu, color: AppColors.primary),
-                    title: Text('AI Engine Provider', style: AppTypography.label),
-                    trailing: Text('Gemini Flash 1.5', style: AppTypography.caption),
+                    title:
+                        Text('AI Engine Provider', style: AppTypography.label),
+                    trailing:
+                        Text('Gemini Flash 1.5', style: AppTypography.caption),
                   ),
                 ],
               ),

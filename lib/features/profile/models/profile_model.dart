@@ -96,7 +96,8 @@ class ProfileData {
       targetDegree: targetDegree ?? this.targetDegree,
       targetCountries: targetCountries ?? this.targetCountries,
       targetUniversities: targetUniversities ?? this.targetUniversities,
-      profileCompletionPercentage: profileCompletionPercentage ?? this.profileCompletionPercentage,
+      profileCompletionPercentage:
+          profileCompletionPercentage ?? this.profileCompletionPercentage,
       aiReadinessScore: aiReadinessScore ?? this.aiReadinessScore,
       currentGpa: currentGpa ?? this.currentGpa,
       standardizedTests: standardizedTests ?? this.standardizedTests,
@@ -104,9 +105,11 @@ class ProfileData {
       projects: projects ?? this.projects,
       skills: skills ?? this.skills,
       budget: budget ?? this.budget,
-      scholarshipPreference: scholarshipPreference ?? this.scholarshipPreference,
+      scholarshipPreference:
+          scholarshipPreference ?? this.scholarshipPreference,
       studyMode: studyMode ?? this.studyMode,
-      applicationsSubmitted: applicationsSubmitted ?? this.applicationsSubmitted,
+      applicationsSubmitted:
+          applicationsSubmitted ?? this.applicationsSubmitted,
       scholarshipsSaved: scholarshipsSaved ?? this.scholarshipsSaved,
       resumeScore: resumeScore ?? this.resumeScore,
       sopScore: sopScore ?? this.sopScore,

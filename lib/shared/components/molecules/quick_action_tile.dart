@@ -30,7 +30,8 @@ class _QuickActionTileState extends State<QuickActionTile> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final textColor =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
     final hoverBgColor = isDark ? AppColors.darkSurface : AppColors.background;
 
     return MouseRegion(
@@ -51,8 +52,10 @@ class _QuickActionTileState extends State<QuickActionTile> {
               AppIconButton(
                 icon: widget.icon,
                 isFilled: true,
-                backgroundColor: isDark ? AppColors.darkBorder : AppColors.surface,
-                color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                backgroundColor:
+                    isDark ? AppColors.darkBorder : AppColors.surface,
+                color:
+                    isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
               ),
               const SizedBox(height: AppSpacing.p8),
               Text(
@@ -65,7 +68,10 @@ class _QuickActionTileState extends State<QuickActionTile> {
                 const SizedBox(height: AppSpacing.p4),
                 Text(
                   widget.subtitle!,
-                  style: AppTypography.caption.copyWith(color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+                  style: AppTypography.caption.copyWith(
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textSecondary),
                   textAlign: TextAlign.center,
                   maxLines: 1,
                 ),
@@ -74,9 +80,9 @@ class _QuickActionTileState extends State<QuickActionTile> {
           ),
         ),
       ).animate(target: _isHovered ? 1 : 0).scale(
-        end: const Offset(1.05, 1.05),
-        duration: AppDuration.fast,
-      ),
+            end: const Offset(1.05, 1.05),
+            duration: AppDuration.fast,
+          ),
     );
   }
 }

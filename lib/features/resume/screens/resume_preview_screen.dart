@@ -27,13 +27,16 @@ class ResumePreviewScreen extends ConsumerWidget {
           final file = await pdfService.savePdfFile(resume);
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Saved ATS-friendly PDF to ${file.path}'), backgroundColor: AppColors.success),
+              SnackBar(
+                  content: Text('Saved ATS-friendly PDF to ${file.path}'),
+                  backgroundColor: AppColors.success),
             );
           }
         },
         backgroundColor: AppColors.primary,
         icon: const Icon(Iconsax.document_download, color: Colors.white),
-        label: Text('Export ATS PDF', style: AppTypography.labelLarge.copyWith(color: Colors.white)),
+        label: Text('Export ATS PDF',
+            style: AppTypography.labelLarge.copyWith(color: Colors.white)),
       ),
       body: SafeArea(
         child: Column(
@@ -52,7 +55,8 @@ class ResumePreviewScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, WidgetRef ref, UserResume resume, dynamic pdfService, bool isDark) {
+  Widget _buildHeader(BuildContext context, WidgetRef ref, UserResume resume,
+      dynamic pdfService, bool isDark) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.p24),
       child: Row(
@@ -90,7 +94,8 @@ class ResumePreviewScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTemplateSelector(BuildContext context, WidgetRef ref, UserResume resume, bool isDark) {
+  Widget _buildTemplateSelector(
+      BuildContext context, WidgetRef ref, UserResume resume, bool isDark) {
     final templates = ['Modern', 'Executive', 'Academic', 'Minimal'];
 
     return Container(
@@ -107,18 +112,30 @@ class ResumePreviewScreen extends ConsumerWidget {
             onTap: () => ref.read(resumeProvider.notifier).setTemplate(t),
             child: Container(
               margin: const EdgeInsets.only(right: AppSpacing.p12),
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p20, vertical: AppSpacing.p12),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.p20, vertical: AppSpacing.p12),
               decoration: BoxDecoration(
-                color: isSelected ? AppColors.primary : (isDark ? AppColors.darkSurface : AppColors.surface),
+                color: isSelected
+                    ? AppColors.primary
+                    : (isDark ? AppColors.darkSurface : AppColors.surface),
                 borderRadius: BorderRadius.circular(100),
-                border: Border.all(color: isSelected ? AppColors.primary : (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
+                border: Border.all(
+                    color: isSelected
+                        ? AppColors.primary
+                        : (isDark ? AppColors.darkBorder : AppColors.border)
+                            .withOpacity(0.5)),
               ),
               child: Center(
                 child: Text(
                   t,
                   style: AppTypography.labelLarge.copyWith(
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                    color: isSelected ? Colors.white : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+                    fontWeight:
+                        isSelected ? FontWeight.bold : FontWeight.normal,
+                    color: isSelected
+                        ? Colors.white
+                        : (isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary),
                   ),
                 ),
               ),
@@ -134,67 +151,89 @@ class ResumePreviewScreen extends ConsumerWidget {
       child: Container(
         width: double.infinity,
         constraints: const BoxConstraints(maxWidth: 800),
-        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
+        margin: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
         padding: const EdgeInsets.all(AppSpacing.p32),
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 30, offset: const Offset(0, 15)),
+            BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 30,
+                offset: const Offset(0, 15)),
           ],
-          border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
+          border: Border.all(
+              color: (isDark ? AppColors.darkBorder : AppColors.border)
+                  .withOpacity(0.5)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
               resume.fullName.isNotEmpty ? resume.fullName : 'Alex Morgan',
-              style: AppTypography.display.copyWith(color: AppColors.primary, fontSize: 32),
+              style: AppTypography.display
+                  .copyWith(color: AppColors.primary, fontSize: 32),
             ),
             const SizedBox(height: AppSpacing.p8),
             Text(
               '${resume.email} • ${resume.phone} • ${resume.location}',
-              style: AppTypography.labelMedium.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.labelMedium
+                  .copyWith(color: AppColors.textSecondary),
             ),
             const SizedBox(height: AppSpacing.p24),
-            Divider(height: 1, color: isDark ? AppColors.darkBorder : AppColors.border),
+            Divider(
+                height: 1,
+                color: isDark ? AppColors.darkBorder : AppColors.border),
             const SizedBox(height: AppSpacing.p24),
-
             if (resume.summary.isNotEmpty) ...[
               _sectionTitle('SUMMARY'),
-              Text(resume.summary, style: AppTypography.bodyMedium.copyWith(height: 1.6, color: isDark ? Colors.grey.shade300 : Colors.black87)),
+              Text(resume.summary,
+                  style: AppTypography.bodyMedium.copyWith(
+                      height: 1.6,
+                      color: isDark ? Colors.grey.shade300 : Colors.black87)),
               const SizedBox(height: AppSpacing.p24),
             ],
-
             if (resume.education.isNotEmpty) ...[
               _sectionTitle('EDUCATION'),
               ...resume.education.map((e) => Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.p8),
-                    child: Text('• $e', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.grey.shade300 : Colors.black87)),
+                    child: Text('• $e',
+                        style: AppTypography.bodyMedium.copyWith(
+                            color: isDark
+                                ? Colors.grey.shade300
+                                : Colors.black87)),
                   )),
               const SizedBox(height: AppSpacing.p24),
             ],
-
             if (resume.experience.isNotEmpty) ...[
               _sectionTitle('EXPERIENCE'),
               ...resume.experience.map((e) => Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.p8),
-                    child: Text('• $e', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.grey.shade300 : Colors.black87)),
+                    child: Text('• $e',
+                        style: AppTypography.bodyMedium.copyWith(
+                            color: isDark
+                                ? Colors.grey.shade300
+                                : Colors.black87)),
                   )),
               const SizedBox(height: AppSpacing.p24),
             ],
-
             if (resume.skills.isNotEmpty) ...[
               _sectionTitle('SKILLS'),
-              Text(resume.skills.join(' • '), style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.grey.shade300 : Colors.black87)),
+              Text(resume.skills.join(' • '),
+                  style: AppTypography.bodyMedium.copyWith(
+                      color: isDark ? Colors.grey.shade300 : Colors.black87)),
               const SizedBox(height: AppSpacing.p24),
             ],
-
             if (resume.projects.isNotEmpty) ...[
               _sectionTitle('PROJECTS'),
               ...resume.projects.map((p) => Padding(
                     padding: const EdgeInsets.only(bottom: AppSpacing.p8),
-                    child: Text('• $p', style: AppTypography.bodyMedium.copyWith(color: isDark ? Colors.grey.shade300 : Colors.black87)),
+                    child: Text('• $p',
+                        style: AppTypography.bodyMedium.copyWith(
+                            color: isDark
+                                ? Colors.grey.shade300
+                                : Colors.black87)),
                   )),
             ],
           ],
@@ -208,7 +247,8 @@ class ResumePreviewScreen extends ConsumerWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.p12),
       child: Text(
         title,
-        style: AppTypography.titleMedium.copyWith(letterSpacing: 1.2, color: AppColors.primary),
+        style: AppTypography.titleMedium
+            .copyWith(letterSpacing: 1.2, color: AppColors.primary),
       ),
     );
   }

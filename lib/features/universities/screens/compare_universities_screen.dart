@@ -18,10 +18,13 @@ class CompareUniversitiesScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final allUniversities = ref.watch(universitiesProvider);
-    final universitiesToCompare = allUniversities.where((u) => universityIds.contains(u.id)).toList();
-    
+    final universitiesToCompare =
+        allUniversities.where((u) => universityIds.contains(u.id)).toList();
+
     // Fallback if empty
-    final displayUniversities = universitiesToCompare.isEmpty ? allUniversities.take(2).toList() : universitiesToCompare;
+    final displayUniversities = universitiesToCompare.isEmpty
+        ? allUniversities.take(2).toList()
+        : universitiesToCompare;
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -34,14 +37,18 @@ class CompareUniversitiesScreen extends ConsumerWidget {
         ),
         title: Column(
           children: [
-            Text('Compare Universities', style: AppTypography.title.copyWith(fontSize: 16)),
-            Text('AI-powered side-by-side comparison', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+            Text('Compare Universities',
+                style: AppTypography.title.copyWith(fontSize: 16)),
+            Text('AI-powered side-by-side comparison',
+                style: AppTypography.caption
+                    .copyWith(color: AppColors.textSecondary)),
           ],
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Iconsax.document_download, color: AppColors.textPrimary),
+            icon: const Icon(Iconsax.document_download,
+                color: AppColors.textPrimary),
             onPressed: () {},
           ),
           IconButton(
@@ -87,7 +94,8 @@ class CompareUniversitiesScreen extends ConsumerWidget {
             ),
             child: Text(
               '$count / 4 Selected',
-              style: AppTypography.caption.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
+              style: AppTypography.caption.copyWith(
+                  color: AppColors.primary, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -101,7 +109,8 @@ class CompareUniversitiesScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: universities.map((u) => _buildUniversityColumnHeader(u)).toList(),
+        children:
+            universities.map((u) => _buildUniversityColumnHeader(u)).toList(),
       ),
     ).animate().fade(delay: 100.ms).slideX();
   }
@@ -122,7 +131,8 @@ class CompareUniversitiesScreen extends ConsumerWidget {
                   height: 100,
                   width: 160,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(height: 100, width: 160, color: Colors.grey.shade300),
+                  errorBuilder: (_, __, ___) => Container(
+                      height: 100, width: 160, color: Colors.grey.shade300),
                 ),
               ),
               Positioned(
@@ -130,8 +140,10 @@ class CompareUniversitiesScreen extends ConsumerWidget {
                 right: 8,
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
-                  child: const Icon(Iconsax.close_circle, size: 16, color: AppColors.error),
+                  decoration: const BoxDecoration(
+                      color: Colors.white, shape: BoxShape.circle),
+                  child: const Icon(Iconsax.close_circle,
+                      size: 16, color: AppColors.error),
                 ),
               ),
             ],
@@ -145,17 +157,30 @@ class CompareUniversitiesScreen extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(university.name, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
+                child: Text(university.name,
+                    style: AppTypography.label
+                        .copyWith(fontWeight: FontWeight.bold),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis),
               ),
             ],
           ),
           const SizedBox(height: 4),
-          Text(university.location, style: AppTypography.caption.copyWith(color: AppColors.textSecondary, fontSize: 10), maxLines: 1),
+          Text(university.location,
+              style: AppTypography.caption
+                  .copyWith(color: AppColors.textSecondary, fontSize: 10),
+              maxLines: 1),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-            child: Text('AI Match ${university.aiMatch}%', style: AppTypography.caption.copyWith(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.bold)),
+            decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8)),
+            child: Text('AI Match ${university.aiMatch}%',
+                style: AppTypography.caption.copyWith(
+                    color: AppColors.primary,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -173,7 +198,10 @@ class CompareUniversitiesScreen extends ConsumerWidget {
         gradient: AppColors.aiGradient,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10)),
+          BoxShadow(
+              color: AppColors.primary.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10)),
         ],
       ),
       child: Column(
@@ -183,13 +211,17 @@ class CompareUniversitiesScreen extends ConsumerWidget {
             children: [
               const Icon(Iconsax.magic_star, color: Colors.white, size: 24),
               const SizedBox(width: 12),
-              Text('AI Winner', style: AppTypography.title.copyWith(color: Colors.white)),
+              Text('AI Winner',
+                  style: AppTypography.title.copyWith(color: Colors.white)),
             ],
-          ).animate(onPlay: (controller) => controller.repeat(reverse: true)).shimmer(duration: 2.seconds),
+          )
+              .animate(onPlay: (controller) => controller.repeat(reverse: true))
+              .shimmer(duration: 2.seconds),
           const SizedBox(height: 16),
           Text(
             'Based on your academic profile, ${winner.name} provides the highest placement ROI and admission probability.',
-            style: AppTypography.body.copyWith(color: Colors.white, height: 1.5),
+            style:
+                AppTypography.body.copyWith(color: Colors.white, height: 1.5),
           ),
         ],
       ),
@@ -198,7 +230,7 @@ class CompareUniversitiesScreen extends ConsumerWidget {
 
   Widget _buildComparisonTable(List<University> universities) {
     if (universities.isEmpty) return const SizedBox.shrink();
-    
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -214,13 +246,26 @@ class CompareUniversitiesScreen extends ConsumerWidget {
             ),
             child: Column(
               children: [
-                _buildTableRow('NIRF Ranking', universities.map((u) => u.nirfRanking).toList()),
-                _buildTableRow('AI Match', universities.map((u) => '${u.aiMatch}%').toList()),
-                _buildTableRow('Fees', universities.map((u) => u.fees).toList()),
-                _buildTableRow('Placement %', universities.map((u) => '${u.placementScore.toInt()}%').toList()),
-                _buildTableRow('ROI Score', universities.map((u) => '${u.roiScore.toInt()}/100').toList()),
-                _buildTableRow('Accreditation', universities.map((u) => u.accreditation).toList()),
-                _buildTableRow('Type', universities.map((u) => u.type).toList(), isLast: true),
+                _buildTableRow('NIRF Ranking',
+                    universities.map((u) => u.nirfRanking).toList()),
+                _buildTableRow('AI Match',
+                    universities.map((u) => '${u.aiMatch}%').toList()),
+                _buildTableRow(
+                    'Fees', universities.map((u) => u.fees).toList()),
+                _buildTableRow(
+                    'Placement %',
+                    universities
+                        .map((u) => '${u.placementScore.toInt()}%')
+                        .toList()),
+                _buildTableRow(
+                    'ROI Score',
+                    universities
+                        .map((u) => '${u.roiScore.toInt()}/100')
+                        .toList()),
+                _buildTableRow('Accreditation',
+                    universities.map((u) => u.accreditation).toList()),
+                _buildTableRow('Type', universities.map((u) => u.type).toList(),
+                    isLast: true),
               ],
             ),
           ),
@@ -229,21 +274,28 @@ class CompareUniversitiesScreen extends ConsumerWidget {
     ).animate().fade(delay: 300.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildTableRow(String title, List<String> values, {bool isLast = false}) {
+  Widget _buildTableRow(String title, List<String> values,
+      {bool isLast = false}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       decoration: BoxDecoration(
-        border: isLast ? null : Border(bottom: BorderSide(color: Colors.grey.shade100)),
+        border: isLast
+            ? null
+            : Border(bottom: BorderSide(color: Colors.grey.shade100)),
       ),
       child: Row(
         children: [
           Expanded(
             flex: 2,
-            child: Text(title, style: AppTypography.caption.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
+            child: Text(title,
+                style: AppTypography.caption.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.bold)),
           ),
           ...values.map((value) => Expanded(
                 flex: 2,
-                child: Text(value, style: AppTypography.label, textAlign: TextAlign.center),
+                child: Text(value,
+                    style: AppTypography.label, textAlign: TextAlign.center),
               )),
         ],
       ),
@@ -280,8 +332,10 @@ class CompareUniversitiesScreen extends ConsumerWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
                   ),
-                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  topTitles:
+                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles:
+                      AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 ),
                 gridData: const FlGridData(show: false),
                 borderData: FlBorderData(show: false),
@@ -295,13 +349,15 @@ class CompareUniversitiesScreen extends ConsumerWidget {
                         toY: uni.placementScore,
                         color: AppColors.primary,
                         width: 16,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(8)),
                       ),
                       BarChartRodData(
                         toY: uni.researchScore,
                         color: AppColors.secondary,
                         width: 16,
-                        borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(8)),
                       ),
                     ],
                   );
@@ -326,7 +382,11 @@ class CompareUniversitiesScreen extends ConsumerWidget {
   Widget _buildChartLegend(Color color, String label) {
     return Row(
       children: [
-        Container(width: 12, height: 12, decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(4))),
+        Container(
+            width: 12,
+            height: 12,
+            decoration: BoxDecoration(
+                color: color, borderRadius: BorderRadius.circular(4))),
         const SizedBox(width: 8),
         Text(label, style: AppTypography.caption),
       ],
@@ -341,8 +401,10 @@ class CompareUniversitiesScreen extends ConsumerWidget {
         children: [
           Text('AI Analysis', style: AppTypography.title),
           const SizedBox(height: 16),
-          _buildExpandableCard('Career ROI', 'BITS Pilani leads in ROI due to strong industry ties, but VIT offers aggressive startup support.'),
-          _buildExpandableCard('Placement Prediction', 'IIT Bombay has the highest predicted placement for your preferred major.'),
+          _buildExpandableCard('Career ROI',
+              'BITS Pilani leads in ROI due to strong industry ties, but VIT offers aggressive startup support.'),
+          _buildExpandableCard('Placement Prediction',
+              'IIT Bombay has the highest predicted placement for your preferred major.'),
         ],
       ),
     ).animate().fade(delay: 500.ms).slideY(begin: 0.1);
@@ -357,11 +419,14 @@ class CompareUniversitiesScreen extends ConsumerWidget {
         border: Border.all(color: Colors.grey.shade200),
       ),
       child: ExpansionTile(
-        title: Text(title, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
+        title: Text(title,
+            style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
         childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         expandedCrossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(description, style: AppTypography.body.copyWith(color: AppColors.textSecondary)),
+          Text(description,
+              style:
+                  AppTypography.body.copyWith(color: AppColors.textSecondary)),
         ],
       ),
     );
@@ -376,7 +441,12 @@ class CompareUniversitiesScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -10))],
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 20,
+                offset: const Offset(0, -10))
+          ],
         ),
         child: SafeArea(
           top: false,
@@ -387,9 +457,12 @@ class CompareUniversitiesScreen extends ConsumerWidget {
                   onPressed: () {},
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: Text('Save', style: AppTypography.button.copyWith(color: AppColors.textPrimary)),
+                  child: Text('Save',
+                      style: AppTypography.button
+                          .copyWith(color: AppColors.textPrimary)),
                 ),
               ),
               const SizedBox(width: 16),
@@ -398,20 +471,25 @@ class CompareUniversitiesScreen extends ConsumerWidget {
                 child: ElevatedButton(
                   onPressed: () {
                     for (var id in universityIds) {
-                      ref.read(applicationsNotifierProvider.notifier).createApplication(
-                        universityName: 'University $id',
-                        course: 'M.S. Degree',
-                        deadline: '01 Dec 2025',
-                      );
+                      ref
+                          .read(applicationsNotifierProvider.notifier)
+                          .createApplication(
+                            universityName: 'University $id',
+                            course: 'M.S. Degree',
+                            deadline: '01 Dec 2025',
+                          );
                     }
                     context.go('/applications');
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: Text('Apply to Selected', style: AppTypography.button.copyWith(color: Colors.white)),
+                  child: Text('Apply to Selected',
+                      style:
+                          AppTypography.button.copyWith(color: Colors.white)),
                 ),
               ),
             ],

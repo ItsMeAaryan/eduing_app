@@ -24,7 +24,10 @@ class SpeechAudioService {
   }) async {
     if (!_isAvailable) {
       final initOk = await initialize();
-      if (!initOk) throw Exception('Speech recognition unavailable on this device. Use manual text input.');
+      if (!initOk) {
+        throw Exception(
+            'Speech recognition unavailable on this device. Use manual text input.');
+      }
     }
 
     await _speech.listen(

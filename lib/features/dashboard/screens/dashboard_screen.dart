@@ -25,13 +25,14 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(userProfileProvider);
-    
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p24),
+          padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.p24, vertical: AppSpacing.p24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -64,7 +65,7 @@ class _DashboardGreeting extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final stats = ref.watch(dashboardStatsProvider);
     final readiness = stats.profileStrength.toInt();
-    
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,10 +78,13 @@ class _DashboardGreeting extends ConsumerWidget {
                 children: [
                   Text(
                     'Good Evening,',
-                    style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.bodyMedium
+                        .copyWith(color: AppColors.textSecondary),
                   ),
                   const SizedBox(width: AppSpacing.p4),
-                  Text(user.name, style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold)),
+                  Text(user.name,
+                      style: AppTypography.titleMedium
+                          .copyWith(fontWeight: FontWeight.bold)),
                 ],
               ),
               const SizedBox(height: AppSpacing.p8),
@@ -150,17 +154,20 @@ class _HeroCommandCenter extends ConsumerWidget {
                   children: [
                     Text(
                       'Admission Readiness',
-                      style: AppTypography.labelMedium.copyWith(color: Colors.white.withOpacity(0.8)),
+                      style: AppTypography.labelMedium
+                          .copyWith(color: Colors.white.withOpacity(0.8)),
                     ),
                     const SizedBox(height: AppSpacing.p4),
                     Text(
                       '$readiness%',
-                      style: AppTypography.display.copyWith(color: Colors.white),
+                      style:
+                          AppTypography.display.copyWith(color: Colors.white),
                     ),
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p12, vertical: AppSpacing.p8),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.p12, vertical: AppSpacing.p8),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(16),
@@ -168,11 +175,13 @@ class _HeroCommandCenter extends ConsumerWidget {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Iconsax.magic_star, color: Colors.white, size: 16),
+                      const Icon(Iconsax.magic_star,
+                          color: Colors.white, size: 16),
                       const SizedBox(width: AppSpacing.p8),
                       Text(
                         '4 Tasks Left',
-                        style: AppTypography.labelMedium.copyWith(color: Colors.white),
+                        style: AppTypography.labelMedium
+                            .copyWith(color: Colors.white),
                       ),
                     ],
                   ),
@@ -194,12 +203,14 @@ class _HeroCommandCenter extends ConsumerWidget {
                       children: [
                         Text(
                           'Next Priority',
-                          style: AppTypography.caption.copyWith(color: Colors.white.withOpacity(0.7)),
+                          style: AppTypography.caption
+                              .copyWith(color: Colors.white.withOpacity(0.7)),
                         ),
                         const SizedBox(height: AppSpacing.p4),
                         Text(
                           'Upload IELTS Score',
-                          style: AppTypography.titleMedium.copyWith(color: Colors.white),
+                          style: AppTypography.titleMedium
+                              .copyWith(color: Colors.white),
                         ),
                       ],
                     ),
@@ -216,10 +227,10 @@ class _HeroCommandCenter extends ConsumerWidget {
         ),
       ),
     ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(
-      begin: const Offset(1, 1),
-      end: const Offset(1.01, 1.01),
-      duration: 3.seconds,
-    );
+          begin: const Offset(1, 1),
+          end: const Offset(1.01, 1.01),
+          duration: 3.seconds,
+        );
   }
 }
 
@@ -315,11 +326,11 @@ class _TimelineDeadlinesList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final deadlines = ref.watch(upcomingDeadlinesProvider);
-    
+
     // Grouping logic (simplified for UI demonstration)
     final today = deadlines.take(1).toList();
     final thisWeek = deadlines.skip(1).take(2).toList();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -327,7 +338,9 @@ class _TimelineDeadlinesList extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Timeline', style: AppTypography.titleLarge),
-            Text('View all', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+            Text('View all',
+                style: AppTypography.labelLarge
+                    .copyWith(color: AppColors.primary)),
           ],
         ),
         const SizedBox(height: AppSpacing.p24),
@@ -364,7 +377,9 @@ class _TimelineHeader extends StatelessWidget {
           ),
         ),
         const SizedBox(width: AppSpacing.p12),
-        Text(title, style: AppTypography.labelLarge.copyWith(color: AppColors.textSecondary)),
+        Text(title,
+            style: AppTypography.labelLarge
+                .copyWith(color: AppColors.textSecondary)),
       ],
     );
   }
@@ -400,35 +415,43 @@ class _RecentApplicationsList extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Active Applications', style: AppTypography.titleLarge),
-            Text('View all', style: AppTypography.labelLarge.copyWith(color: AppColors.primary)),
+            Text('View all',
+                style: AppTypography.labelLarge
+                    .copyWith(color: AppColors.primary)),
           ],
         ),
         const SizedBox(height: AppSpacing.p24),
         ...applications.map((app) => Padding(
-          padding: const EdgeInsets.only(bottom: AppSpacing.p20),
-          child: PremiumApplicationCard(
-            logoUrl: app.logoUrl,
-            universityName: app.university,
-            course: app.campus,
-            status: _mapStatus(app.status),
-            deadline: 'Aug 30',
-            progress: app.aiMatch / 100.0,
-            onTap: () {},
-            onMenuTap: () {},
-          ),
-        )),
+              padding: const EdgeInsets.only(bottom: AppSpacing.p20),
+              child: PremiumApplicationCard(
+                logoUrl: app.logoUrl,
+                universityName: app.university,
+                course: app.campus,
+                status: _mapStatus(app.status),
+                deadline: 'Aug 30',
+                progress: app.aiMatch / 100.0,
+                onTap: () {},
+                onMenuTap: () {},
+              ),
+            )),
       ],
     ).animate().fade(duration: 500.ms, delay: 200.ms).slideY(begin: 0.1);
   }
 
   StatusType _mapStatus(String statusText) {
-    switch(statusText.toLowerCase()) {
-      case 'submitted': return StatusType.submitted;
-      case 'under review': return StatusType.underReview;
-      case 'accepted': return StatusType.accepted;
-      case 'rejected': return StatusType.rejected;
-      case 'not started': return StatusType.notStarted;
-      default: return StatusType.inProgress;
+    switch (statusText.toLowerCase()) {
+      case 'submitted':
+        return StatusType.submitted;
+      case 'under review':
+        return StatusType.underReview;
+      case 'accepted':
+        return StatusType.accepted;
+      case 'rejected':
+        return StatusType.rejected;
+      case 'not started':
+        return StatusType.notStarted;
+      default:
+        return StatusType.inProgress;
     }
   }
 }

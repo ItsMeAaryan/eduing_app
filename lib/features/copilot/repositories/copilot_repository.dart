@@ -18,8 +18,13 @@ class CopilotRepository extends BaseRepository<ChatSession> {
   Stream<List<ChatSession>> getChatSessionsStream() {
     final col = getUserCollection();
     if (col == null) return Stream.value([]);
-    return col.orderBy('createdAt', descending: true).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => ChatSession.fromMap(doc.data(), doc.id)).toList();
+    return col
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => ChatSession.fromMap(doc.data(), doc.id))
+          .toList();
     });
   }
 }

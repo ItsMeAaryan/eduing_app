@@ -14,7 +14,8 @@ class AuthRepository {
 
   Future<UserCredential?> signInWithEmail(String email, String password) async {
     try {
-      return await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return await _auth.signInWithEmailAndPassword(
+          email: email, password: password);
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
     }
@@ -25,7 +26,8 @@ class AuthRepository {
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null;
 
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
       final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -33,7 +35,8 @@ class AuthRepository {
 
       final userCredential = await _auth.signInWithCredential(credential);
       if (userCredential.user != null) {
-        await _createUserDocument(userCredential.user!, userCredential.user!.displayName ?? 'User');
+        await _createUserDocument(
+            userCredential.user!, userCredential.user!.displayName ?? 'User');
       }
       return userCredential;
     } catch (e) {
@@ -41,13 +44,15 @@ class AuthRepository {
     }
   }
 
-  Future<UserCredential?> registerWithEmail(String email, String password, String fullName) async {
+  Future<UserCredential?> registerWithEmail(
+      String email, String password, String fullName) async {
     try {
-      final credential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
-      
+      final credential = await _auth.createUserWithEmailAndPassword(
+          email: email, password: password);
+
       // Update display name
       await credential.user?.updateDisplayName(fullName);
-      
+
       // Create user profile in Firestore
       if (credential.user != null) {
         await _createUserDocument(credential.user!, fullName);
@@ -88,7 +93,7 @@ class AuthRepository {
   Future<void> _createUserDocument(User user, String fullName) async {
     final docRef = _firestore.collection('users').doc(user.uid);
     final doc = await docRef.get();
-    
+
     if (!doc.exists) {
       await docRef.set({
         'uid': user.uid,

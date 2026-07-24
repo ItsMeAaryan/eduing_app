@@ -12,8 +12,9 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 class NotificationService {
   final FirebaseMessaging _messaging = FirebaseService.messaging;
-  final FlutterLocalNotificationsPlugin _localNotificationsPlugin = FlutterLocalNotificationsPlugin();
-  
+  final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
   void Function(String route)? onNotificationTap;
 
   Future<void> initialize() async {
@@ -21,13 +22,13 @@ class NotificationService {
 
     await _requestPermission();
     await _initLocalNotifications();
-    
+
     // Foreground messages
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-    
+
     // Background tap
     FirebaseMessaging.onMessageOpenedApp.listen(_handleMessageTap);
-    
+
     // Terminated tap
     final initialMessage = await _messaging.getInitialMessage();
     if (initialMessage != null) {
@@ -45,13 +46,14 @@ class NotificationService {
   }
 
   Future<void> _initLocalNotifications() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings(
       requestSoundPermission: false,
       requestBadgePermission: false,
       requestAlertPermission: false,
     );
-    
+
     const initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,

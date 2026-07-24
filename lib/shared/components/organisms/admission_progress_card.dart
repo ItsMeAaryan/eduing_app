@@ -50,12 +50,14 @@ class AdmissionProgressCard extends StatelessWidget {
                   children: [
                     Text(
                       "Overall Readiness",
-                      style: AppTypography.labelMedium.copyWith(color: Colors.white70),
+                      style: AppTypography.labelMedium
+                          .copyWith(color: Colors.white70),
                     ),
                     const SizedBox(height: AppSpacing.p4),
                     Text(
                       "$readinessPercentage%",
-                      style: AppTypography.display.copyWith(color: Colors.white),
+                      style:
+                          AppTypography.display.copyWith(color: Colors.white),
                     ),
                     const SizedBox(height: AppSpacing.p16),
                     AppButton(

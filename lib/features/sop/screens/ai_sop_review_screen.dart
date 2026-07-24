@@ -29,7 +29,8 @@ class AISopReviewScreen extends ConsumerWidget {
             _buildHeader(context, isDark),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(AppSpacing.p24, 0, AppSpacing.p24, 100),
+                padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.p24, 0, AppSpacing.p24, 100),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -81,7 +82,10 @@ class AISopReviewScreen extends ConsumerWidget {
         gradient: AppColors.aiGradient,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
-          BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 30, offset: const Offset(0, 15)),
+          BoxShadow(
+              color: AppColors.primary.withOpacity(0.3),
+              blurRadius: 30,
+              offset: const Offset(0, 15)),
         ],
       ),
       child: Center(
@@ -91,15 +95,20 @@ class AISopReviewScreen extends ConsumerWidget {
                 .animate(onPlay: (c) => c.repeat(reverse: true))
                 .shimmer(duration: 2.seconds),
             const SizedBox(height: AppSpacing.p16),
-            Text('${review.overallScore}%', style: AppTypography.display.copyWith(color: Colors.white, fontSize: 64)),
-            Text('Overall SOP Quality Score', style: AppTypography.titleMedium.copyWith(color: Colors.white70)),
+            Text('${review.overallScore}%',
+                style: AppTypography.display
+                    .copyWith(color: Colors.white, fontSize: 64)),
+            Text('Overall SOP Quality Score',
+                style:
+                    AppTypography.titleMedium.copyWith(color: Colors.white70)),
           ],
         ),
       ),
     ).animate().fade().scale();
   }
 
-  Widget _buildDetailedScores(BuildContext context, AISopReview review, bool isDark) {
+  Widget _buildDetailedScores(
+      BuildContext context, AISopReview review, bool isDark) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -112,8 +121,11 @@ class AISopReviewScreen extends ConsumerWidget {
               _buildScoreRow('Grammar & Tone', review.grammar, isDark),
               _buildScoreRow('Clarity & Conciseness', review.clarity, isDark),
               _buildScoreRow('Structure & Flow', review.structure, isDark),
-              _buildScoreRow('Storytelling & Hook', review.storytelling, isDark),
-              _buildScoreRow('Research & Alignment', review.researchDepth, isDark, isLast: true),
+              _buildScoreRow(
+                  'Storytelling & Hook', review.storytelling, isDark),
+              _buildScoreRow(
+                  'Research & Alignment', review.researchDepth, isDark,
+                  isLast: true),
             ],
           ),
         ),
@@ -121,19 +133,28 @@ class AISopReviewScreen extends ConsumerWidget {
     ).animate().fade(delay: 100.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildScoreRow(String label, int score, bool isDark, {bool isLast = false}) {
+  Widget _buildScoreRow(String label, int score, bool isDark,
+      {bool isLast = false}) {
     return Padding(
       padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.p16),
       child: Row(
         children: [
-          Expanded(child: Text(label, style: AppTypography.labelLarge.copyWith(color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary))),
+          Expanded(
+              child: Text(label,
+                  style: AppTypography.labelLarge.copyWith(
+                      color: isDark
+                          ? AppColors.darkTextPrimary
+                          : AppColors.textPrimary))),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p12, vertical: AppSpacing.p4),
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.p12, vertical: AppSpacing.p4),
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Text('$score%', style: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary)),
+            child: Text('$score%',
+                style: AppTypography.labelMedium.copyWith(
+                    fontWeight: FontWeight.bold, color: AppColors.primary)),
           ),
         ],
       ),
@@ -162,16 +183,22 @@ class AISopReviewScreen extends ConsumerWidget {
                         color: Colors.amber.withOpacity(0.15),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Iconsax.flash, size: 20, color: Colors.amber),
+                      child: const Icon(Iconsax.flash,
+                          size: 20, color: Colors.amber),
                     ),
                     const SizedBox(width: AppSpacing.p16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(rec.text, style: AppTypography.bodyMedium.copyWith(height: 1.5)),
+                          Text(rec.text,
+                              style: AppTypography.bodyMedium
+                                  .copyWith(height: 1.5)),
                           const SizedBox(height: AppSpacing.p8),
-                          Text('Impact: ${rec.estimatedImprovement} • Priority: ${rec.priority}', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                          Text(
+                              'Impact: ${rec.estimatedImprovement} • Priority: ${rec.priority}',
+                              style: AppTypography.caption
+                                  .copyWith(color: AppColors.textSecondary)),
                         ],
                       ),
                     ),
@@ -197,19 +224,23 @@ class AISopReviewScreen extends ConsumerWidget {
             padding: const EdgeInsets.all(AppSpacing.p24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: review.strengths.map(
-                (s) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.p12),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Icon(Iconsax.tick_circle, color: AppColors.success, size: 20),
-                      const SizedBox(width: AppSpacing.p12),
-                      Expanded(child: Text(s, style: AppTypography.bodyMedium)),
-                    ],
-                  ),
-                ),
-              ).toList(),
+              children: review.strengths
+                  .map(
+                    (s) => Padding(
+                      padding: const EdgeInsets.only(bottom: AppSpacing.p12),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(Iconsax.tick_circle,
+                              color: AppColors.success, size: 20),
+                          const SizedBox(width: AppSpacing.p12),
+                          Expanded(
+                              child: Text(s, style: AppTypography.bodyMedium)),
+                        ],
+                      ),
+                    ),
+                  )
+                  .toList(),
             ),
           ),
         ],

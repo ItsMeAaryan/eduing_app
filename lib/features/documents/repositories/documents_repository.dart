@@ -20,8 +20,13 @@ class DocumentRepository extends BaseRepository<AppDocument> {
     if (col == null) {
       return Stream.value([]);
     }
-    return col.orderBy('uploadDate', descending: true).snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => AppDocument.fromMap(doc.data(), doc.id)).toList();
+    return col
+        .orderBy('uploadDate', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs
+          .map((doc) => AppDocument.fromMap(doc.data(), doc.id))
+          .toList();
     });
   }
 }

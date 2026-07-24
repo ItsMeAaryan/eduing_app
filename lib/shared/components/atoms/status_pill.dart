@@ -4,7 +4,17 @@ import '../../../core/theme/typography/app_typography.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/spacing/app_spacing.dart';
 
-enum StatusType { notStarted, inProgress, draft, submitted, underReview, accepted, rejected, visa, completed }
+enum StatusType {
+  notStarted,
+  inProgress,
+  draft,
+  submitted,
+  underReview,
+  accepted,
+  rejected,
+  visa,
+  completed
+}
 
 class StatusPill extends StatelessWidget {
   final StatusType type;
@@ -46,12 +56,14 @@ class StatusPill extends StatelessWidget {
         break;
       case StatusType.notStarted:
         bgColor = isDark ? AppColors.darkSurface : AppColors.background;
-        textColor = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+        textColor =
+            isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
         break;
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p12, vertical: AppSpacing.p4),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p12, vertical: AppSpacing.p4),
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: AppRadius.b100, // Capsule
@@ -68,15 +80,24 @@ class StatusPill extends StatelessWidget {
 
   String _getDefaultLabel() {
     switch (type) {
-      case StatusType.notStarted: return "Not Started";
-      case StatusType.inProgress: return "In Progress";
-      case StatusType.draft: return "Draft";
-      case StatusType.submitted: return "Submitted";
-      case StatusType.underReview: return "Under Review";
-      case StatusType.accepted: return "Accepted";
-      case StatusType.rejected: return "Rejected";
-      case StatusType.visa: return "Visa";
-      case StatusType.completed: return "Completed";
+      case StatusType.notStarted:
+        return "Not Started";
+      case StatusType.inProgress:
+        return "In Progress";
+      case StatusType.draft:
+        return "Draft";
+      case StatusType.submitted:
+        return "Submitted";
+      case StatusType.underReview:
+        return "Under Review";
+      case StatusType.accepted:
+        return "Accepted";
+      case StatusType.rejected:
+        return "Rejected";
+      case StatusType.visa:
+        return "Visa";
+      case StatusType.completed:
+        return "Completed";
     }
   }
 }

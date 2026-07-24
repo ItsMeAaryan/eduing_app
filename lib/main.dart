@@ -36,7 +36,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settings = ref.watch(settingsProvider);
-    
+
     ThemeMode themeMode;
     switch (settings.themeMode.toLowerCase()) {
       case 'dark':

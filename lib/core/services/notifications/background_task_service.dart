@@ -40,7 +40,7 @@ class BackgroundTaskService {
       "refreshPlannerReminders",
       frequency: const Duration(hours: 4),
     );
-    
+
     Workmanager().registerPeriodicTask(
       "2",
       "checkScholarshipExpiry",

@@ -23,11 +23,18 @@ class DocumentsScreen extends ConsumerStatefulWidget {
 }
 
 class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
-  final List<String> _filters = ['All', 'Academic', 'Identity', 'Financial', 'Certificates'];
+  final List<String> _filters = [
+    'All',
+    'Academic',
+    'Identity',
+    'Financial',
+    'Certificates'
+  ];
   String _selectedFilter = 'All';
   final TextEditingController _searchController = TextEditingController();
 
-  Future<void> _handleFileSelection(BuildContext context, String source, String name, String category) async {
+  Future<void> _handleFileSelection(
+      BuildContext context, String source, String name, String category) async {
     final storageService = ref.read(documentStorageServiceProvider);
     File? selectedFile;
 
@@ -47,12 +54,15 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
               category: category,
             );
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Uploading $name...'), backgroundColor: AppColors.primary));
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text('Uploading $name...'),
+              backgroundColor: AppColors.primary));
         }
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString()), backgroundColor: AppColors.error));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(e.toString()), backgroundColor: AppColors.error));
       }
     }
   }
@@ -66,12 +76,17 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Theme.of(context).cardColor,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Padding(
-              padding: EdgeInsets.only(left: 24, right: 24, top: 32, bottom: MediaQuery.of(context).viewInsets.bottom + 24),
+              padding: EdgeInsets.only(
+                  left: 24,
+                  right: 24,
+                  top: 32,
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -85,13 +100,17 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
                     value: category,
-                    items: _filters.where((f) => f != 'All').map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                    items: _filters
+                        .where((f) => f != 'All')
+                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                        .toList(),
                     onChanged: (val) {
                       if (val != null) setModalState(() => category = val);
                     },
                     decoration: InputDecoration(
                       labelText: 'Category',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16)),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -99,27 +118,27 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                     children: [
                       Expanded(
                         child: _UploadSourceButton(
-                          icon: Iconsax.folder_add, 
-                          label: 'File', 
-                          isSelected: source == 'file', 
+                          icon: Iconsax.folder_add,
+                          label: 'File',
+                          isSelected: source == 'file',
                           onTap: () => setModalState(() => source = 'file'),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: _UploadSourceButton(
-                          icon: Iconsax.gallery, 
-                          label: 'Gallery', 
-                          isSelected: source == 'gallery', 
+                          icon: Iconsax.gallery,
+                          label: 'Gallery',
+                          isSelected: source == 'gallery',
                           onTap: () => setModalState(() => source = 'gallery'),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: _UploadSourceButton(
-                          icon: Iconsax.camera, 
-                          label: 'Camera', 
-                          isSelected: source == 'camera', 
+                          icon: Iconsax.camera,
+                          label: 'Camera',
+                          isSelected: source == 'camera',
                           onTap: () => setModalState(() => source = 'camera'),
                         ),
                       ),
@@ -132,7 +151,8 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                     onPressed: () {
                       if (nameController.text.isEmpty) return;
                       ctx.pop();
-                      _handleFileSelection(context, source, nameController.text.trim(), category);
+                      _handleFileSelection(context, source,
+                          nameController.text.trim(), category);
                     },
                   ),
                 ],
@@ -152,9 +172,11 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
     final filteredDocuments = _selectedFilter == 'All'
         ? documents
         : documents.where((d) => d.category == _selectedFilter).toList();
-        
-    final verifiedCount = documents.where((d) => d.status == DocumentStatus.verified).length;
-    final pendingCount = documents.where((d) => d.status == DocumentStatus.pending).length;
+
+    final verifiedCount =
+        documents.where((d) => d.status == DocumentStatus.verified).length;
+    final pendingCount =
+        documents.where((d) => d.status == DocumentStatus.pending).length;
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -162,7 +184,8 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
         onPressed: _showUploadModal,
         backgroundColor: AppColors.primary,
         icon: const Icon(Iconsax.add, color: Colors.white),
-        label: Text('Upload', style: AppTypography.labelLarge.copyWith(color: Colors.white)),
+        label: Text('Upload',
+            style: AppTypography.labelLarge.copyWith(color: Colors.white)),
       ),
       body: SafeArea(
         bottom: false,
@@ -179,20 +202,23 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                     children: [
                       Text('Secure Vault', style: AppTypography.display),
                       const SizedBox(height: AppSpacing.p4),
-                      Text('${documents.length} Total Documents', style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                      Text('${documents.length} Total Documents',
+                          style: AppTypography.bodyMedium
+                              .copyWith(color: AppColors.textSecondary)),
                     ],
                   ),
                   AppIconButton(
                     icon: Iconsax.shield_tick,
                     isFilled: true,
-                    backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+                    backgroundColor:
+                        isDark ? AppColors.darkSurface : AppColors.surface,
                     color: AppColors.success,
                     onPressed: () {},
                   ),
                 ],
               ),
             ),
-            
+
             // Search Bar
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
@@ -202,26 +228,35 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                 prefixIcon: Iconsax.search_normal,
               ),
             ),
-            
+
             const SizedBox(height: AppSpacing.p24),
-            
+
             // Summary Chips
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
               child: Row(
                 children: [
-                  _SummaryChip(label: 'Verified', count: verifiedCount.toString(), color: AppColors.success),
+                  _SummaryChip(
+                      label: 'Verified',
+                      count: verifiedCount.toString(),
+                      color: AppColors.success),
                   const SizedBox(width: AppSpacing.p12),
-                  _SummaryChip(label: 'Pending Review', count: pendingCount.toString(), color: AppColors.warning),
+                  _SummaryChip(
+                      label: 'Pending Review',
+                      count: pendingCount.toString(),
+                      color: AppColors.warning),
                   const SizedBox(width: AppSpacing.p12),
-                  const _SummaryChip(label: 'Missing', count: '2', color: AppColors.error), // Mock missing count
+                  const _SummaryChip(
+                      label: 'Missing',
+                      count: '2',
+                      color: AppColors.error), // Mock missing count
                 ],
               ),
             ),
-            
+
             const SizedBox(height: AppSpacing.p24),
-            
+
             // Filters
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -234,16 +269,29 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                     child: GestureDetector(
                       onTap: () => setState(() => _selectedFilter = filter),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.p16,
+                            vertical: AppSpacing.p8),
                         decoration: BoxDecoration(
-                          color: isSelected ? AppColors.primary : Colors.transparent,
+                          color: isSelected
+                              ? AppColors.primary
+                              : Colors.transparent,
                           borderRadius: BorderRadius.circular(100),
-                          border: Border.all(color: isSelected ? AppColors.primary : (isDark ? AppColors.darkBorder : AppColors.border)),
+                          border: Border.all(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : (isDark
+                                      ? AppColors.darkBorder
+                                      : AppColors.border)),
                         ),
                         child: Text(
                           filter,
                           style: AppTypography.labelMedium.copyWith(
-                            color: isSelected ? Colors.white : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary),
                           ),
                         ),
                       ),
@@ -252,48 +300,66 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                 }).toList(),
               ),
             ),
-            
+
             const SizedBox(height: AppSpacing.p16),
-            
+
             // Content
             Expanded(
               child: filteredDocuments.isEmpty
                   ? _buildEmptyState(isDark)
                   : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p8),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.p24, vertical: AppSpacing.p8),
                       itemCount: filteredDocuments.length,
                       itemBuilder: (context, index) {
                         final doc = filteredDocuments[index];
-                        final progressState = ref.watch(activeUploadProgressProvider(doc.id));
+                        final progressState =
+                            ref.watch(activeUploadProgressProvider(doc.id));
 
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.p16),
+                          padding:
+                              const EdgeInsets.only(bottom: AppSpacing.p16),
                           child: Stack(
                             children: [
                               DocumentCard(
                                 document: doc,
-                                onTap: () => context.push('/documents/preview', extra: doc),
-                                onDelete: () => ref.read(documentsNotifierProvider.notifier).deleteDocument(doc.id),
-                                onRename: () {}, // Handled directly inside preview typically, or add modal
-                                onShare: () => ref.read(documentsNotifierProvider.notifier).shareDocument(doc.id),
+                                onTap: () => context.push('/documents/preview',
+                                    extra: doc),
+                                onDelete: () => ref
+                                    .read(documentsNotifierProvider.notifier)
+                                    .deleteDocument(doc.id),
+                                onRename:
+                                    () {}, // Handled directly inside preview typically, or add modal
+                                onShare: () => ref
+                                    .read(documentsNotifierProvider.notifier)
+                                    .shareDocument(doc.id),
                               ),
-                              if (progressState != null && !progressState.isCompleted)
+                              if (progressState != null &&
+                                  !progressState.isCompleted)
                                 Positioned.fill(
                                   child: Container(
                                     decoration: BoxDecoration(
-                                      color: (isDark ? AppColors.darkBackground : AppColors.background).withOpacity(0.8),
+                                      color: (isDark
+                                              ? AppColors.darkBackground
+                                              : AppColors.background)
+                                          .withOpacity(0.8),
                                       borderRadius: BorderRadius.circular(16),
                                     ),
                                     child: Center(
                                       child: CircularProgressIndicator(
-                                        value: progressState.progress > 0 ? progressState.progress : null,
+                                        value: progressState.progress > 0
+                                            ? progressState.progress
+                                            : null,
                                         color: AppColors.primary,
                                       ),
                                     ),
                                   ),
                                 ),
                             ],
-                          ).animate().fade().slideY(begin: 0.1, delay: (index * 50).ms),
+                          )
+                              .animate()
+                              .fade()
+                              .slideY(begin: 0.1, delay: (index * 50).ms),
                         );
                       },
                     ),
@@ -317,7 +383,8 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                 color: isDark ? AppColors.darkSurface : AppColors.surface,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Iconsax.folder_add, size: 48, color: AppColors.primary),
+              child: const Icon(Iconsax.folder_add,
+                  size: 48, color: AppColors.primary),
             ),
             const SizedBox(height: AppSpacing.p24),
             Text('No Documents Found', style: AppTypography.titleLarge),
@@ -325,7 +392,8 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
             Text(
               'Upload your first document to secure it in your vault.',
               textAlign: TextAlign.center,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodyMedium
+                  .copyWith(color: AppColors.textSecondary),
             ),
           ],
         ),
@@ -339,14 +407,16 @@ class _SummaryChip extends StatelessWidget {
   final String count;
   final Color color;
 
-  const _SummaryChip({required this.label, required this.count, required this.color});
+  const _SummaryChip(
+      {required this.label, required this.count, required this.color});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : AppColors.surface,
         borderRadius: BorderRadius.circular(16),
@@ -363,11 +433,16 @@ class _SummaryChip extends StatelessWidget {
             ),
             child: Text(
               count,
-              style: AppTypography.labelLarge.copyWith(color: color, fontWeight: FontWeight.bold),
+              style: AppTypography.labelLarge
+                  .copyWith(color: color, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(width: AppSpacing.p12),
-          Text(label, style: AppTypography.labelMedium.copyWith(color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary)),
+          Text(label,
+              style: AppTypography.labelMedium.copyWith(
+                  color: isDark
+                      ? AppColors.darkTextPrimary
+                      : AppColors.textPrimary)),
         ],
       ),
     );
@@ -380,7 +455,11 @@ class _UploadSourceButton extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
 
-  const _UploadSourceButton({required this.icon, required this.label, required this.isSelected, required this.onTap});
+  const _UploadSourceButton(
+      {required this.icon,
+      required this.label,
+      required this.isSelected,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -390,9 +469,12 @@ class _UploadSourceButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withOpacity(0.1) : Colors.transparent,
+          color: isSelected
+              ? AppColors.primary.withOpacity(0.1)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: isSelected ? AppColors.primary : Colors.grey.shade300),
+          border: Border.all(
+              color: isSelected ? AppColors.primary : Colors.grey.shade300),
         ),
         child: Column(
           children: [

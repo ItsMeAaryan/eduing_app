@@ -3,17 +3,12 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import '../firebase/firebase_service.dart';
 
-enum SyncState {
-  online,
-  offline,
-  syncing,
-  error
-}
+enum SyncState { online, offline, syncing, error }
 
 class SyncService {
   final Connectivity _connectivity = Connectivity();
   StreamSubscription<List<ConnectivityResult>>? _subscription;
-  
+
   final _syncStateController = StreamController<SyncState>.broadcast();
   Stream<SyncState> get syncStateStream => _syncStateController.stream;
 
@@ -31,7 +26,7 @@ class SyncService {
 
   void _updateState(List<ConnectivityResult> results) {
     final isOnline = !results.contains(ConnectivityResult.none);
-    
+
     if (isOnline && _currentState == SyncState.offline) {
       _flushQueue();
     } else if (!isOnline) {

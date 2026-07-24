@@ -9,7 +9,8 @@ class SopSection {
     this.isCompleted = false,
   });
 
-  Map<String, dynamic> toMap() => {'title': title, 'content': content, 'isCompleted': isCompleted};
+  Map<String, dynamic> toMap() =>
+      {'title': title, 'content': content, 'isCompleted': isCompleted};
   factory SopSection.fromMap(Map<String, dynamic> map) => SopSection(
         title: map['title'] ?? '',
         content: map['content'] ?? '',
@@ -37,7 +38,8 @@ class AISopRecommendation {
         'isCompleted': isCompleted,
       };
 
-  factory AISopRecommendation.fromMap(Map<String, dynamic> map) => AISopRecommendation(
+  factory AISopRecommendation.fromMap(Map<String, dynamic> map) =>
+      AISopRecommendation(
         text: map['text'] ?? '',
         priority: map['priority'] ?? 'Medium',
         estimatedImprovement: map['estimatedImprovement'] ?? '',
@@ -63,10 +65,20 @@ class AISopReview {
     this.storytelling = 86,
     this.researchDepth = 85,
     this.recommendations = const [
-      AISopRecommendation(text: 'Mention specific university professors or lab initiatives.', priority: 'High', estimatedImprovement: '+8% Alignment'),
-      AISopRecommendation(text: 'Smooth out transitions between academic history and career aspirations.', priority: 'Medium', estimatedImprovement: '+4% Structure'),
+      AISopRecommendation(
+          text: 'Mention specific university professors or lab initiatives.',
+          priority: 'High',
+          estimatedImprovement: '+8% Alignment'),
+      AISopRecommendation(
+          text:
+              'Smooth out transitions between academic history and career aspirations.',
+          priority: 'Medium',
+          estimatedImprovement: '+4% Structure'),
     ],
-    this.strengths = const ['Compelling motivation paragraph', 'Strong academic achievement references'],
+    this.strengths = const [
+      'Compelling motivation paragraph',
+      'Strong academic achievement references'
+    ],
   });
 
   Map<String, dynamic> toMap() => {
@@ -90,7 +102,8 @@ class AISopReview {
       storytelling: map['storytelling'] ?? 86,
       researchDepth: map['researchDepth'] ?? 85,
       recommendations: (map['recommendations'] as List<dynamic>?)
-              ?.map((r) => AISopRecommendation.fromMap(r as Map<String, dynamic>))
+              ?.map(
+                  (r) => AISopRecommendation.fromMap(r as Map<String, dynamic>))
               .toList() ??
           const [],
       strengths: List<String>.from(map['strengths'] ?? []),

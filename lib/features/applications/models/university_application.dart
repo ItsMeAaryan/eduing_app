@@ -1,6 +1,14 @@
 import '../../../shared/models/university_model.dart';
 
-enum ApplicationStatus { draft, submitted, review, accepted, rejected, interview, scholarship }
+enum ApplicationStatus {
+  draft,
+  submitted,
+  review,
+  accepted,
+  rejected,
+  interview,
+  scholarship
+}
 
 class ApplicationTimelineStage {
   final String title;
@@ -22,7 +30,8 @@ class ApplicationTimelineStage {
         'isActive': isActive,
       };
 
-  factory ApplicationTimelineStage.fromMap(Map<String, dynamic> map) => ApplicationTimelineStage(
+  factory ApplicationTimelineStage.fromMap(Map<String, dynamic> map) =>
+      ApplicationTimelineStage(
         title: map['title'] ?? '',
         date: map['date'] ?? '',
         isCompleted: map['isCompleted'] ?? false,
@@ -37,7 +46,8 @@ class DocumentRequirement {
   const DocumentRequirement({required this.name, required this.status});
 
   Map<String, dynamic> toMap() => {'name': name, 'status': status};
-  factory DocumentRequirement.fromMap(Map<String, dynamic> map) => DocumentRequirement(
+  factory DocumentRequirement.fromMap(Map<String, dynamic> map) =>
+      DocumentRequirement(
         name: map['name'] ?? '',
         status: map['status'] ?? 'Pending',
       );
@@ -50,7 +60,8 @@ class ApplicationActivity {
   const ApplicationActivity({required this.action, required this.date});
 
   Map<String, dynamic> toMap() => {'action': action, 'date': date};
-  factory ApplicationActivity.fromMap(Map<String, dynamic> map) => ApplicationActivity(
+  factory ApplicationActivity.fromMap(Map<String, dynamic> map) =>
+      ApplicationActivity(
         action: map['action'] ?? '',
         date: map['date'] ?? '',
       );
@@ -137,7 +148,8 @@ class UniversityApplication {
         'linkedDocumentIds': linkedDocumentIds,
       };
 
-  factory UniversityApplication.fromMap(Map<String, dynamic> map, String docId) {
+  factory UniversityApplication.fromMap(
+      Map<String, dynamic> map, String docId) {
     ApplicationStatus parsedStatus = ApplicationStatus.submitted;
     final statusStr = map['status'] as String?;
     for (final s in ApplicationStatus.values) {
@@ -146,7 +158,8 @@ class UniversityApplication {
 
     return UniversityApplication(
       id: docId,
-      university: University.fromMap(map['university'] as Map<String, dynamic>? ?? {}),
+      university:
+          University.fromMap(map['university'] as Map<String, dynamic>? ?? {}),
       course: map['course'] ?? 'Computer Science',
       status: parsedStatus,
       submissionDate: map['submissionDate'] ?? '15 Oct 2025',
@@ -154,15 +167,18 @@ class UniversityApplication {
       progress: (map['progress'] as num?)?.toDouble() ?? 0.5,
       aiSuccessPrediction: map['aiSuccessPrediction'] ?? 85,
       timeline: (map['timeline'] as List<dynamic>?)
-              ?.map((t) => ApplicationTimelineStage.fromMap(t as Map<String, dynamic>))
+              ?.map((t) =>
+                  ApplicationTimelineStage.fromMap(t as Map<String, dynamic>))
               .toList() ??
           const [],
       documents: (map['documents'] as List<dynamic>?)
-              ?.map((d) => DocumentRequirement.fromMap(d as Map<String, dynamic>))
+              ?.map(
+                  (d) => DocumentRequirement.fromMap(d as Map<String, dynamic>))
               .toList() ??
           const [],
       activities: (map['activities'] as List<dynamic>?)
-              ?.map((a) => ApplicationActivity.fromMap(a as Map<String, dynamic>))
+              ?.map(
+                  (a) => ApplicationActivity.fromMap(a as Map<String, dynamic>))
               .toList() ??
           const [],
       notes: map['notes'] ?? '',

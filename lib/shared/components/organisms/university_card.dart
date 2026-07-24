@@ -21,8 +21,10 @@ class UniversityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    final subtitleColor = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final textColor =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final subtitleColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
 
     return SquircleCard(
       padding: const EdgeInsets.all(AppSpacing.p16),
@@ -52,20 +54,23 @@ class UniversityCard extends StatelessWidget {
                 const SizedBox(height: AppSpacing.p4),
                 Text(
                   location,
-                  style: AppTypography.bodyMedium.copyWith(color: subtitleColor),
+                  style:
+                      AppTypography.bodyMedium.copyWith(color: subtitleColor),
                 ),
               ],
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p12, vertical: AppSpacing.p4),
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.p12, vertical: AppSpacing.p4),
             decoration: BoxDecoration(
               color: isDark ? AppColors.darkSurface : AppColors.background,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               "#$rank",
-              style: AppTypography.labelMedium.copyWith(color: AppColors.primary),
+              style:
+                  AppTypography.labelMedium.copyWith(color: AppColors.primary),
             ),
           ),
         ],

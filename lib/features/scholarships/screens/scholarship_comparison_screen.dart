@@ -14,7 +14,8 @@ class ScholarshipComparisonScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final data = ref.watch(scholarshipsProvider);
-    final savedScholarships = data.scholarships.where((s) => s.isSaved).toList();
+    final savedScholarships =
+        data.scholarships.where((s) => s.isSaved).toList();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -25,11 +26,14 @@ class ScholarshipComparisonScreen extends ConsumerWidget {
           icon: const Icon(Iconsax.arrow_left_2, color: AppColors.textPrimary),
           onPressed: () => context.pop(),
         ),
-        title: Text('Compare Scholarships', style: AppTypography.title.copyWith(fontSize: 16)),
+        title: Text('Compare Scholarships',
+            style: AppTypography.title.copyWith(fontSize: 16)),
         centerTitle: true,
       ),
       body: savedScholarships.length < 2
-          ? Center(child: Text('Save at least 2 scholarships to compare.', style: AppTypography.body))
+          ? Center(
+              child: Text('Save at least 2 scholarships to compare.',
+                  style: AppTypography.body))
           : SingleChildScrollView(
               padding: const EdgeInsets.only(bottom: 100),
               child: SingleChildScrollView(
@@ -37,7 +41,9 @@ class ScholarshipComparisonScreen extends ConsumerWidget {
                 padding: const EdgeInsets.all(24),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: savedScholarships.map((s) => _buildComparisonCard(s)).toList(),
+                  children: savedScholarships
+                      .map((s) => _buildComparisonCard(s))
+                      .toList(),
                 ),
               ),
             ),
@@ -53,7 +59,10 @@ class ScholarshipComparisonScreen extends ConsumerWidget {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, 10)),
         ],
       ),
       child: Column(
@@ -65,18 +74,24 @@ class ScholarshipComparisonScreen extends ConsumerWidget {
           _buildMetricRow('Coverage', s.coverage, AppColors.textPrimary),
           _buildMetricRow('Deadline', s.deadline, AppColors.warning),
           _buildMetricRow('Difficulty', s.difficulty, AppColors.error),
-          _buildMetricRow('Probability', '${s.eligibilityAnalysis.successProbability}%', AppColors.secondary),
+          _buildMetricRow(
+              'Probability',
+              '${s.eligibilityAnalysis.successProbability}%',
+              AppColors.secondary),
           const SizedBox(height: 16),
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Text('Covered Expenses', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text('Covered Expenses',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           const SizedBox(height: 8),
           ...s.coveredExpenses.map((e) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
                 child: Row(
                   children: [
-                    const Icon(Iconsax.tick_circle, color: AppColors.success, size: 16),
+                    const Icon(Iconsax.tick_circle,
+                        color: AppColors.success, size: 16),
                     const SizedBox(width: 8),
                     Expanded(child: Text(e, style: AppTypography.caption)),
                   ],
@@ -98,11 +113,18 @@ class ScholarshipComparisonScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const CircleAvatar(backgroundColor: Colors.white, child: Icon(Iconsax.bank, color: AppColors.primary)),
+          const CircleAvatar(
+              backgroundColor: Colors.white,
+              child: Icon(Iconsax.bank, color: AppColors.primary)),
           const SizedBox(height: 12),
-          Text(s.name, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold), maxLines: 2, overflow: TextOverflow.ellipsis),
+          Text(s.name,
+              style: AppTypography.label.copyWith(fontWeight: FontWeight.bold),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis),
           const SizedBox(height: 4),
-          Text(s.organization, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+          Text(s.organization,
+              style: AppTypography.caption
+                  .copyWith(color: AppColors.textSecondary)),
         ],
       ),
     );
@@ -114,8 +136,12 @@ class ScholarshipComparisonScreen extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
-          Text(value, style: AppTypography.label.copyWith(color: valueColor, fontWeight: FontWeight.bold)),
+          Text(label,
+              style: AppTypography.caption
+                  .copyWith(color: AppColors.textSecondary)),
+          Text(value,
+              style: AppTypography.label
+                  .copyWith(color: valueColor, fontWeight: FontWeight.bold)),
         ],
       ),
     );

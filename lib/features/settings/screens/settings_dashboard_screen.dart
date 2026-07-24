@@ -36,45 +36,121 @@ class SettingsDashboardScreen extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.p32),
                     _buildSectionHeader('General'),
                     _buildSettingsGroup([
-                      _buildListTile('Language', settings.language, Iconsax.language_square, null, isDark),
-                      _buildListTile('Theme', settings.themeMode, Iconsax.moon, null, isDark),
+                      _buildListTile('Language', settings.language,
+                          Iconsax.language_square, null, isDark),
+                      _buildListTile('Theme', settings.themeMode, Iconsax.moon,
+                          null, isDark),
                     ], isDark),
                     const SizedBox(height: AppSpacing.p32),
                     _buildSectionHeader('AI Preferences'),
                     _buildSettingsGroup([
-                      _buildSwitchTile('Conversation Memory', settings.conversationMemory, Iconsax.data, (v) => ref.read(settingsProvider.notifier).updateSetting(conversationMemory: v), isDark),
-                      _buildSwitchTile('AI Suggestions', settings.aiSuggestions, Iconsax.magic_star, (v) => ref.read(settingsProvider.notifier).updateSetting(aiSuggestions: v), isDark),
-                      _buildListTile('Writing Style', settings.writingStyle, Iconsax.edit_2, null, isDark),
+                      _buildSwitchTile(
+                          'Conversation Memory',
+                          settings.conversationMemory,
+                          Iconsax.data,
+                          (v) => ref
+                              .read(settingsProvider.notifier)
+                              .updateSetting(conversationMemory: v),
+                          isDark),
+                      _buildSwitchTile(
+                          'AI Suggestions',
+                          settings.aiSuggestions,
+                          Iconsax.magic_star,
+                          (v) => ref
+                              .read(settingsProvider.notifier)
+                              .updateSetting(aiSuggestions: v),
+                          isDark),
+                      _buildListTile('Writing Style', settings.writingStyle,
+                          Iconsax.edit_2, null, isDark),
                     ], isDark),
                     const SizedBox(height: AppSpacing.p32),
                     _buildSectionHeader('Notifications'),
                     _buildSettingsGroup([
-                      _buildSwitchTile('Push Notifications', settings.pushNotifications, Iconsax.notification, (v) => ref.read(settingsProvider.notifier).updateSetting(pushNotifications: v), isDark),
-                      _buildSwitchTile('Application Updates', settings.applicationUpdates, Iconsax.document_1, (v) => ref.read(settingsProvider.notifier).updateSetting(applicationUpdates: v), isDark),
-                      _buildSwitchTile('Planner Reminders', settings.plannerReminders, Iconsax.calendar_1, (v) => ref.read(settingsProvider.notifier).updateSetting(plannerReminders: v), isDark),
+                      _buildSwitchTile(
+                          'Push Notifications',
+                          settings.pushNotifications,
+                          Iconsax.notification,
+                          (v) => ref
+                              .read(settingsProvider.notifier)
+                              .updateSetting(pushNotifications: v),
+                          isDark),
+                      _buildSwitchTile(
+                          'Application Updates',
+                          settings.applicationUpdates,
+                          Iconsax.document_1,
+                          (v) => ref
+                              .read(settingsProvider.notifier)
+                              .updateSetting(applicationUpdates: v),
+                          isDark),
+                      _buildSwitchTile(
+                          'Planner Reminders',
+                          settings.plannerReminders,
+                          Iconsax.calendar_1,
+                          (v) => ref
+                              .read(settingsProvider.notifier)
+                              .updateSetting(plannerReminders: v),
+                          isDark),
                     ], isDark),
                     const SizedBox(height: AppSpacing.p32),
                     _buildSectionHeader('Privacy & Data'),
                     _buildSettingsGroup([
-                      _buildSwitchTile('Analytics', settings.analyticsToggle, Iconsax.chart, (v) => ref.read(settingsProvider.notifier).updateSetting(analyticsToggle: v), isDark),
-                      _buildActionTile('Export Data', Iconsax.export_1, isDark ? AppColors.darkTextPrimary : AppColors.textPrimary, () {}, isDark),
-                      _buildActionTile('Clear Cache', Iconsax.trash, AppColors.error, () {}, isDark),
+                      _buildSwitchTile(
+                          'Analytics',
+                          settings.analyticsToggle,
+                          Iconsax.chart,
+                          (v) => ref
+                              .read(settingsProvider.notifier)
+                              .updateSetting(analyticsToggle: v),
+                          isDark),
+                      _buildActionTile(
+                          'Export Data',
+                          Iconsax.export_1,
+                          isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
+                          () {},
+                          isDark),
+                      _buildActionTile('Clear Cache', Iconsax.trash,
+                          AppColors.error, () {}, isDark),
                     ], isDark),
                     const SizedBox(height: AppSpacing.p32),
                     _buildSectionHeader('Developer'),
                     _buildSettingsGroup([
-                      _buildSwitchTile('Developer Mode', settings.developerMode, Iconsax.code, (v) => ref.read(settingsProvider.notifier).updateSetting(developerMode: v), isDark),
-                      _buildSwitchTile('Mock API', settings.mockApiToggle, Iconsax.cloud_connection, (v) => ref.read(settingsProvider.notifier).updateSetting(mockApiToggle: v), isDark),
+                      _buildSwitchTile(
+                          'Developer Mode',
+                          settings.developerMode,
+                          Iconsax.code,
+                          (v) => ref
+                              .read(settingsProvider.notifier)
+                              .updateSetting(developerMode: v),
+                          isDark),
+                      _buildSwitchTile(
+                          'Mock API',
+                          settings.mockApiToggle,
+                          Iconsax.cloud_connection,
+                          (v) => ref
+                              .read(settingsProvider.notifier)
+                              .updateSetting(mockApiToggle: v),
+                          isDark),
                     ], isDark),
                     const SizedBox(height: AppSpacing.p32),
                     _buildSectionHeader('About'),
                     _buildSettingsGroup([
-                      _buildListTile('Version', '1.0.0-dev.16', Iconsax.info_circle, null, isDark),
-                      _buildActionTile('Privacy Policy', Iconsax.shield_tick, isDark ? AppColors.darkTextPrimary : AppColors.textPrimary, () {}, isDark),
+                      _buildListTile('Version', '1.0.0-dev.16',
+                          Iconsax.info_circle, null, isDark),
+                      _buildActionTile(
+                          'Privacy Policy',
+                          Iconsax.shield_tick,
+                          isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary,
+                          () {},
+                          isDark),
                     ], isDark),
                     const SizedBox(height: AppSpacing.p40),
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.p24),
                       child: SizedBox(
                         width: double.infinity,
                         child: AppButton(
@@ -132,14 +208,17 @@ class SettingsDashboardScreen extends ConsumerWidget {
                 children: [
                   Text('Prince Mittal', style: AppTypography.titleMedium),
                   const SizedBox(height: AppSpacing.p4),
-                  Text('prince.mittal@example.com', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                  Text('prince.mittal@example.com',
+                      style: AppTypography.caption
+                          .copyWith(color: AppColors.textSecondary)),
                 ],
               ),
             ),
             AppIconButton(
               icon: Iconsax.edit_2,
               isFilled: true,
-              backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+              backgroundColor:
+                  isDark ? AppColors.darkSurface : AppColors.surface,
               onPressed: () {},
             ),
           ],
@@ -150,8 +229,13 @@ class SettingsDashboardScreen extends ConsumerWidget {
 
   Widget _buildSectionHeader(String title) {
     return Padding(
-      padding: const EdgeInsets.only(left: AppSpacing.p32, bottom: AppSpacing.p12),
-      child: Text(title.toUpperCase(), style: AppTypography.caption.copyWith(color: AppColors.textSecondary, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
+      padding:
+          const EdgeInsets.only(left: AppSpacing.p32, bottom: AppSpacing.p12),
+      child: Text(title.toUpperCase(),
+          style: AppTypography.caption.copyWith(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2)),
     );
   }
 
@@ -161,68 +245,97 @@ class SettingsDashboardScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
+        border: Border.all(
+            color: (isDark ? AppColors.darkBorder : AppColors.border)
+                .withOpacity(0.5)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
         children: [
           for (int i = 0; i < children.length; i++) ...[
             children[i],
-            if (i < children.length - 1) Divider(height: 1, indent: 64, color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
+            if (i < children.length - 1)
+              Divider(
+                  height: 1,
+                  indent: 64,
+                  color: (isDark ? AppColors.darkBorder : AppColors.border)
+                      .withOpacity(0.5)),
           ],
         ],
       ),
     );
   }
 
-  Widget _buildListTile(String title, String subtitle, IconData icon, VoidCallback? onTap, bool isDark) {
+  Widget _buildListTile(String title, String subtitle, IconData icon,
+      VoidCallback? onTap, bool isDark) {
     return ListTile(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.p20, vertical: AppSpacing.p4),
+      contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p20, vertical: AppSpacing.p4),
       leading: Container(
         padding: const EdgeInsets.all(AppSpacing.p12),
-        decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
+        decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
         child: Icon(icon, color: AppColors.primary, size: 20),
       ),
-      title: Text(title, style: AppTypography.labelLarge.copyWith(color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary)),
+      title: Text(title,
+          style: AppTypography.labelLarge.copyWith(
+              color:
+                  isDark ? AppColors.darkTextPrimary : AppColors.textPrimary)),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(subtitle, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+          Text(subtitle,
+              style: AppTypography.caption
+                  .copyWith(color: AppColors.textSecondary)),
           const SizedBox(width: AppSpacing.p8),
-          const Icon(Iconsax.arrow_right_3, size: 16, color: AppColors.textSecondary),
+          const Icon(Iconsax.arrow_right_3,
+              size: 16, color: AppColors.textSecondary),
         ],
       ),
     );
   }
 
-  Widget _buildSwitchTile(String title, bool value, IconData icon, ValueChanged<bool> onChanged, bool isDark) {
+  Widget _buildSwitchTile(String title, bool value, IconData icon,
+      ValueChanged<bool> onChanged, bool isDark) {
     return SwitchListTile(
       value: value,
       onChanged: onChanged,
       activeColor: AppColors.primary,
-      contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.p20, vertical: AppSpacing.p4),
+      contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p20, vertical: AppSpacing.p4),
       secondary: Container(
         padding: const EdgeInsets.all(AppSpacing.p12),
-        decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
+        decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.1), shape: BoxShape.circle),
         child: Icon(icon, color: AppColors.primary, size: 20),
       ),
-      title: Text(title, style: AppTypography.labelLarge.copyWith(color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary)),
+      title: Text(title,
+          style: AppTypography.labelLarge.copyWith(
+              color:
+                  isDark ? AppColors.darkTextPrimary : AppColors.textPrimary)),
     );
   }
 
-  Widget _buildActionTile(String title, IconData icon, Color color, VoidCallback onTap, bool isDark) {
+  Widget _buildActionTile(String title, IconData icon, Color color,
+      VoidCallback onTap, bool isDark) {
     return ListTile(
       onTap: onTap,
-      contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.p20, vertical: AppSpacing.p4),
+      contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p20, vertical: AppSpacing.p4),
       leading: Container(
         padding: const EdgeInsets.all(AppSpacing.p12),
-        decoration: BoxDecoration(color: color.withOpacity(0.1), shape: BoxShape.circle),
+        decoration: BoxDecoration(
+            color: color.withOpacity(0.1), shape: BoxShape.circle),
         child: Icon(icon, color: color, size: 20),
       ),
-      title: Text(title, style: AppTypography.labelLarge.copyWith(color: color)),
+      title:
+          Text(title, style: AppTypography.labelLarge.copyWith(color: color)),
     );
   }
 }

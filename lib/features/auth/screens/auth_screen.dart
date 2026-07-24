@@ -46,7 +46,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
     switch (_mode) {
       case AuthMode.login:
-        controller.signInWithEmail(_emailController.text.trim(), _passwordController.text).then((_) {
+        controller
+            .signInWithEmail(
+                _emailController.text.trim(), _passwordController.text)
+            .then((_) {
           if (!mounted) return;
           if (ref.read(authControllerProvider).hasError) {
             _showError(ref.read(authControllerProvider).error.toString());
@@ -56,12 +59,16 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         });
         break;
       case AuthMode.register:
-        controller.registerWithEmail(_emailController.text.trim(), _passwordController.text, _fullNameController.text.trim()).then((_) {
+        controller
+            .registerWithEmail(_emailController.text.trim(),
+                _passwordController.text, _fullNameController.text.trim())
+            .then((_) {
           if (!mounted) return;
           if (ref.read(authControllerProvider).hasError) {
             _showError(ref.read(authControllerProvider).error.toString());
           } else {
-            _showSuccess('Account created! Please check your email for verification.');
+            _showSuccess(
+                'Account created! Please check your email for verification.');
             setState(() => _mode = AuthMode.login);
           }
         });
@@ -81,11 +88,13 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   }
 
   void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: AppColors.error));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: AppColors.error));
   }
 
   void _showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: AppColors.success));
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: AppColors.success));
   }
 
   @override
@@ -94,7 +103,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final isLoading = state.isLoading;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex =
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -103,7 +113,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         body: SafeArea(
           child: Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p40),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.p24, vertical: AppSpacing.p40),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 500),
                 child: Column(
@@ -117,30 +128,40 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                           gradient: AppColors.aiGradient,
                           shape: BoxShape.circle,
                           boxShadow: [
-                            BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 30, offset: const Offset(0, 15)),
+                            BoxShadow(
+                                color: AppColors.primary.withOpacity(0.3),
+                                blurRadius: 30,
+                                offset: const Offset(0, 15)),
                           ],
                         ),
-                        child: const Icon(Iconsax.book_1, size: 64, color: Colors.white),
-                      ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
+                        child: const Icon(Iconsax.book_1,
+                            size: 64, color: Colors.white),
+                      )
+                          .animate()
+                          .scale(duration: 600.ms, curve: Curves.easeOutBack),
                     ),
                     const SizedBox(height: AppSpacing.p40),
                     Text(
-                      _mode == AuthMode.login ? 'Welcome back'
-                          : _mode == AuthMode.register ? 'Create an account'
-                          : 'Reset Password',
+                      _mode == AuthMode.login
+                          ? 'Welcome back'
+                          : _mode == AuthMode.register
+                              ? 'Create an account'
+                              : 'Reset Password',
                       style: AppTypography.display.copyWith(fontSize: 32),
                       textAlign: TextAlign.center,
                     ).animate().fade(delay: 100.ms).slideY(begin: 0.1),
                     const SizedBox(height: AppSpacing.p12),
                     Text(
-                      _mode == AuthMode.login ? 'Sign in to access your dashboard'
-                          : _mode == AuthMode.register ? 'Join EDUING today'
-                          : 'Enter your email to receive a reset link',
-                      style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                      _mode == AuthMode.login
+                          ? 'Sign in to access your dashboard'
+                          : _mode == AuthMode.register
+                              ? 'Join EDUING today'
+                              : 'Enter your email to receive a reset link',
+                      style: AppTypography.bodyMedium
+                          .copyWith(color: AppColors.textSecondary),
                       textAlign: TextAlign.center,
                     ).animate().fade(delay: 200.ms).slideY(begin: 0.1),
                     const SizedBox(height: AppSpacing.p40),
-
                     SquircleCard(
                       padding: const EdgeInsets.all(AppSpacing.p32),
                       child: Form(
@@ -151,21 +172,27 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                               TextFormField(
                                 controller: _fullNameController,
                                 style: AppTypography.bodyMedium,
-                                decoration: _inputDecoration('Full Name', Iconsax.user, isDark),
-                                validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter your name' : null,
+                                decoration: _inputDecoration(
+                                    'Full Name', Iconsax.user, isDark),
+                                validator: (v) =>
+                                    (v == null || v.trim().isEmpty)
+                                        ? 'Enter your name'
+                                        : null,
                               ),
                               const SizedBox(height: AppSpacing.p20),
                             ],
-
                             TextFormField(
                               controller: _emailController,
                               keyboardType: TextInputType.emailAddress,
                               style: AppTypography.bodyMedium,
-                              decoration: _inputDecoration('Email Address', Iconsax.sms, isDark),
-                              validator: (v) => (v == null || !emailRegex.hasMatch(v.trim())) ? 'Enter a valid email' : null,
+                              decoration: _inputDecoration(
+                                  'Email Address', Iconsax.sms, isDark),
+                              validator: (v) =>
+                                  (v == null || !emailRegex.hasMatch(v.trim()))
+                                      ? 'Enter a valid email'
+                                      : null,
                             ),
                             const SizedBox(height: AppSpacing.p20),
-
                             if (_mode != AuthMode.forgotPassword) ...[
                               TextFormField(
                                 controller: _passwordController,
@@ -176,15 +203,21 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   Iconsax.lock,
                                   isDark,
                                   suffixIcon: IconButton(
-                                    icon: Icon(_obscurePassword ? Iconsax.eye_slash : Iconsax.eye, color: AppColors.textSecondary),
-                                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                    icon: Icon(
+                                        _obscurePassword
+                                            ? Iconsax.eye_slash
+                                            : Iconsax.eye,
+                                        color: AppColors.textSecondary),
+                                    onPressed: () => setState(() =>
+                                        _obscurePassword = !_obscurePassword),
                                   ),
                                 ),
-                                validator: (v) => (v == null || v.length < 6) ? 'Password must be at least 6 characters' : null,
+                                validator: (v) => (v == null || v.length < 6)
+                                    ? 'Password must be at least 6 characters'
+                                    : null,
                               ),
                               const SizedBox(height: AppSpacing.p20),
                             ],
-
                             if (_mode == AuthMode.register) ...[
                               TextFormField(
                                 controller: _confirmPasswordController,
@@ -195,47 +228,69 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                   Iconsax.lock,
                                   isDark,
                                   suffixIcon: IconButton(
-                                    icon: Icon(_obscureConfirmPassword ? Iconsax.eye_slash : Iconsax.eye, color: AppColors.textSecondary),
-                                    onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                                    icon: Icon(
+                                        _obscureConfirmPassword
+                                            ? Iconsax.eye_slash
+                                            : Iconsax.eye,
+                                        color: AppColors.textSecondary),
+                                    onPressed: () => setState(() =>
+                                        _obscureConfirmPassword =
+                                            !_obscureConfirmPassword),
                                   ),
                                 ),
-                                validator: (v) => v != _passwordController.text ? 'Passwords do not match' : null,
+                                validator: (v) => v != _passwordController.text
+                                    ? 'Passwords do not match'
+                                    : null,
                               ),
                               const SizedBox(height: AppSpacing.p20),
                             ],
-
                             if (_mode == AuthMode.login)
                               Align(
                                 alignment: Alignment.centerRight,
                                 child: TextButton(
-                                  onPressed: () => setState(() => _mode = AuthMode.forgotPassword),
-                                  child: Text('Forgot Password?', style: AppTypography.labelMedium.copyWith(color: AppColors.primary)),
+                                  onPressed: () => setState(
+                                      () => _mode = AuthMode.forgotPassword),
+                                  child: Text('Forgot Password?',
+                                      style: AppTypography.labelMedium
+                                          .copyWith(color: AppColors.primary)),
                                 ),
                               ),
-
                             const SizedBox(height: AppSpacing.p32),
-                            
                             SizedBox(
                               width: double.infinity,
                               child: AppButton(
-                                text: _mode == AuthMode.login ? 'Sign In'
-                                    : _mode == AuthMode.register ? 'Sign Up'
-                                    : 'Send Reset Link',
+                                text: _mode == AuthMode.login
+                                    ? 'Sign In'
+                                    : _mode == AuthMode.register
+                                        ? 'Sign Up'
+                                        : 'Send Reset Link',
                                 isLoading: isLoading,
                                 onPressed: _submit,
                               ),
                             ),
-
                             if (_mode == AuthMode.login) ...[
                               const SizedBox(height: AppSpacing.p24),
                               Row(
                                 children: [
-                                  Expanded(child: Divider(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5))),
+                                  Expanded(
+                                      child: Divider(
+                                          color: (isDark
+                                                  ? AppColors.darkBorder
+                                                  : AppColors.border)
+                                              .withOpacity(0.5))),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16),
-                                    child: Text('OR', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: AppSpacing.p16),
+                                    child: Text('OR',
+                                        style: AppTypography.caption.copyWith(
+                                            color: AppColors.textSecondary)),
                                   ),
-                                  Expanded(child: Divider(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5))),
+                                  Expanded(
+                                      child: Divider(
+                                          color: (isDark
+                                                  ? AppColors.darkBorder
+                                                  : AppColors.border)
+                                              .withOpacity(0.5))),
                                 ],
                               ),
                               const SizedBox(height: AppSpacing.p24),
@@ -243,19 +298,24 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 width: double.infinity,
                                 child: AppButton(
                                   text: 'Continue with Google',
-                                  icon: Iconsax.global, // Using global as a placeholder for Google icon
+                                  icon: Iconsax
+                                      .global, // Using global as a placeholder for Google icon
                                   variant: AppButtonVariant.secondary,
                                   isLoading: isLoading,
                                   onPressed: () async {
-                                    final repo = ref.read(authRepositoryProvider);
+                                    final repo =
+                                        ref.read(authRepositoryProvider);
                                     try {
-                                      final credential = await repo.signInWithGoogle();
+                                      final credential =
+                                          await repo.signInWithGoogle();
                                       if (!context.mounted) return;
                                       if (credential != null) {
                                         context.go('/');
                                       }
                                     } catch (e) {
-                                      if (context.mounted) _showError('Google Sign-In: $e');
+                                      if (context.mounted) {
+                                        _showError('Google Sign-In: $e');
+                                      }
                                     }
                                   },
                                 ),
@@ -265,26 +325,31 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                         ),
                       ),
                     ).animate().fade(delay: 300.ms).slideY(begin: 0.1),
-
                     const SizedBox(height: AppSpacing.p40),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          _mode == AuthMode.login ? 'Don\'t have an account?'
-                              : _mode == AuthMode.register ? 'Already have an account?'
-                              : 'Remember your password?',
-                          style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                          _mode == AuthMode.login
+                              ? 'Don\'t have an account?'
+                              : _mode == AuthMode.register
+                                  ? 'Already have an account?'
+                                  : 'Remember your password?',
+                          style: AppTypography.bodyMedium
+                              .copyWith(color: AppColors.textSecondary),
                         ),
                         TextButton(
                           onPressed: () {
                             setState(() {
-                              _mode = _mode == AuthMode.login ? AuthMode.register : AuthMode.login;
+                              _mode = _mode == AuthMode.login
+                                  ? AuthMode.register
+                                  : AuthMode.login;
                             });
                           },
                           child: Text(
                             _mode == AuthMode.login ? 'Sign Up' : 'Sign In',
-                            style: AppTypography.labelLarge.copyWith(color: AppColors.primary),
+                            style: AppTypography.labelLarge
+                                .copyWith(color: AppColors.primary),
                           ),
                         ),
                       ],
@@ -299,10 +364,12 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     );
   }
 
-  InputDecoration _inputDecoration(String label, IconData icon, bool isDark, {Widget? suffixIcon}) {
+  InputDecoration _inputDecoration(String label, IconData icon, bool isDark,
+      {Widget? suffixIcon}) {
     return InputDecoration(
       labelText: label,
-      labelStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+      labelStyle:
+          AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
       prefixIcon: Icon(icon, color: AppColors.textSecondary),
       suffixIcon: suffixIcon,
       filled: true,
@@ -313,7 +380,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),
-        borderSide: BorderSide(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
+        borderSide: BorderSide(
+            color: (isDark ? AppColors.darkBorder : AppColors.border)
+                .withOpacity(0.5)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(16),

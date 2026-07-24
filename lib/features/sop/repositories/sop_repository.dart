@@ -19,7 +19,9 @@ class SopRepository extends BaseRepository<UserSop> {
     final col = getUserCollection();
     if (col == null) return Stream.value([]);
     return col.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => UserSop.fromMap(doc.data(), doc.id)).toList();
+      return snapshot.docs
+          .map((doc) => UserSop.fromMap(doc.data(), doc.id))
+          .toList();
     });
   }
 }

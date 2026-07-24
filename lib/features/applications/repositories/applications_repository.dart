@@ -6,7 +6,8 @@ class ApplicationRepository extends BaseRepository<UniversityApplication> {
   ApplicationRepository() : super('applications');
 
   @override
-  UniversityApplication fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  UniversityApplication fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> doc) {
     return UniversityApplication.fromMap(doc.data() ?? {}, doc.id);
   }
 
@@ -19,7 +20,9 @@ class ApplicationRepository extends BaseRepository<UniversityApplication> {
     final col = getUserCollection();
     if (col == null) return Stream.value([]);
     return col.snapshots().map((snapshot) {
-      return snapshot.docs.map((doc) => UniversityApplication.fromMap(doc.data(), doc.id)).toList();
+      return snapshot.docs
+          .map((doc) => UniversityApplication.fromMap(doc.data(), doc.id))
+          .toList();
     });
   }
 }

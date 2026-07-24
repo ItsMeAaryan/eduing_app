@@ -20,7 +20,7 @@ class ShimmerBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     final baseColor = isDark ? AppColors.darkSurface : AppColors.border;
     final highlightColor = isDark ? AppColors.darkBorder : AppColors.background;
 
@@ -32,7 +32,8 @@ class ShimmerBlock extends StatelessWidget {
         height: height,
         decoration: BoxDecoration(
           color: baseColor,
-          borderRadius: shape == BoxShape.circle ? null : (borderRadius ?? AppRadius.b12),
+          borderRadius:
+              shape == BoxShape.circle ? null : (borderRadius ?? AppRadius.b12),
           shape: shape,
         ),
       ),

@@ -32,12 +32,15 @@ class AppTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     final fillColor = isDark ? AppColors.darkSurface : AppColors.background;
-    final hintColor = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
-    final textColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    final iconColor = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
-    
+    final hintColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final textColor =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final iconColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -59,22 +62,27 @@ class AppTextField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: AppTypography.bodyLarge.copyWith(color: hintColor),
-              prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: iconColor, size: 20) : null,
+              prefixIcon: prefixIcon != null
+                  ? Icon(prefixIcon, color: iconColor, size: 20)
+                  : null,
               suffixIcon: suffixIcon,
               filled: true,
               fillColor: fillColor,
-              contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.p20, vertical: AppSpacing.p16),
+              contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.p20, vertical: AppSpacing.p16),
               border: OutlineInputBorder(
                 borderRadius: AppRadius.b16,
                 borderSide: BorderSide.none,
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: AppRadius.b16,
-                borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                borderSide:
+                    const BorderSide(color: AppColors.primary, width: 2),
               ),
               errorBorder: OutlineInputBorder(
                 borderRadius: AppRadius.b16,
-                borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+                borderSide:
+                    const BorderSide(color: AppColors.error, width: 1.5),
               ),
               errorText: errorText,
             ),

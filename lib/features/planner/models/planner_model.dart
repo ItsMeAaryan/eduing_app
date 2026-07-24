@@ -1,4 +1,13 @@
-enum EventType { application, interview, scholarship, resume, sop, document, reminder, personal }
+enum EventType {
+  application,
+  interview,
+  scholarship,
+  resume,
+  sop,
+  document,
+  reminder,
+  personal
+}
 
 class PlannerEvent {
   final String id;

@@ -12,7 +12,8 @@ final chatSessionsStreamProvider = StreamProvider<List<ChatSession>>((ref) {
   return repo.getChatSessionsStream();
 });
 
-final copilotProvider = StateNotifierProvider<CopilotNotifier, CopilotDashboardData>((ref) {
+final copilotProvider =
+    StateNotifierProvider<CopilotNotifier, CopilotDashboardData>((ref) {
   final repo = ref.watch(copilotRepositoryProvider);
   final aiService = ref.watch(aiServiceProvider);
   return CopilotNotifier(repo, aiService);
@@ -50,7 +51,8 @@ class CopilotNotifier extends StateNotifier<CopilotDashboardData> {
       history: [
         ChatMessage(
           id: 'welcome_1',
-          text: 'Hello! I am your EDUING AI Copilot. Ask me anything about university admissions, SOPs, resumes, or scholarships.',
+          text:
+              'Hello! I am your EDUING AI Copilot. Ask me anything about university admissions, SOPs, resumes, or scholarships.',
           role: MessageRole.ai,
           timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
         ),
@@ -104,18 +106,23 @@ class CopilotNotifier extends StateNotifier<CopilotDashboardData> {
       history: updatedHistory,
     );
 
-    final prompt = contextInjection != null ? '[CONTEXT: $contextInjection]\n\nUser Question: $text' : text;
+    final prompt = contextInjection != null
+        ? '[CONTEXT: $contextInjection]\n\nUser Question: $text'
+        : text;
     final aiResponse = await _aiService.chat(prompt);
 
     final finalAiMsg = ChatMessage(
       id: aiTypingId,
-      text: aiResponse.isNotEmpty ? aiResponse : 'I am here to guide your study abroad journey. How can I help with your documents or applications?',
+      text: aiResponse.isNotEmpty
+          ? aiResponse
+          : 'I am here to guide your study abroad journey. How can I help with your documents or applications?',
       role: MessageRole.ai,
       timestamp: DateTime.now(),
       isTyping: false,
     );
 
-    final finalHistory = state.history.map((m) => m.id == aiTypingId ? finalAiMsg : m).toList();
+    final finalHistory =
+        state.history.map((m) => m.id == aiTypingId ? finalAiMsg : m).toList();
 
     state = CopilotDashboardData(
       recentInsights: state.recentInsights,

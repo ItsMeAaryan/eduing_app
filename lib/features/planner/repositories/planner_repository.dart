@@ -5,7 +5,8 @@ class PlannerRepository extends BaseRepository<Map<String, dynamic>> {
   PlannerRepository() : super('planner');
 
   @override
-  Map<String, dynamic> fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  Map<String, dynamic> fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> doc) {
     return doc.data() ?? {};
   }
 

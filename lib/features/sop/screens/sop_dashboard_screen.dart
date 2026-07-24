@@ -64,7 +64,9 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
   void _saveContent() {
     ref.read(sopProvider.notifier).updateContent(_contentController.text);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('SOP saved securely.'), backgroundColor: AppColors.success),
+      const SnackBar(
+          content: Text('SOP saved securely.'),
+          backgroundColor: AppColors.success),
     );
   }
 
@@ -78,11 +80,15 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
           margin: const EdgeInsets.all(AppSpacing.p24),
           padding: const EdgeInsets.all(AppSpacing.p16),
           decoration: BoxDecoration(
-            color: (isDark ? AppColors.darkSurface : Colors.white).withOpacity(0.9),
+            color: (isDark ? AppColors.darkSurface : Colors.white)
+                .withOpacity(0.9),
             borderRadius: BorderRadius.circular(32),
             border: Border.all(color: AppColors.primary.withOpacity(0.3)),
             boxShadow: [
-              BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 24, offset: const Offset(0, 10)),
+              BoxShadow(
+                  color: AppColors.primary.withOpacity(0.2),
+                  blurRadius: 24,
+                  offset: const Offset(0, 10)),
             ],
           ),
           child: Column(
@@ -91,33 +97,33 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
               Text('AI Writing Assist', style: AppTypography.titleLarge),
               const SizedBox(height: AppSpacing.p16),
               _buildAIAction(
-                icon: Iconsax.edit_2, 
-                title: 'Fix Grammar & Tone', 
-                onTap: () async {
-                  ctx.pop();
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('AI is polishing your text...')));
-                  await ref.read(sopProvider.notifier).improveSopWithAI();
-                  _contentController.text = ref.read(sopProvider).fullContent;
-                }
-              ),
+                  icon: Iconsax.edit_2,
+                  title: 'Fix Grammar & Tone',
+                  onTap: () async {
+                    ctx.pop();
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('AI is polishing your text...')));
+                    await ref.read(sopProvider.notifier).improveSopWithAI();
+                    _contentController.text = ref.read(sopProvider).fullContent;
+                  }),
               const SizedBox(height: AppSpacing.p8),
               _buildAIAction(
-                icon: Iconsax.maximize_4, 
-                title: 'Expand Current Paragraph', 
-                onTap: () {
-                  ctx.pop();
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Expanding context...')));
-                }
-              ),
+                  icon: Iconsax.maximize_4,
+                  title: 'Expand Current Paragraph',
+                  onTap: () {
+                    ctx.pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Expanding context...')));
+                  }),
               const SizedBox(height: AppSpacing.p8),
               _buildAIAction(
-                icon: Iconsax.brush_2, 
-                title: 'Rewrite (More Professional)', 
-                onTap: () {
-                  ctx.pop();
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rewriting professionally...')));
-                }
-              ),
+                  icon: Iconsax.brush_2,
+                  title: 'Rewrite (More Professional)',
+                  onTap: () {
+                    ctx.pop();
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Rewriting professionally...')));
+                  }),
             ],
           ),
         );
@@ -125,7 +131,10 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
     );
   }
 
-  Widget _buildAIAction({required IconData icon, required String title, required VoidCallback onTap}) {
+  Widget _buildAIAction(
+      {required IconData icon,
+      required String title,
+      required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -138,7 +147,9 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
           children: [
             Icon(icon, color: AppColors.primary, size: 20),
             const SizedBox(width: AppSpacing.p12),
-            Text(title, style: AppTypography.labelLarge.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
+            Text(title,
+                style: AppTypography.labelLarge.copyWith(
+                    color: AppColors.primary, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -152,12 +163,16 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      floatingActionButton: _isEditing ? null : FloatingActionButton.extended(
-        onPressed: _showAIAssistMenu,
-        backgroundColor: AppColors.primary,
-        icon: const Icon(Iconsax.magic_star, color: Colors.white),
-        label: Text('AI Assist', style: AppTypography.labelLarge.copyWith(color: Colors.white)),
-      ),
+      floatingActionButton: _isEditing
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: _showAIAssistMenu,
+              backgroundColor: AppColors.primary,
+              icon: const Icon(Iconsax.magic_star, color: Colors.white),
+              label: Text('AI Assist',
+                  style:
+                      AppTypography.labelLarge.copyWith(color: Colors.white)),
+            ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -167,7 +182,8 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
               child: Stack(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p32),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.p32),
                     child: TextField(
                       controller: _contentController,
                       focusNode: _focusNode,
@@ -176,21 +192,25 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
                       style: AppTypography.bodyMedium.copyWith(
                         fontSize: 18,
                         height: 1.8,
-                        color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary,
+                        color: isDark
+                            ? AppColors.darkTextPrimary
+                            : AppColors.textPrimary,
                       ),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Start writing your Statement of Purpose...',
                       ),
                       onChanged: (_) {
-                         // Auto-save logic could go here
+                        // Auto-save logic could go here
                       },
                     ),
                   ),
-                  
+
                   // Distraction-free gradient fades
                   Positioned(
-                    top: 0, left: 0, right: 0,
+                    top: 0,
+                    left: 0,
+                    right: 0,
                     height: 24,
                     child: Container(
                       decoration: BoxDecoration(
@@ -199,14 +219,18 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
                           end: Alignment.bottomCenter,
                           colors: [
                             Theme.of(context).scaffoldBackgroundColor,
-                            Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
+                            Theme.of(context)
+                                .scaffoldBackgroundColor
+                                .withOpacity(0),
                           ],
                         ),
                       ),
                     ),
                   ),
                   Positioned(
-                    bottom: 0, left: 0, right: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
                     height: 80,
                     child: Container(
                       decoration: BoxDecoration(
@@ -215,7 +239,9 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
                           end: Alignment.topCenter,
                           colors: [
                             Theme.of(context).scaffoldBackgroundColor,
-                            Theme.of(context).scaffoldBackgroundColor.withOpacity(0),
+                            Theme.of(context)
+                                .scaffoldBackgroundColor
+                                .withOpacity(0),
                           ],
                         ),
                       ),
@@ -232,7 +258,8 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
 
   Widget _buildHeader(UserSop sop, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.p16, AppSpacing.p16, AppSpacing.p16, AppSpacing.p24),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.p16, AppSpacing.p16, AppSpacing.p16, AppSpacing.p24),
       child: Row(
         children: [
           AppIconButton(
@@ -249,8 +276,13 @@ class _SopDashboardScreenState extends ConsumerState<SopDashboardScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(sop.targetProgram, style: AppTypography.titleLarge, maxLines: 1, overflow: TextOverflow.ellipsis),
-                Text('${sop.universityName} • ${sop.wordCount} words', style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                Text(sop.targetProgram,
+                    style: AppTypography.titleLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
+                Text('${sop.universityName} • ${sop.wordCount} words',
+                    style: AppTypography.bodyMedium
+                        .copyWith(color: AppColors.textSecondary)),
               ],
             ),
           ),

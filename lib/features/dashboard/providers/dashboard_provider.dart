@@ -51,21 +51,24 @@ final recentApplicationsProvider = Provider<List<ApplicationStatus>>((ref) {
     ApplicationStatus(
       university: 'BITS Pilani',
       campus: 'Pilani Campus',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/BITS_Pilani-Logo.svg/1200px-BITS_Pilani-Logo.svg.png',
+      logoUrl:
+          'https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/BITS_Pilani-Logo.svg/1200px-BITS_Pilani-Logo.svg.png',
       aiMatch: 91,
       status: 'Applied',
     ),
     ApplicationStatus(
       university: 'IIT Bombay',
       campus: 'Computer Science',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f3/IIT_Bombay_logo.svg/1200px-IIT_Bombay_logo.svg.png',
+      logoUrl:
+          'https://upload.wikimedia.org/wikipedia/en/thumb/f/f3/IIT_Bombay_logo.svg/1200px-IIT_Bombay_logo.svg.png',
       aiMatch: 89,
       status: 'Pending',
     ),
     ApplicationStatus(
       university: 'Delhi University',
       campus: 'B.Sc. (Hons) CS',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/b4/University_of_Delhi_coat_of_arms.svg/1200px-University_of_Delhi_coat_of_arms.svg.png',
+      logoUrl:
+          'https://upload.wikimedia.org/wikipedia/en/thumb/b/b4/University_of_Delhi_coat_of_arms.svg/1200px-University_of_Delhi_coat_of_arms.svg.png',
       aiMatch: 75,
       status: 'Shortlisted',
     ),

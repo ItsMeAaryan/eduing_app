@@ -20,8 +20,9 @@ class AppAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? AppColors.darkSurface : AppColors.background;
-    final fallbackColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    
+    final fallbackColor =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+
     Widget content;
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       content = Image.network(

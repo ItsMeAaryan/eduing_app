@@ -35,16 +35,20 @@ class _AppIconButtonState extends State<AppIconButton> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isDisabled = widget.onPressed == null;
-    
-    final defaultIconColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    final defaultBgColor = isDark ? AppColors.darkSurface : AppColors.background;
 
-    final iconColor = isDisabled 
+    final defaultIconColor =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final defaultBgColor =
+        isDark ? AppColors.darkSurface : AppColors.background;
+
+    final iconColor = isDisabled
         ? (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary)
         : (widget.color ?? (widget.isFilled ? Colors.white : defaultIconColor));
-        
+
     final bgColor = widget.isFilled
-        ? (isDisabled ? (isDark ? AppColors.darkBorder : AppColors.border) : (widget.backgroundColor ?? AppColors.primary))
+        ? (isDisabled
+            ? (isDark ? AppColors.darkBorder : AppColors.border)
+            : (widget.backgroundColor ?? AppColors.primary))
         : (_isHovered ? defaultBgColor : Colors.transparent);
 
     final size = widget.isSmall ? 32.0 : 40.0;
@@ -73,9 +77,9 @@ class _AppIconButtonState extends State<AppIconButton> {
           ),
         ),
       ).animate(target: _isPressed ? 1 : 0).scale(
-        end: const Offset(0.90, 0.90),
-        duration: AppDuration.fast,
-      ),
+            end: const Offset(0.90, 0.90),
+            duration: AppDuration.fast,
+          ),
     );
   }
 }

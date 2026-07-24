@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/scholarship_model.dart';
 
-final scholarshipsProvider = StateNotifierProvider<ScholarshipsNotifier, ScholarshipDashboardData>((ref) {
+final scholarshipsProvider =
+    StateNotifierProvider<ScholarshipsNotifier, ScholarshipDashboardData>(
+        (ref) {
   return ScholarshipsNotifier();
 });
 
@@ -26,8 +28,13 @@ class ScholarshipsNotifier extends StateNotifier<ScholarshipDashboardData> {
           deadline: '15 Nov 2025',
           country: 'USA',
           degree: 'Bachelors',
-          description: 'Awarded to top international students demonstrating exceptional academic merit and leadership potential.',
-          benefits: ['Full tuition coverage', 'Mentorship program', 'Networking events'],
+          description:
+              'Awarded to top international students demonstrating exceptional academic merit and leadership potential.',
+          benefits: [
+            'Full tuition coverage',
+            'Mentorship program',
+            'Networking events'
+          ],
           coveredExpenses: ['Tuition', 'Health Insurance'],
           requiredDocuments: ['SOP', '2 LORs', 'Academic Transcripts'],
           selectionProcess: 'Initial screening followed by an interview round.',
@@ -54,7 +61,8 @@ class ScholarshipsNotifier extends StateNotifier<ScholarshipDashboardData> {
           deadline: '30 Dec 2025',
           country: 'Global',
           degree: 'Bachelors',
-          description: 'Aimed at students pursuing degrees in Science, Technology, Engineering, or Mathematics with innovative project portfolios.',
+          description:
+              'Aimed at students pursuing degrees in Science, Technology, Engineering, or Mathematics with innovative project portfolios.',
           benefits: ['One-time grant', 'Access to exclusive tech workshops'],
           coveredExpenses: ['Equipment', 'Partial Tuition'],
           requiredDocuments: ['Project Portfolio', 'Resume', 'SOP'],
@@ -69,7 +77,9 @@ class ScholarshipsNotifier extends StateNotifier<ScholarshipDashboardData> {
             fundingScore: 60,
             strengths: ['Excellent Project Portfolio', 'CS Major'],
             weaknesses: ['Need clearer long-term vision in SOP'],
-            requiredImprovements: ['Revise SOP to focus on community impact of projects'],
+            requiredImprovements: [
+              'Revise SOP to focus on community impact of projects'
+            ],
           ),
         ),
       ],
@@ -78,7 +88,8 @@ class ScholarshipsNotifier extends StateNotifier<ScholarshipDashboardData> {
           id: 'rec_1',
           type: 'Highest ROI',
           scholarshipName: 'Global Excellence Scholarship',
-          reasoning: 'Matches your top-tier academic profile and covers full tuition.',
+          reasoning:
+              'Matches your top-tier academic profile and covers full tuition.',
           estimatedSavings: '\$200,000 over 4 years',
           priority: 'High',
         ),
@@ -122,7 +133,7 @@ class ScholarshipsNotifier extends StateNotifier<ScholarshipDashboardData> {
       }
       return s;
     }).toList();
-    
+
     state = ScholarshipDashboardData(
       totalAvailable: state.totalAvailable,
       savedCount: updatedScholarships.where((s) => s.isSaved).length,

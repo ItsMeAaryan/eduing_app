@@ -4,14 +4,18 @@ import '../models/university_application.dart';
 import '../repositories/applications_repository.dart';
 import '../../../shared/models/university_model.dart';
 
-final applicationRepositoryProvider = Provider((ref) => ApplicationRepository());
+final applicationRepositoryProvider =
+    Provider((ref) => ApplicationRepository());
 
-final applicationsStreamProvider = StreamProvider<List<UniversityApplication>>((ref) {
+final applicationsStreamProvider =
+    StreamProvider<List<UniversityApplication>>((ref) {
   final repo = ref.watch(applicationRepositoryProvider);
   return repo.getApplicationsStream();
 });
 
-final applicationsNotifierProvider = StateNotifierProvider<ApplicationsNotifier, List<UniversityApplication>>((ref) {
+final applicationsNotifierProvider =
+    StateNotifierProvider<ApplicationsNotifier, List<UniversityApplication>>(
+        (ref) {
   final repo = ref.watch(applicationRepositoryProvider);
   return ApplicationsNotifier(repo);
 });
@@ -56,13 +60,26 @@ class ApplicationsNotifier extends StateNotifier<List<UniversityApplication>> {
             submissionDate: '15 Oct 2025',
             deadline: '01 Dec 2025',
             progress: 0.85,
-            notes: 'Followed up with professor regarding research assistantship.',
+            notes:
+                'Followed up with professor regarding research assistantship.',
             timeline: [
-              ApplicationTimelineStage(title: 'Profile Created', date: '01 Sep', isCompleted: true),
-              ApplicationTimelineStage(title: 'Documents Uploaded', date: '15 Sep', isCompleted: true),
-              ApplicationTimelineStage(title: 'Application Submitted', date: '15 Oct', isCompleted: true, isActive: true),
-              ApplicationTimelineStage(title: 'Interview', date: '10 Nov', isCompleted: false),
-              ApplicationTimelineStage(title: 'Decision Received', date: '15 Dec', isCompleted: false),
+              ApplicationTimelineStage(
+                  title: 'Profile Created', date: '01 Sep', isCompleted: true),
+              ApplicationTimelineStage(
+                  title: 'Documents Uploaded',
+                  date: '15 Sep',
+                  isCompleted: true),
+              ApplicationTimelineStage(
+                  title: 'Application Submitted',
+                  date: '15 Oct',
+                  isCompleted: true,
+                  isActive: true),
+              ApplicationTimelineStage(
+                  title: 'Interview', date: '10 Nov', isCompleted: false),
+              ApplicationTimelineStage(
+                  title: 'Decision Received',
+                  date: '15 Dec',
+                  isCompleted: false),
             ],
           ),
         ];
@@ -102,13 +119,22 @@ class ApplicationsNotifier extends StateNotifier<List<UniversityApplication>> {
       ),
       course: course,
       status: ApplicationStatus.draft,
-      submissionDate: '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+      submissionDate:
+          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
       deadline: deadline,
       progress: 0.2,
       timeline: [
-        const ApplicationTimelineStage(title: 'Draft Started', date: 'Today', isCompleted: true, isActive: true),
-        const ApplicationTimelineStage(title: 'Application Submitted', date: 'Pending', isCompleted: false),
-        const ApplicationTimelineStage(title: 'Under Review', date: 'Pending', isCompleted: false),
+        const ApplicationTimelineStage(
+            title: 'Draft Started',
+            date: 'Today',
+            isCompleted: true,
+            isActive: true),
+        const ApplicationTimelineStage(
+            title: 'Application Submitted',
+            date: 'Pending',
+            isCompleted: false),
+        const ApplicationTimelineStage(
+            title: 'Under Review', date: 'Pending', isCompleted: false),
       ],
     );
 

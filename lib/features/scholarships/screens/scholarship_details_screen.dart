@@ -16,7 +16,9 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final data = ref.watch(scholarshipsProvider);
-    final scholarship = data.scholarships.firstWhere((s) => s.id == scholarshipId, orElse: () => data.scholarships.first);
+    final scholarship = data.scholarships.firstWhere(
+        (s) => s.id == scholarshipId,
+        orElse: () => data.scholarships.first);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -35,9 +37,11 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
                     const SizedBox(height: 32),
                     _buildSection('About', scholarship.description),
                     const SizedBox(height: 24),
-                    _buildListSection('Benefits', scholarship.benefits, Iconsax.star),
+                    _buildListSection(
+                        'Benefits', scholarship.benefits, Iconsax.star),
                     const SizedBox(height: 24),
-                    _buildListSection('Covered Expenses', scholarship.coveredExpenses, Iconsax.wallet_money),
+                    _buildListSection('Covered Expenses',
+                        scholarship.coveredExpenses, Iconsax.wallet_money),
                     const SizedBox(height: 32),
                     _buildChecklist(scholarship.requiredDocuments),
                   ]),
@@ -70,7 +74,10 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
-                  colors: [Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.8)],
+                  colors: [
+                    Colors.black.withOpacity(0.2),
+                    Colors.black.withOpacity(0.8)
+                  ],
                 ),
               ),
             ),
@@ -82,14 +89,23 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(color: AppColors.success, borderRadius: BorderRadius.circular(8)),
-                    child: Text('${scholarship.aiMatchScore}% AI Match', style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                        color: AppColors.success,
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Text('${scholarship.aiMatchScore}% AI Match',
+                        style: AppTypography.caption.copyWith(
+                            color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(height: 12),
-                  Text(scholarship.name, style: AppTypography.headline.copyWith(color: Colors.white)),
+                  Text(scholarship.name,
+                      style:
+                          AppTypography.headline.copyWith(color: Colors.white)),
                   const SizedBox(height: 4),
-                  Text(scholarship.organization, style: AppTypography.title.copyWith(color: Colors.white70)),
+                  Text(scholarship.organization,
+                      style:
+                          AppTypography.title.copyWith(color: Colors.white70)),
                 ],
               ),
             ),
@@ -103,7 +119,8 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _buildInfoItem(Iconsax.wallet_money, 'Amount', scholarship.fundingAmount),
+        _buildInfoItem(
+            Iconsax.wallet_money, 'Amount', scholarship.fundingAmount),
         _buildInfoItem(Iconsax.global, 'Country', scholarship.country),
         _buildInfoItem(Iconsax.calendar, 'Deadline', scholarship.deadline),
       ],
@@ -119,8 +136,11 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
           child: Icon(icon, color: AppColors.primary),
         ),
         const SizedBox(height: 8),
-        Text(value, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
-        Text(label, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+        Text(value,
+            style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
+        Text(label,
+            style:
+                AppTypography.caption.copyWith(color: AppColors.textSecondary)),
       ],
     );
   }
@@ -138,7 +158,8 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              const Icon(Iconsax.magic_star, color: AppColors.primary, size: 20),
+              const Icon(Iconsax.magic_star,
+                  color: AppColors.primary, size: 20),
               const SizedBox(width: 12),
               Text('AI Eligibility Analysis', style: AppTypography.title),
             ],
@@ -147,21 +168,40 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildCircularScore('Eligibility', analysis.eligibilityPercentage, AppColors.success),
-              _buildCircularScore('Probability', analysis.successProbability, AppColors.warning),
-              _buildCircularScore('Funding', analysis.fundingScore, AppColors.primary),
+              _buildCircularScore('Eligibility', analysis.eligibilityPercentage,
+                  AppColors.success),
+              _buildCircularScore('Probability', analysis.successProbability,
+                  AppColors.warning),
+              _buildCircularScore(
+                  'Funding', analysis.fundingScore, AppColors.primary),
             ],
           ),
           const SizedBox(height: 24),
           const Divider(),
           const SizedBox(height: 16),
-          Text('Strengths', style: AppTypography.label.copyWith(color: AppColors.success)),
+          Text('Strengths',
+              style: AppTypography.label.copyWith(color: AppColors.success)),
           const SizedBox(height: 8),
-          ...analysis.strengths.map((s) => Padding(padding: const EdgeInsets.only(bottom: 4), child: Row(children: [const Icon(Iconsax.tick_circle, size: 16, color: AppColors.success), const SizedBox(width: 8), Text(s, style: AppTypography.caption)]))),
+          ...analysis.strengths.map((s) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(children: [
+                const Icon(Iconsax.tick_circle,
+                    size: 16, color: AppColors.success),
+                const SizedBox(width: 8),
+                Text(s, style: AppTypography.caption)
+              ]))),
           const SizedBox(height: 16),
-          Text('Required Improvements', style: AppTypography.label.copyWith(color: AppColors.error)),
+          Text('Required Improvements',
+              style: AppTypography.label.copyWith(color: AppColors.error)),
           const SizedBox(height: 8),
-          ...analysis.requiredImprovements.map((s) => Padding(padding: const EdgeInsets.only(bottom: 4), child: Row(children: [const Icon(Iconsax.info_circle, size: 16, color: AppColors.error), const SizedBox(width: 8), Expanded(child: Text(s, style: AppTypography.caption))]))),
+          ...analysis.requiredImprovements.map((s) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Row(children: [
+                const Icon(Iconsax.info_circle,
+                    size: 16, color: AppColors.error),
+                const SizedBox(width: 8),
+                Expanded(child: Text(s, style: AppTypography.caption))
+              ]))),
         ],
       ),
     ).animate().fade(delay: 100.ms).slideY(begin: 0.1);
@@ -176,13 +216,22 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              CircularProgressIndicator(value: value / 100.0, backgroundColor: Colors.grey.shade200, color: color, strokeWidth: 6),
-              Center(child: Text('$value%', style: AppTypography.label.copyWith(fontWeight: FontWeight.bold))),
+              CircularProgressIndicator(
+                  value: value / 100.0,
+                  backgroundColor: Colors.grey.shade200,
+                  color: color,
+                  strokeWidth: 6),
+              Center(
+                  child: Text('$value%',
+                      style: AppTypography.label
+                          .copyWith(fontWeight: FontWeight.bold))),
             ],
           ),
         ),
         const SizedBox(height: 8),
-        Text(label, style: AppTypography.caption.copyWith(color: AppColors.textSecondary, fontSize: 10)),
+        Text(label,
+            style: AppTypography.caption
+                .copyWith(color: AppColors.textSecondary, fontSize: 10)),
       ],
     );
   }
@@ -232,11 +281,15 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
             border: Border.all(color: Colors.grey.shade200),
           ),
           child: Column(
-            children: documents.map((doc) => ListTile(
-                  leading: const Icon(Iconsax.document, color: AppColors.primary),
-                  title: Text(doc, style: AppTypography.label),
-                  trailing: const Icon(Iconsax.arrow_right_3, size: 16, color: AppColors.textSecondary),
-                )).toList(),
+            children: documents
+                .map((doc) => ListTile(
+                      leading: const Icon(Iconsax.document,
+                          color: AppColors.primary),
+                      title: Text(doc, style: AppTypography.label),
+                      trailing: const Icon(Iconsax.arrow_right_3,
+                          size: 16, color: AppColors.textSecondary),
+                    ))
+                .toList(),
           ),
         ),
       ],
@@ -252,7 +305,12 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -10))],
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 20,
+                offset: const Offset(0, -10))
+          ],
         ),
         child: SafeArea(
           top: false,
@@ -264,9 +322,12 @@ class ScholarshipDetailsScreen extends ConsumerWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: Text('Start Application', style: AppTypography.button.copyWith(color: Colors.white)),
+                  child: Text('Start Application',
+                      style:
+                          AppTypography.button.copyWith(color: Colors.white)),
                 ),
               ),
             ],

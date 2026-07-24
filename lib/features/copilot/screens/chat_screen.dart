@@ -4,7 +4,6 @@ import 'package:iconsax/iconsax.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
-
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
 import '../../../core/theme/spacing/app_spacing.dart';
@@ -40,7 +39,9 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
   void _sendMessage([String? textToSend]) {
     final text = textToSend ?? _controller.text.trim();
     if (text.isNotEmpty) {
-      ref.read(copilotProvider.notifier).sendMessage(text, contextInjection: _selectedContext);
+      ref
+          .read(copilotProvider.notifier)
+          .sendMessage(text, contextInjection: _selectedContext);
       _controller.clear();
       setState(() => _selectedContext = null);
       _scrollToBottom();
@@ -70,14 +71,17 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
                 gradient: AppColors.aiGradient,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Iconsax.magic_star, color: Colors.white, size: 20),
+              child:
+                  const Icon(Iconsax.magic_star, color: Colors.white, size: 20),
             ),
             const SizedBox(width: AppSpacing.p12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('Strategist', style: AppTypography.titleLarge),
-                Text('Online', style: AppTypography.caption.copyWith(color: AppColors.success)),
+                Text('Online',
+                    style: AppTypography.caption
+                        .copyWith(color: AppColors.success)),
               ],
             ),
           ],
@@ -97,7 +101,8 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
             child: AppIconButton(
               icon: Iconsax.more,
               isFilled: true,
-              backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
+              backgroundColor:
+                  isDark ? AppColors.darkSurface : AppColors.surface,
               onPressed: () {},
             ),
           ),
@@ -125,8 +130,10 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
 
   Widget _buildContextBadge(bool isDark) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p8),
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
+      margin: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p24, vertical: AppSpacing.p8),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
       decoration: BoxDecoration(
         color: AppColors.primary.withOpacity(0.1),
         borderRadius: BorderRadius.circular(100),
@@ -137,7 +144,8 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
         children: [
           const Icon(Iconsax.document_text, size: 16, color: AppColors.primary),
           const SizedBox(width: AppSpacing.p8),
-          Text('Context Attached: $_selectedContext', style: AppTypography.caption.copyWith(color: AppColors.primary)),
+          Text('Context Attached: $_selectedContext',
+              style: AppTypography.caption.copyWith(color: AppColors.primary)),
           const SizedBox(width: AppSpacing.p8),
           GestureDetector(
             onTap: () => setState(() => _selectedContext = null),
@@ -169,13 +177,18 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
             child: GestureDetector(
               onTap: () => _sendMessage(s),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.darkSurface : AppColors.surface,
                   borderRadius: BorderRadius.circular(100),
-                  border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
+                  border: Border.all(
+                      color: (isDark ? AppColors.darkBorder : AppColors.border)
+                          .withOpacity(0.5)),
                 ),
-                child: Text(s, style: AppTypography.labelMedium.copyWith(color: AppColors.primary)),
+                child: Text(s,
+                    style: AppTypography.labelMedium
+                        .copyWith(color: AppColors.primary)),
               ),
             ),
           );
@@ -190,7 +203,8 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
       padding: const EdgeInsets.only(bottom: AppSpacing.p24),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisAlignment: isAI ? MainAxisAlignment.start : MainAxisAlignment.end,
+        mainAxisAlignment:
+            isAI ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: [
           if (isAI) ...[
             Container(
@@ -200,7 +214,8 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
                 gradient: AppColors.aiGradient,
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Iconsax.magic_star, color: Colors.white, size: 16),
+              child:
+                  const Icon(Iconsax.magic_star, color: Colors.white, size: 16),
             ),
             const SizedBox(width: AppSpacing.p12),
           ],
@@ -208,17 +223,32 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.p16),
               decoration: BoxDecoration(
-                color: isAI ? (isDark ? AppColors.darkSurface : AppColors.surface) : AppColors.primary,
+                color: isAI
+                    ? (isDark ? AppColors.darkSurface : AppColors.surface)
+                    : AppColors.primary,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(24),
                   topRight: const Radius.circular(24),
                   bottomLeft: Radius.circular(isAI ? 4 : 24),
                   bottomRight: Radius.circular(isAI ? 24 : 4),
                 ),
-                border: isAI ? Border.all(color: isDark ? AppColors.darkBorder : AppColors.border) : null,
-                boxShadow: isAI 
-                    ? [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 4))] 
-                    : [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 8))],
+                border: isAI
+                    ? Border.all(
+                        color: isDark ? AppColors.darkBorder : AppColors.border)
+                    : null,
+                boxShadow: isAI
+                    ? [
+                        BoxShadow(
+                            color: Colors.black.withOpacity(0.02),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4))
+                      ]
+                    : [
+                        BoxShadow(
+                            color: AppColors.primary.withOpacity(0.3),
+                            blurRadius: 16,
+                            offset: const Offset(0, 8))
+                      ],
               ),
               child: message.isTyping
                   ? Row(
@@ -227,16 +257,23 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
                         const SizedBox(
                           width: 14,
                           height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.primary),
                         ),
                         const SizedBox(width: AppSpacing.p8),
-                        Text('Analyzing Profile...', style: AppTypography.labelMedium.copyWith(color: AppColors.primary)),
+                        Text('Analyzing Profile...',
+                            style: AppTypography.labelMedium
+                                .copyWith(color: AppColors.primary)),
                       ],
                     )
                   : Text(
                       message.text,
                       style: AppTypography.bodyMedium.copyWith(
-                        color: isAI ? (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary) : Colors.white,
+                        color: isAI
+                            ? (isDark
+                                ? AppColors.darkTextPrimary
+                                : AppColors.textPrimary)
+                            : Colors.white,
                         height: 1.5,
                       ),
                     ),
@@ -250,14 +287,19 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkSurface : AppColors.surface,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+                border: Border.all(
+                    color: isDark ? AppColors.darkBorder : AppColors.border),
               ),
-              child: const Icon(Iconsax.user, color: AppColors.textSecondary, size: 16),
+              child: const Icon(Iconsax.user,
+                  color: AppColors.textSecondary, size: 16),
             ),
           ],
         ],
       ),
-    ).animate().fade().slideY(begin: 0.1, duration: 300.ms, curve: Curves.easeOutQuart);
+    )
+        .animate()
+        .fade()
+        .slideY(begin: 0.1, duration: 300.ms, curve: Curves.easeOutQuart);
   }
 
   Widget _buildInputArea(bool isDark) {
@@ -270,7 +312,10 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
       ),
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
-        border: Border(top: BorderSide(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5))),
+        border: Border(
+            top: BorderSide(
+                color: (isDark ? AppColors.darkBorder : AppColors.border)
+                    .withOpacity(0.5))),
       ),
       child: Row(
         children: [
@@ -281,7 +326,9 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
             onPressed: () {
               setState(() => _selectedContext = 'Application & Resume Context');
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Context attached to next query'), backgroundColor: AppColors.primary),
+                const SnackBar(
+                    content: Text('Context attached to next query'),
+                    backgroundColor: AppColors.primary),
               );
             },
           ),

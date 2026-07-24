@@ -10,7 +10,9 @@ abstract class BaseRepository<T> {
 
   String get _uid {
     final user = FirebaseService.auth.currentUser;
-    if (user == null) throw Exception('User must be authenticated to access this resource.');
+    if (user == null) {
+      throw Exception('User must be authenticated to access this resource.');
+    }
     return user.uid;
   }
 
@@ -51,10 +53,15 @@ abstract class BaseRepository<T> {
   }
 
   Stream<T?> stream(String id) {
-    return _colRef.doc(id).snapshots().map((doc) => doc.exists ? fromFirestore(doc) : null);
+    return _colRef
+        .doc(id)
+        .snapshots()
+        .map((doc) => doc.exists ? fromFirestore(doc) : null);
   }
 
   Stream<List<T>> streamQuery(Query<Map<String, dynamic>> query) {
-    return query.snapshots().map((snapshot) => snapshot.docs.map(fromFirestore).toList());
+    return query
+        .snapshots()
+        .map((snapshot) => snapshot.docs.map(fromFirestore).toList());
   }
 }

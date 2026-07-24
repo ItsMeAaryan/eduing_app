@@ -43,7 +43,8 @@ class ChatMessage {
         id: map['id'] ?? '',
         text: map['text'] ?? '',
         role: map['role'] == 'user' ? MessageRole.user : MessageRole.ai,
-        timestamp: DateTime.fromMillisecondsSinceEpoch(map['timestamp'] ?? DateTime.now().millisecondsSinceEpoch),
+        timestamp: DateTime.fromMillisecondsSinceEpoch(
+            map['timestamp'] ?? DateTime.now().millisecondsSinceEpoch),
         isTyping: map['isTyping'] ?? false,
       );
 }
@@ -68,14 +69,16 @@ class ChatSession {
         'createdAt': createdAt.millisecondsSinceEpoch,
       };
 
-  factory ChatSession.fromMap(Map<String, dynamic> map, String docId) => ChatSession(
+  factory ChatSession.fromMap(Map<String, dynamic> map, String docId) =>
+      ChatSession(
         id: docId,
         title: map['title'] ?? 'AI Guidance Session',
         messages: (map['messages'] as List<dynamic>?)
                 ?.map((m) => ChatMessage.fromMap(m as Map<String, dynamic>))
                 .toList() ??
             const [],
-        createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] ?? DateTime.now().millisecondsSinceEpoch),
+        createdAt: DateTime.fromMillisecondsSinceEpoch(
+            map['createdAt'] ?? DateTime.now().millisecondsSinceEpoch),
       );
 }
 

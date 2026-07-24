@@ -8,6 +8,7 @@ import '../../../core/theme/typography/app_typography.dart';
 import '../../../core/theme/app_duration.dart';
 
 enum AppButtonVariant { primary, secondary, outline, text, ghost }
+
 enum AppButtonSize { small, medium, large }
 
 class AppButton extends StatefulWidget {
@@ -58,7 +59,8 @@ class _AppButtonState extends State<AppButton> {
           padding: _getPadding(),
           decoration: _getDecoration(isDisabled),
           child: Row(
-            mainAxisSize: widget.isFullWidth ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisSize:
+                widget.isFullWidth ? MainAxisSize.max : MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (widget.isLoading) ...[
@@ -67,7 +69,8 @@ class _AppButtonState extends State<AppButton> {
                   height: _getIconSize(),
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(_getTextColor(isDisabled)),
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                        _getTextColor(isDisabled)),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.p8),
@@ -91,21 +94,24 @@ class _AppButtonState extends State<AppButton> {
           ),
         ),
       ).animate(target: _isPressed ? 1 : 0).scale(
-        end: const Offset(0.96, 0.96),
-        duration: AppDuration.fast,
-        curve: Curves.easeOutCubic,
-      ),
+            end: const Offset(0.96, 0.96),
+            duration: AppDuration.fast,
+            curve: Curves.easeOutCubic,
+          ),
     );
   }
 
   EdgeInsets _getPadding() {
     switch (widget.size) {
       case AppButtonSize.small:
-        return const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p8);
+        return const EdgeInsets.symmetric(
+            horizontal: AppSpacing.p16, vertical: AppSpacing.p8);
       case AppButtonSize.medium:
-        return const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p12);
+        return const EdgeInsets.symmetric(
+            horizontal: AppSpacing.p24, vertical: AppSpacing.p12);
       case AppButtonSize.large:
-        return const EdgeInsets.symmetric(horizontal: AppSpacing.p32, vertical: AppSpacing.p16);
+        return const EdgeInsets.symmetric(
+            horizontal: AppSpacing.p32, vertical: AppSpacing.p16);
     }
   }
 
@@ -136,7 +142,7 @@ class _AppButtonState extends State<AppButton> {
     Color? borderColor;
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     switch (widget.variant) {
       case AppButtonVariant.primary:
         bgColor = isDisabled
@@ -152,7 +158,9 @@ class _AppButtonState extends State<AppButton> {
         bgColor = Colors.transparent;
         borderColor = isDisabled
             ? (isDark ? AppColors.darkBorder : AppColors.border)
-            : (_isHovered ? AppColors.primary : (isDark ? AppColors.darkBorder : AppColors.border));
+            : (_isHovered
+                ? AppColors.primary
+                : (isDark ? AppColors.darkBorder : AppColors.border));
         break;
       case AppButtonVariant.text:
       case AppButtonVariant.ghost:
@@ -165,17 +173,19 @@ class _AppButtonState extends State<AppButton> {
     return BoxDecoration(
       color: bgColor,
       borderRadius: AppRadius.b100, // Capsule shape
-      border: borderColor != null ? Border.all(color: borderColor, width: 1.5) : null,
+      border: borderColor != null
+          ? Border.all(color: borderColor, width: 1.5)
+          : null,
     );
   }
 
   Color _getTextColor(bool isDisabled) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     if (isDisabled) {
       return isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
     }
-    
+
     switch (widget.variant) {
       case AppButtonVariant.primary:
       case AppButtonVariant.secondary:

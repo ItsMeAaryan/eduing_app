@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/models/university_model.dart';
 
-final universitiesProvider = StateNotifierProvider<UniversitiesNotifier, List<University>>((ref) {
+final universitiesProvider =
+    StateNotifierProvider<UniversitiesNotifier, List<University>>((ref) {
   return UniversitiesNotifier();
 });
 
@@ -37,7 +38,8 @@ class UniversitiesNotifier extends StateNotifier<List<University>> {
       final matchesCategory = _currentCategory == 'All' ||
           uni.type.toLowerCase().contains(_currentCategory.toLowerCase()) ||
           uni.course.toLowerCase().contains(_currentCategory.toLowerCase()) ||
-          uni.coursesList.any((c) => c.toLowerCase().contains(_currentCategory.toLowerCase()));
+          uni.coursesList.any(
+              (c) => c.toLowerCase().contains(_currentCategory.toLowerCase()));
 
       return matchesQuery && matchesCategory;
     }).toList();
@@ -58,8 +60,10 @@ class UniversitiesNotifier extends StateNotifier<List<University>> {
       id: '1',
       name: 'BITS Pilani',
       location: 'Pilani, Rajasthan',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/BITS_Pilani_clock_tower.jpg/1200px-BITS_Pilani_clock_tower.jpg',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/BITS_Pilani-Logo.svg/1200px-BITS_Pilani-Logo.svg.png',
+      imageUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/BITS_Pilani_clock_tower.jpg/1200px-BITS_Pilani_clock_tower.jpg',
+      logoUrl:
+          'https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/BITS_Pilani-Logo.svg/1200px-BITS_Pilani-Logo.svg.png',
       aiMatch: 95,
       rating: 4.8,
       nirfRanking: 'NIRF #1',
@@ -78,8 +82,10 @@ class UniversitiesNotifier extends StateNotifier<List<University>> {
       id: '2',
       name: 'Indian Institute of Technology Bombay',
       location: 'Mumbai, Maharashtra',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/IIT_Bombay_Main_Building.jpg/1200px-IIT_Bombay_Main_Building.jpg',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f3/IIT_Bombay_logo.svg/1200px-IIT_Bombay_logo.svg.png',
+      imageUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/IIT_Bombay_Main_Building.jpg/1200px-IIT_Bombay_Main_Building.jpg',
+      logoUrl:
+          'https://upload.wikimedia.org/wikipedia/en/thumb/f/f3/IIT_Bombay_logo.svg/1200px-IIT_Bombay_logo.svg.png',
       aiMatch: 94,
       rating: 4.7,
       nirfRanking: 'NIRF #2',
@@ -98,8 +104,10 @@ class UniversitiesNotifier extends StateNotifier<List<University>> {
       id: '3',
       name: 'Delhi University',
       location: 'New Delhi, Delhi',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Delhi_University_VC_Office.jpg/1200px-Delhi_University_VC_Office.jpg',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/b4/University_of_Delhi_coat_of_arms.svg/1200px-University_of_Delhi_coat_of_arms.svg.png',
+      imageUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/Delhi_University_VC_Office.jpg/1200px-Delhi_University_VC_Office.jpg',
+      logoUrl:
+          'https://upload.wikimedia.org/wikipedia/en/thumb/b/b4/University_of_Delhi_coat_of_arms.svg/1200px-University_of_Delhi_coat_of_arms.svg.png',
       aiMatch: 93,
       rating: 4.6,
       nirfRanking: 'NIRF #3',
@@ -119,8 +127,10 @@ class UniversitiesNotifier extends StateNotifier<List<University>> {
       id: '4',
       name: 'VIT Vellore',
       location: 'Vellore, Tamil Nadu',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/VIT_Vellore_Main_Building.jpg/1200px-VIT_Vellore_Main_Building.jpg',
-      logoUrl: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c5/Vellore_Institute_of_Technology_seal_2017.svg/1200px-Vellore_Institute_of_Technology_seal_2017.svg.png',
+      imageUrl:
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/VIT_Vellore_Main_Building.jpg/1200px-VIT_Vellore_Main_Building.jpg',
+      logoUrl:
+          'https://upload.wikimedia.org/wikipedia/en/thumb/c/c5/Vellore_Institute_of_Technology_seal_2017.svg/1200px-Vellore_Institute_of_Technology_seal_2017.svg.png',
       aiMatch: 92,
       rating: 4.5,
       nirfRanking: 'NIRF #4',

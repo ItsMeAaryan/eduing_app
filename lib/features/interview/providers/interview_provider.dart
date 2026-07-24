@@ -8,12 +8,14 @@ import '../../../core/services/ai/ai_service.dart';
 final interviewRepositoryProvider = Provider((ref) => InterviewRepository());
 final speechAudioServiceProvider = Provider((ref) => SpeechAudioService());
 
-final interviewSessionsStreamProvider = StreamProvider<List<InterviewSession>>((ref) {
+final interviewSessionsStreamProvider =
+    StreamProvider<List<InterviewSession>>((ref) {
   final repo = ref.watch(interviewRepositoryProvider);
   return repo.getSessionsStream();
 });
 
-final interviewNotifierProvider = StateNotifierProvider<InterviewNotifier, List<InterviewSession>>((ref) {
+final interviewNotifierProvider =
+    StateNotifierProvider<InterviewNotifier, List<InterviewSession>>((ref) {
   final repo = ref.watch(interviewRepositoryProvider);
   final aiService = ref.watch(aiServiceProvider);
   return InterviewNotifier(repo, aiService);
@@ -36,8 +38,10 @@ class InterviewNotifier extends StateNotifier<List<InterviewSession>> {
           const InterviewSession(
             id: 'sess_1',
             date: '18 Aug 2025',
-            questionTitle: 'Why did you choose this university and degree program?',
-            userTranscript: 'I selected this university due to its exceptional research facilities and pioneering work in artificial intelligence...',
+            questionTitle:
+                'Why did you choose this university and degree program?',
+            userTranscript:
+                'I selected this university due to its exceptional research facilities and pioneering work in artificial intelligence...',
             score: 88,
             report: AIInterviewReport(
               overallScore: 88,
@@ -46,7 +50,11 @@ class InterviewNotifier extends StateNotifier<List<InterviewSession>> {
               technicalKnowledge: 92,
               clarity: 88,
               recommendations: [
-                AIInterviewRecommendation(text: 'Mention specific professors whose research aligns with your interests.', priority: 'High', estimatedImpact: '+6% Overall'),
+                AIInterviewRecommendation(
+                    text:
+                        'Mention specific professors whose research aligns with your interests.',
+                    priority: 'High',
+                    estimatedImpact: '+6% Overall'),
               ],
               strengths: ['Great articulation', 'Clear academic intent'],
             ),
@@ -77,7 +85,8 @@ Provide:
 
     final session = InterviewSession(
       id: sessionId,
-      date: '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
+      date:
+          '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
       questionTitle: questionTitle,
       userTranscript: answerText,
       score: 86,
@@ -89,12 +98,17 @@ Provide:
         clarity: 84,
         recommendations: [
           AIInterviewRecommendation(
-            text: aiFeedback.isNotEmpty ? aiFeedback : 'Practice giving structured responses using STAR technique.',
+            text: aiFeedback.isNotEmpty
+                ? aiFeedback
+                : 'Practice giving structured responses using STAR technique.',
             priority: 'High',
             estimatedImpact: '+8% Clarity',
           ),
         ],
-        strengths: const ['Good vocabulary', 'Direct answer to question prompt'],
+        strengths: const [
+          'Good vocabulary',
+          'Direct answer to question prompt'
+        ],
       ),
     );
 

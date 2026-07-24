@@ -5,23 +5,23 @@ class AppColors {
   static const Color primary = Color(0xFF8B5CF6); // Modern EDUing Purple
   static const Color primaryDark = Color(0xFF7C3AED);
   static const Color primaryLight = Color(0xFFA78BFA);
-  
+
   static const Color background = Color(0xFFF8F9FB); // Light Mode bg
   static const Color surface = Colors.white; // Light Mode surface
   static const Color textPrimary = Color(0xFF111827); // Very dark gray/black
   static const Color textSecondary = Color(0xFF6B7280); // Gray
   static const Color border = Color(0xFFE5E7EB);
-  
+
   // Legacy
   static const Color secondary = Color(0xFF10C675);
-  
+
   // Dark Theme Colors
   static const Color darkBackground = Color(0xFF111827); // Dark Mode bg
   static const Color darkSurface = Color(0xFF1F2937); // Dark Mode surface
   static const Color darkTextPrimary = Color(0xFFF9FAFB);
   static const Color darkTextSecondary = Color(0xFF9CA3AF);
   static const Color darkBorder = Color(0xFF374151);
-  
+
   // Semantic Colors
   static const Color success = Color(0xFF10B981); // Green
   static const Color successBg = Color(0xFFD1FAE5);
@@ -43,7 +43,7 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
-  
+
   static const LinearGradient aiGradient = LinearGradient(
     colors: [Color(0xFF8B5CF6), Color(0xFFEC4899)],
     begin: Alignment.topLeft,

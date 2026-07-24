@@ -6,16 +6,19 @@ import '../repositories/documents_repository.dart';
 import '../services/document_storage_service.dart';
 
 final documentRepositoryProvider = Provider((ref) => DocumentRepository());
-final documentStorageServiceProvider = Provider((ref) => DocumentStorageService());
+final documentStorageServiceProvider =
+    Provider((ref) => DocumentStorageService());
 
 final documentsStreamProvider = StreamProvider<List<AppDocument>>((ref) {
   final repo = ref.watch(documentRepositoryProvider);
   return repo.getDocumentsStream();
 });
 
-final activeUploadProgressProvider = StateProvider.family<UploadProgress?, String>((ref, docId) => null);
+final activeUploadProgressProvider =
+    StateProvider.family<UploadProgress?, String>((ref, docId) => null);
 
-final documentsNotifierProvider = StateNotifierProvider<DocumentsNotifier, List<AppDocument>>((ref) {
+final documentsNotifierProvider =
+    StateNotifierProvider<DocumentsNotifier, List<AppDocument>>((ref) {
   final repo = ref.watch(documentRepositoryProvider);
   final storageService = ref.watch(documentStorageServiceProvider);
   return DocumentsNotifier(repo, storageService, ref);
@@ -26,7 +29,8 @@ class DocumentsNotifier extends StateNotifier<List<AppDocument>> {
   final DocumentStorageService _storageService;
   final Ref _ref;
 
-  DocumentsNotifier(this._repository, this._storageService, this._ref) : super([]) {
+  DocumentsNotifier(this._repository, this._storageService, this._ref)
+      : super([]) {
     _loadInitialData();
   }
 
@@ -48,7 +52,8 @@ class DocumentsNotifier extends StateNotifier<List<AppDocument>> {
 
     final sizeInMb = (await file.length()) / (1024 * 1024);
     final sizeStr = '${sizeInMb.toStringAsFixed(1)} MB';
-    final nowStr = '${DateTime.now().day} ${_monthName(DateTime.now().month)} ${DateTime.now().year}';
+    final nowStr =
+        '${DateTime.now().day} ${_monthName(DateTime.now().month)} ${DateTime.now().year}';
 
     final initialDoc = AppDocument(
       id: docId,
@@ -66,7 +71,9 @@ class DocumentsNotifier extends StateNotifier<List<AppDocument>> {
     state = [initialDoc, ...state];
 
     // Listen to upload stream
-    _storageService.uploadDocument(uid: uid, docId: docId, file: file).listen((progress) async {
+    _storageService
+        .uploadDocument(uid: uid, docId: docId, file: file)
+        .listen((progress) async {
       _ref.read(activeUploadProgressProvider(docId).notifier).state = progress;
 
       if (progress.isCompleted && progress.downloadUrl != null) {
@@ -108,11 +115,25 @@ class DocumentsNotifier extends StateNotifier<List<AppDocument>> {
 
   Future<void> shareDocument(String id) async {
     final doc = state.firstWhere((d) => d.id == id);
-    await _storageService.shareDocumentFile(doc.name, doc.localPath, doc.previewUrl);
+    await _storageService.shareDocumentFile(
+        doc.name, doc.localPath, doc.previewUrl);
   }
 
   String _monthName(int month) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
     return months[month - 1];
   }
 }

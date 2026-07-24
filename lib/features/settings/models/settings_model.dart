@@ -100,7 +100,8 @@ class AppSettings {
     );
   }
 
-  factory AppSettings.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory AppSettings.fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> doc) {
     final data = doc.data() ?? {};
     return AppSettings(
       language: data['language'] ?? 'English',

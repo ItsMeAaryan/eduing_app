@@ -22,14 +22,14 @@ class AppChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final bgColor = isSelected 
+    final bgColor = isSelected
         ? AppColors.primary
         : (isDark ? AppColors.darkSurface : AppColors.background);
-        
+
     final textColor = isSelected
         ? Colors.white
         : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary);
-        
+
     final borderColor = isSelected
         ? AppColors.primary
         : (isDark ? AppColors.darkBorder : AppColors.border);
@@ -37,7 +37,8 @@ class AppChip extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: AppRadius.b100, // Capsule shape

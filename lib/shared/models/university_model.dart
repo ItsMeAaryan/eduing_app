@@ -49,14 +49,28 @@ class University {
     required this.tags,
     required this.studentCount,
     this.isFavorite = false,
-    this.description = 'A premier institution known for excellence in education and research. It offers world-class facilities and has a track record of outstanding placements.',
+    this.description =
+        'A premier institution known for excellence in education and research. It offers world-class facilities and has a track record of outstanding placements.',
     this.admissionProbability = 85.0,
     this.scholarshipProbability = 75.0,
     this.hostelCompatibility = 90.0,
     this.internationalOpportunities = 80.0,
     this.gallery = const [],
-    this.coursesList = const ['Engineering', 'Medical', 'MBA', 'Science', 'Arts'],
-    this.facilities = const ['Hostels', 'Labs', 'Sports', 'Library', 'WiFi', 'Medical'],
+    this.coursesList = const [
+      'Engineering',
+      'Medical',
+      'MBA',
+      'Science',
+      'Arts'
+    ],
+    this.facilities = const [
+      'Hostels',
+      'Labs',
+      'Sports',
+      'Library',
+      'WiFi',
+      'Medical'
+    ],
   });
 
   University copyWith({
@@ -110,9 +124,11 @@ class University {
       isFavorite: isFavorite ?? this.isFavorite,
       description: description ?? this.description,
       admissionProbability: admissionProbability ?? this.admissionProbability,
-      scholarshipProbability: scholarshipProbability ?? this.scholarshipProbability,
+      scholarshipProbability:
+          scholarshipProbability ?? this.scholarshipProbability,
       hostelCompatibility: hostelCompatibility ?? this.hostelCompatibility,
-      internationalOpportunities: internationalOpportunities ?? this.internationalOpportunities,
+      internationalOpportunities:
+          internationalOpportunities ?? this.internationalOpportunities,
       gallery: gallery ?? this.gallery,
       coursesList: coursesList ?? this.coursesList,
       facilities: facilities ?? this.facilities,
@@ -174,14 +190,21 @@ class University {
       tags: List<String>.from(map['tags'] ?? []),
       studentCount: map['studentCount'] ?? '',
       isFavorite: map['isFavorite'] ?? false,
-      description: map['description'] ?? 'A premier institution known for excellence in education and research.',
-      admissionProbability: (map['admissionProbability'] as num?)?.toDouble() ?? 85.0,
-      scholarshipProbability: (map['scholarshipProbability'] as num?)?.toDouble() ?? 75.0,
-      hostelCompatibility: (map['hostelCompatibility'] as num?)?.toDouble() ?? 90.0,
-      internationalOpportunities: (map['internationalOpportunities'] as num?)?.toDouble() ?? 80.0,
+      description: map['description'] ??
+          'A premier institution known for excellence in education and research.',
+      admissionProbability:
+          (map['admissionProbability'] as num?)?.toDouble() ?? 85.0,
+      scholarshipProbability:
+          (map['scholarshipProbability'] as num?)?.toDouble() ?? 75.0,
+      hostelCompatibility:
+          (map['hostelCompatibility'] as num?)?.toDouble() ?? 90.0,
+      internationalOpportunities:
+          (map['internationalOpportunities'] as num?)?.toDouble() ?? 80.0,
       gallery: List<String>.from(map['gallery'] ?? []),
-      coursesList: List<String>.from(map['coursesList'] ?? ['Engineering', 'Management', 'Sciences']),
-      facilities: List<String>.from(map['facilities'] ?? ['Hostels', 'Labs', 'Library']),
+      coursesList: List<String>.from(
+          map['coursesList'] ?? ['Engineering', 'Management', 'Sciences']),
+      facilities: List<String>.from(
+          map['facilities'] ?? ['Hostels', 'Labs', 'Library']),
     );
   }
 }

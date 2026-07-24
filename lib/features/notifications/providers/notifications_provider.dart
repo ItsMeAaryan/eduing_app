@@ -16,7 +16,8 @@ class NotificationsNotifier extends StateNotifier<List<NotificationItem>> {
     NotificationItem(
       id: '2',
       title: 'Stanford Application Deadline',
-      message: 'Your Stanford university application is due in 3 days. Complete the checklist.',
+      message:
+          'Your Stanford university application is due in 3 days. Complete the checklist.',
       type: 'deadline',
       timestamp: DateTime.now().subtract(const Duration(hours: 2)),
       isRead: false,
@@ -24,7 +25,8 @@ class NotificationsNotifier extends StateNotifier<List<NotificationItem>> {
     NotificationItem(
       id: '3',
       title: 'Resume Exported',
-      message: 'Your Executive ATS Resume was exported successfully to your files.',
+      message:
+          'Your Executive ATS Resume was exported successfully to your files.',
       type: 'success',
       timestamp: DateTime.now().subtract(const Duration(days: 1)),
       isRead: true,
@@ -40,7 +42,8 @@ class NotificationsNotifier extends StateNotifier<List<NotificationItem>> {
   ];
 
   void markAsRead(String id) {
-    state = state.map((n) => n.id == id ? n.copyWith(isRead: true) : n).toList();
+    state =
+        state.map((n) => n.id == id ? n.copyWith(isRead: true) : n).toList();
   }
 
   void markAllAsRead() {
@@ -52,6 +55,7 @@ class NotificationsNotifier extends StateNotifier<List<NotificationItem>> {
   }
 }
 
-final notificationsProvider = StateNotifierProvider<NotificationsNotifier, List<NotificationItem>>((ref) {
+final notificationsProvider =
+    StateNotifierProvider<NotificationsNotifier, List<NotificationItem>>((ref) {
   return NotificationsNotifier();
 });

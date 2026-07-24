@@ -20,7 +20,14 @@ class UniversitiesScreen extends ConsumerStatefulWidget {
 }
 
 class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
-  final List<String> _filters = ['All', 'Engineering', 'Management', 'Sciences', 'Arts', 'Medical'];
+  final List<String> _filters = [
+    'All',
+    'Engineering',
+    'Management',
+    'Sciences',
+    'Arts',
+    'Medical'
+  ];
   String _selectedFilter = 'All';
   final TextEditingController _searchController = TextEditingController();
 
@@ -53,7 +60,9 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
                     children: [
                       Text('Discover', style: AppTypography.display),
                       const SizedBox(height: AppSpacing.p4),
-                      Text('Explore global universities.', style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                      Text('Explore global universities.',
+                          style: AppTypography.bodyMedium
+                              .copyWith(color: AppColors.textSecondary)),
                     ],
                   ),
                   Container(
@@ -61,7 +70,10 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
                     decoration: BoxDecoration(
                       color: isDark ? AppColors.darkSurface : AppColors.surface,
                       shape: BoxShape.circle,
-                      border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
+                      border: Border.all(
+                          color:
+                              (isDark ? AppColors.darkBorder : AppColors.border)
+                                  .withOpacity(0.5)),
                     ),
                     child: const Icon(Iconsax.bookmark, size: 20),
                   ),
@@ -79,7 +91,7 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
                 onChanged: (val) => notifier.filterByQuery(val),
               ),
             ),
-            
+
             const SizedBox(height: AppSpacing.p24),
 
             // Filters
@@ -97,20 +109,33 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
                         notifier.filterByCategory(filter);
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.p16,
+                            vertical: AppSpacing.p12),
                         decoration: BoxDecoration(
-                          color: isSelected 
-                              ? AppColors.primary 
-                              : (isDark ? AppColors.darkSurface : AppColors.surface),
+                          color: isSelected
+                              ? AppColors.primary
+                              : (isDark
+                                  ? AppColors.darkSurface
+                                  : AppColors.surface),
                           borderRadius: BorderRadius.circular(16),
                           border: Border.all(
-                            color: isSelected ? AppColors.primary : (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5),
+                            color: isSelected
+                                ? AppColors.primary
+                                : (isDark
+                                        ? AppColors.darkBorder
+                                        : AppColors.border)
+                                    .withOpacity(0.5),
                           ),
                         ),
                         child: Text(
                           filter,
                           style: AppTypography.labelMedium.copyWith(
-                            color: isSelected ? Colors.white : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+                            color: isSelected
+                                ? Colors.white
+                                : (isDark
+                                    ? AppColors.darkTextPrimary
+                                    : AppColors.textPrimary),
                           ),
                         ),
                       ),
@@ -119,27 +144,31 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
                 }).toList(),
               ),
             ),
-            
+
             const SizedBox(height: AppSpacing.p24),
-            
+
             // Results Count & Sort
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('${universities.length} Universities', style: AppTypography.titleMedium),
+                  Text('${universities.length} Universities',
+                      style: AppTypography.titleMedium),
                   Row(
                     children: [
-                      Text('Sort by Match', style: AppTypography.labelMedium.copyWith(color: AppColors.primary)),
+                      Text('Sort by Match',
+                          style: AppTypography.labelMedium
+                              .copyWith(color: AppColors.primary)),
                       const SizedBox(width: AppSpacing.p4),
-                      const Icon(Iconsax.arrow_down_1, size: 16, color: AppColors.primary),
+                      const Icon(Iconsax.arrow_down_1,
+                          size: 16, color: AppColors.primary),
                     ],
                   ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: AppSpacing.p16),
 
             // University List
@@ -147,22 +176,30 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
               child: universities.isEmpty
                   ? _buildEmptyState(isDark)
                   : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.p24),
                       itemCount: universities.length,
                       itemBuilder: (context, index) {
                         final uni = universities[index];
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.p16),
+                          padding:
+                              const EdgeInsets.only(bottom: AppSpacing.p16),
                           child: GestureDetector(
-                            onTap: () => context.push('/universities/details', extra: uni),
+                            onTap: () => context.push('/universities/details',
+                                extra: uni),
                             child: UniversityCard(
-                              logoUrl: uni.logoUrl.isNotEmpty ? uni.logoUrl : 'https://placehold.co/100x100/png',
+                              logoUrl: uni.logoUrl.isNotEmpty
+                                  ? uni.logoUrl
+                                  : 'https://placehold.co/100x100/png',
                               name: uni.name,
                               location: uni.location,
                               rank: uni.nirfRanking.toString(),
                             ),
                           ),
-                        ).animate().fade().slideY(begin: 0.1, delay: (index * 50).ms);
+                        )
+                            .animate()
+                            .fade()
+                            .slideY(begin: 0.1, delay: (index * 50).ms);
                       },
                     ),
             ),
@@ -185,7 +222,8 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
                 color: isDark ? AppColors.darkSurface : AppColors.surface,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Iconsax.search_normal_1, size: 48, color: AppColors.primary),
+              child: const Icon(Iconsax.search_normal_1,
+                  size: 48, color: AppColors.primary),
             ),
             const SizedBox(height: AppSpacing.p24),
             Text('No Results Found', style: AppTypography.titleLarge),
@@ -193,7 +231,8 @@ class _UniversitiesScreenState extends ConsumerState<UniversitiesScreen> {
             Text(
               'Try adjusting your search query or filters to find the right university for you.',
               textAlign: TextAlign.center,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodyMedium
+                  .copyWith(color: AppColors.textSecondary),
             ),
             const SizedBox(height: AppSpacing.p32),
             AppButton(

@@ -24,9 +24,10 @@ class ProgressBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final clampedProgress = progress.clamp(0.0, 1.0);
-    
+
     final activeColor = color ?? AppColors.primary;
-    final bgColor = backgroundColor ?? (isDark ? AppColors.darkSurface : AppColors.border);
+    final bgColor =
+        backgroundColor ?? (isDark ? AppColors.darkSurface : AppColors.border);
 
     Widget bar = LayoutBuilder(
       builder: (context, constraints) {

@@ -8,15 +8,15 @@ class GeminiAIService implements AIService {
   late final GenerativeModel _model;
   late final GenerativeModel _jsonModel;
   late ChatSession _chatSession;
-  
+
   GeminiAIService(String apiKey) {
     final key = apiKey.isNotEmpty ? apiKey : 'mock_key';
-    
+
     _model = GenerativeModel(
       model: 'gemini-1.5-flash',
       apiKey: key,
     );
-    
+
     _jsonModel = GenerativeModel(
       model: 'gemini-1.5-flash',
       apiKey: key,
@@ -130,7 +130,8 @@ class GeminiAIService implements AIService {
   }
 
   @override
-  Future<InterviewFeedback> evaluateInterview(String question, String answer) async {
+  Future<InterviewFeedback> evaluateInterview(
+      String question, String answer) async {
     final prompt = '''
       Evaluate the interview answer and return a JSON object:
       {
@@ -148,7 +149,8 @@ class GeminiAIService implements AIService {
   }
 
   @override
-  Future<List<ScholarshipRecommendation>> recommendScholarships(Map<String, dynamic> profile) async {
+  Future<List<ScholarshipRecommendation>> recommendScholarships(
+      Map<String, dynamic> profile) async {
     final profileData = jsonEncode(profile);
     final prompt = '''
       Recommend 3 scholarships based on this profile. Return JSON array of objects:
@@ -156,14 +158,18 @@ class GeminiAIService implements AIService {
       Profile: $profileData
     ''';
     final json = await _generateJson(prompt);
-    if (json.containsKey('recommendations') && json['recommendations'] is List) {
-      return (json['recommendations'] as List).map((e) => ScholarshipRecommendation.fromJson(e)).toList();
+    if (json.containsKey('recommendations') &&
+        json['recommendations'] is List) {
+      return (json['recommendations'] as List)
+          .map((e) => ScholarshipRecommendation.fromJson(e))
+          .toList();
     }
     return [];
   }
 
   @override
-  Future<List<UniversityRecommendation>> recommendUniversities(Map<String, dynamic> profile) async {
+  Future<List<UniversityRecommendation>> recommendUniversities(
+      Map<String, dynamic> profile) async {
     final profileData = jsonEncode(profile);
     final prompt = '''
       Recommend 3 universities based on this profile. Return JSON array of objects:
@@ -171,8 +177,11 @@ class GeminiAIService implements AIService {
       Profile: $profileData
     ''';
     final json = await _generateJson(prompt);
-    if (json.containsKey('recommendations') && json['recommendations'] is List) {
-      return (json['recommendations'] as List).map((e) => UniversityRecommendation.fromJson(e)).toList();
+    if (json.containsKey('recommendations') &&
+        json['recommendations'] is List) {
+      return (json['recommendations'] as List)
+          .map((e) => UniversityRecommendation.fromJson(e))
+          .toList();
     }
     return [];
   }

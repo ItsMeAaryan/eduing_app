@@ -28,7 +28,14 @@ class DocumentStorageService {
   final ImagePicker _imagePicker = ImagePicker();
 
   static const int maxFileSizeBytes = 15 * 1024 * 1024; // 15 MB limit
-  static const List<String> allowedExtensions = ['pdf', 'doc', 'docx', 'png', 'jpg', 'jpeg'];
+  static const List<String> allowedExtensions = [
+    'pdf',
+    'doc',
+    'docx',
+    'png',
+    'jpg',
+    'jpeg'
+  ];
 
   Future<File?> pickDocumentFile() async {
     final result = await FilePicker.platform.pickFiles(
@@ -79,14 +86,16 @@ class DocumentStorageService {
     required File file,
   }) async* {
     try {
-      final storagePath = 'users/$uid/documents/${docId}_${file.path.split('/').last}';
+      final storagePath =
+          'users/$uid/documents/${docId}_${file.path.split('/').last}';
       final ref = _storage.ref().child(storagePath);
       final uploadTask = ref.putFile(file);
 
       await for (final snapshot in uploadTask.snapshotEvents) {
         switch (snapshot.state) {
           case TaskState.running:
-            final double progress = snapshot.bytesTransferred / snapshot.totalBytes;
+            final double progress =
+                snapshot.bytesTransferred / snapshot.totalBytes;
             yield UploadProgress(progress: progress);
             break;
           case TaskState.paused:
@@ -134,13 +143,16 @@ class DocumentStorageService {
     }
   }
 
-  Future<void> shareDocumentFile(String name, String? localPath, String? previewUrl) async {
+  Future<void> shareDocumentFile(
+      String name, String? localPath, String? previewUrl) async {
     if (localPath != null && File(localPath).existsSync()) {
-      await Share.shareXFiles([XFile(localPath)], text: 'Sharing document: $name');
+      await Share.shareXFiles([XFile(localPath)],
+          text: 'Sharing document: $name');
     } else if (previewUrl != null && previewUrl.isNotEmpty) {
       await Share.share('Document Link ($name): $previewUrl');
     } else {
-      throw Exception('No local file or share link available for this document.');
+      throw Exception(
+          'No local file or share link available for this document.');
     }
   }
 

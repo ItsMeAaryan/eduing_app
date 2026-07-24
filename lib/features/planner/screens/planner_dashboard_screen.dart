@@ -17,10 +17,12 @@ class PlannerDashboardScreen extends ConsumerStatefulWidget {
   const PlannerDashboardScreen({super.key});
 
   @override
-  ConsumerState<PlannerDashboardScreen> createState() => _PlannerDashboardScreenState();
+  ConsumerState<PlannerDashboardScreen> createState() =>
+      _PlannerDashboardScreenState();
 }
 
-class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen> {
+class _PlannerDashboardScreenState
+    extends ConsumerState<PlannerDashboardScreen> {
   final List<String> _milestones = [
     'Research',
     'Shortlist',
@@ -31,7 +33,7 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
     'Visa',
     'Departure',
   ];
-  
+
   // Mock current milestone index for UI purposes
   final int _currentMilestoneIndex = 2; // Applications
 
@@ -43,7 +45,7 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {}, 
+        onPressed: () {},
         backgroundColor: AppColors.primary,
         child: const Icon(Iconsax.add, color: Colors.white),
       ),
@@ -53,7 +55,8 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
           slivers: [
             SliverToBoxAdapter(child: _buildHeader(isDark)),
             SliverToBoxAdapter(child: _buildMilestoneRoadmap(isDark)),
-            SliverToBoxAdapter(child: _buildAIRecommendations(data.aiRecommendations, isDark)),
+            SliverToBoxAdapter(
+                child: _buildAIRecommendations(data.aiRecommendations, isDark)),
             SliverToBoxAdapter(child: _buildAgenda(data, isDark)),
             const SliverToBoxAdapter(child: SizedBox(height: 120)),
           ],
@@ -73,7 +76,9 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
             children: [
               Text('Journey', style: AppTypography.display),
               const SizedBox(height: AppSpacing.p4),
-              Text('Your admission roadmap.', style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+              Text('Your admission roadmap.',
+                  style: AppTypography.bodyMedium
+                      .copyWith(color: AppColors.textSecondary)),
             ],
           ),
           AppIconButton(
@@ -115,16 +120,37 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
                         width: isActive ? 56 : 48,
                         height: isActive ? 56 : 48,
                         decoration: BoxDecoration(
-                          color: isCompleted ? AppColors.success 
-                               : isActive ? AppColors.primary 
-                               : (isDark ? AppColors.darkSurface : AppColors.surface),
+                          color: isCompleted
+                              ? AppColors.success
+                              : isActive
+                                  ? AppColors.primary
+                                  : (isDark
+                                      ? AppColors.darkSurface
+                                      : AppColors.surface),
                           shape: BoxShape.circle,
-                          border: isActive ? Border.all(color: AppColors.primary.withOpacity(0.3), width: 4) : null,
-                          boxShadow: isActive ? [BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 16, offset: const Offset(0, 8))] : null,
+                          border: isActive
+                              ? Border.all(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                  width: 4)
+                              : null,
+                          boxShadow: isActive
+                              ? [
+                                  BoxShadow(
+                                      color: AppColors.primary.withOpacity(0.3),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 8))
+                                ]
+                              : null,
                         ),
                         child: Icon(
-                          isCompleted ? Iconsax.tick_circle : (isActive ? Iconsax.routing_2 : Iconsax.location_add),
-                          color: isCompleted || isActive ? Colors.white : AppColors.textSecondary,
+                          isCompleted
+                              ? Iconsax.tick_circle
+                              : (isActive
+                                  ? Iconsax.routing_2
+                                  : Iconsax.location_add),
+                          color: isCompleted || isActive
+                              ? Colors.white
+                              : AppColors.textSecondary,
                           size: isActive ? 24 : 20,
                         ),
                       ),
@@ -132,8 +158,13 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
                       Text(
                         milestone,
                         style: AppTypography.labelMedium.copyWith(
-                          color: isActive ? AppColors.primary : (isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
-                          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                          color: isActive
+                              ? AppColors.primary
+                              : (isDark
+                                  ? AppColors.darkTextSecondary
+                                  : AppColors.textSecondary),
+                          fontWeight:
+                              isActive ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                     ],
@@ -143,7 +174,9 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
                       width: 40,
                       height: 2,
                       margin: const EdgeInsets.only(bottom: 28),
-                      color: isCompleted ? AppColors.success : (isDark ? AppColors.darkBorder : AppColors.border),
+                      color: isCompleted
+                          ? AppColors.success
+                          : (isDark ? AppColors.darkBorder : AppColors.border),
                     ),
                 ],
               );
@@ -154,9 +187,10 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
     ).animate().fade().slideY(begin: 0.1);
   }
 
-  Widget _buildAIRecommendations(List<AIPlannerRecommendation> recommendations, bool isDark) {
+  Widget _buildAIRecommendations(
+      List<AIPlannerRecommendation> recommendations, bool isDark) {
     if (recommendations.isEmpty) return const SizedBox.shrink();
-    
+
     return Padding(
       padding: const EdgeInsets.only(top: AppSpacing.p32),
       child: Column(
@@ -166,7 +200,8 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
             child: Row(
               children: [
-                const Icon(Iconsax.magic_star, color: AppColors.primary, size: 20),
+                const Icon(Iconsax.magic_star,
+                    color: AppColors.primary, size: 20),
                 const SizedBox(width: AppSpacing.p8),
                 Text('Copilot Suggestions', style: AppTypography.titleLarge),
               ],
@@ -189,7 +224,10 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
                     gradient: AppColors.aiGradient,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
-                      BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 10)),
+                      BoxShadow(
+                          color: AppColors.primary.withOpacity(0.2),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10)),
                     ],
                   ),
                   child: Column(
@@ -199,15 +237,28 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p12, vertical: AppSpacing.p4),
-                            decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(12)),
-                            child: Text(rec.priority, style: AppTypography.caption.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.p12,
+                                vertical: AppSpacing.p4),
+                            decoration: BoxDecoration(
+                                color: Colors.white24,
+                                borderRadius: BorderRadius.circular(12)),
+                            child: Text(rec.priority,
+                                style: AppTypography.caption.copyWith(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                           ),
-                          Text(rec.estimatedEffort, style: AppTypography.caption.copyWith(color: Colors.white70)),
+                          Text(rec.estimatedEffort,
+                              style: AppTypography.caption
+                                  .copyWith(color: Colors.white70)),
                         ],
                       ),
                       const Spacer(),
-                      Text(rec.suggestion, style: AppTypography.titleMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold), maxLines: 3, overflow: TextOverflow.ellipsis),
+                      Text(rec.suggestion,
+                          style: AppTypography.titleMedium.copyWith(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis),
                     ],
                   ),
                 );
@@ -221,7 +272,8 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
 
   Widget _buildAgenda(PlannerDashboardData data, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.p24, AppSpacing.p40, AppSpacing.p24, 0),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.p24, AppSpacing.p40, AppSpacing.p24, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -241,13 +293,20 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
   Widget _buildEventCard(PlannerEvent event, bool isDark) {
     Color getEventColor() {
       switch (event.type) {
-        case EventType.application: return AppColors.primary;
-        case EventType.interview: return AppColors.secondary;
-        case EventType.scholarship: return AppColors.success;
-        case EventType.resume: return AppColors.warning;
-        case EventType.sop: return Colors.purple;
-        case EventType.document: return Colors.orange;
-        default: return AppColors.textSecondary;
+        case EventType.application:
+          return AppColors.primary;
+        case EventType.interview:
+          return AppColors.secondary;
+        case EventType.scholarship:
+          return AppColors.success;
+        case EventType.resume:
+          return AppColors.warning;
+        case EventType.sop:
+          return Colors.purple;
+        case EventType.document:
+          return Colors.orange;
+        default:
+          return AppColors.textSecondary;
       }
     }
 
@@ -255,7 +314,8 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
       padding: const EdgeInsets.only(bottom: AppSpacing.p16),
       child: SquircleCard(
         padding: const EdgeInsets.all(AppSpacing.p20),
-        onTap: () => ref.read(plannerProvider.notifier).toggleTaskCompletion(event.id),
+        onTap: () =>
+            ref.read(plannerProvider.notifier).toggleTaskCompletion(event.id),
         child: Row(
           children: [
             Container(
@@ -263,10 +323,18 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
               height: 28,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: event.isCompleted ? AppColors.success : Colors.transparent,
-                border: Border.all(color: event.isCompleted ? AppColors.success : (isDark ? AppColors.darkBorder : AppColors.border), width: 2),
+                color:
+                    event.isCompleted ? AppColors.success : Colors.transparent,
+                border: Border.all(
+                    color: event.isCompleted
+                        ? AppColors.success
+                        : (isDark ? AppColors.darkBorder : AppColors.border),
+                    width: 2),
               ),
-              child: event.isCompleted ? const Icon(Iconsax.tick_circle, color: Colors.white, size: 18) : null,
+              child: event.isCompleted
+                  ? const Icon(Iconsax.tick_circle,
+                      color: Colors.white, size: 18)
+                  : null,
             ),
             const SizedBox(width: AppSpacing.p16),
             Expanded(
@@ -276,25 +344,40 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
                   Text(
                     event.title,
                     style: AppTypography.titleMedium.copyWith(
-                      decoration: event.isCompleted ? TextDecoration.lineThrough : null,
-                      color: event.isCompleted ? AppColors.textSecondary : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+                      decoration:
+                          event.isCompleted ? TextDecoration.lineThrough : null,
+                      color: event.isCompleted
+                          ? AppColors.textSecondary
+                          : (isDark
+                              ? AppColors.darkTextPrimary
+                              : AppColors.textPrimary),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.p4),
-                  Text(event.description, style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                  Text(event.description,
+                      style: AppTypography.bodyMedium
+                          .copyWith(color: AppColors.textSecondary)),
                 ],
               ),
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(DateFormat('MMM d').format(event.date), style: AppTypography.labelMedium.copyWith(color: getEventColor(), fontWeight: FontWeight.bold)),
-                if (event.type == EventType.application || event.type == EventType.scholarship)
+                Text(DateFormat('MMM d').format(event.date),
+                    style: AppTypography.labelMedium.copyWith(
+                        color: getEventColor(), fontWeight: FontWeight.bold)),
+                if (event.type == EventType.application ||
+                    event.type == EventType.scholarship)
                   Container(
                     margin: const EdgeInsets.only(top: AppSpacing.p8),
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p8, vertical: AppSpacing.p4),
-                    decoration: BoxDecoration(color: AppColors.error.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-                    child: Text('Deadline', style: AppTypography.caption.copyWith(color: AppColors.error)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.p8, vertical: AppSpacing.p4),
+                    decoration: BoxDecoration(
+                        color: AppColors.error.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Text('Deadline',
+                        style: AppTypography.caption
+                            .copyWith(color: AppColors.error)),
                   ),
               ],
             ),
@@ -312,8 +395,11 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
           children: [
             Container(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(color: isDark ? AppColors.darkSurface : AppColors.surface, shape: BoxShape.circle),
-              child: const Icon(Iconsax.calendar_tick, size: 48, color: AppColors.primary),
+              decoration: BoxDecoration(
+                  color: isDark ? AppColors.darkSurface : AppColors.surface,
+                  shape: BoxShape.circle),
+              child: const Icon(Iconsax.calendar_tick,
+                  size: 48, color: AppColors.primary),
             ),
             const SizedBox(height: AppSpacing.p24),
             Text('You\'re All Caught Up', style: AppTypography.titleLarge),
@@ -321,7 +407,8 @@ class _PlannerDashboardScreenState extends ConsumerState<PlannerDashboardScreen>
             Text(
               'No pending tasks for this milestone. Check your AI recommendations for next steps.',
               textAlign: TextAlign.center,
-              style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodyMedium
+                  .copyWith(color: AppColors.textSecondary),
             ),
           ],
         ),

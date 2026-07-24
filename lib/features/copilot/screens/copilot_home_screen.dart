@@ -32,7 +32,7 @@ class CopilotHomeScreen extends ConsumerWidget {
             child: Container(
               width: 300,
               height: 300,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: AppColors.aiGradient,
               ),
@@ -44,7 +44,7 @@ class CopilotHomeScreen extends ConsumerWidget {
               child: const SizedBox(),
             ),
           ),
-          
+
           SafeArea(
             child: Column(
               children: [
@@ -65,7 +65,7 @@ class CopilotHomeScreen extends ConsumerWidget {
               ],
             ),
           ),
-          
+
           // Floating Action Bar
           Positioned(
             bottom: AppSpacing.p24,
@@ -78,11 +78,18 @@ class CopilotHomeScreen extends ConsumerWidget {
                 child: Container(
                   padding: const EdgeInsets.all(AppSpacing.p8),
                   decoration: BoxDecoration(
-                    color: (isDark ? AppColors.darkSurface : Colors.white).withOpacity(0.8),
+                    color: (isDark ? AppColors.darkSurface : Colors.white)
+                        .withOpacity(0.8),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.2)),
+                    border: Border.all(
+                        color:
+                            (isDark ? AppColors.darkBorder : AppColors.border)
+                                .withOpacity(0.2)),
                     boxShadow: [
-                      BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20, offset: const Offset(0, 10)),
+                      BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10)),
                     ],
                   ),
                   child: AppButton(
@@ -110,7 +117,9 @@ class CopilotHomeScreen extends ConsumerWidget {
             children: [
               Text('Strategist', style: AppTypography.display),
               const SizedBox(height: AppSpacing.p4),
-              Text('Your AI Admission Expert', style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+              Text('Your AI Admission Expert',
+                  style: AppTypography.bodyMedium
+                      .copyWith(color: AppColors.textSecondary)),
             ],
           ),
           AppIconButton(
@@ -127,13 +136,17 @@ class CopilotHomeScreen extends ConsumerWidget {
   Widget _buildHero(BuildContext context, data, bool isDark) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
+      margin: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
       padding: const EdgeInsets.all(AppSpacing.p24),
       decoration: BoxDecoration(
         gradient: AppColors.aiGradient,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
-          BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 30, offset: const Offset(0, 15)),
+          BoxShadow(
+              color: AppColors.primary.withOpacity(0.3),
+              blurRadius: 30,
+              offset: const Offset(0, 15)),
         ],
       ),
       child: Column(
@@ -143,15 +156,20 @@ class CopilotHomeScreen extends ConsumerWidget {
             children: [
               const Icon(Iconsax.radar, color: Colors.white, size: 28),
               const SizedBox(width: AppSpacing.p12),
-              Text('Overall Readiness', style: AppTypography.titleLarge.copyWith(color: Colors.white)),
+              Text('Overall Readiness',
+                  style:
+                      AppTypography.titleLarge.copyWith(color: Colors.white)),
               const Spacer(),
-              Text('${data.overallReadiness}%', style: AppTypography.display.copyWith(color: Colors.white, fontSize: 32)),
+              Text('${data.overallReadiness}%',
+                  style: AppTypography.display
+                      .copyWith(color: Colors.white, fontSize: 32)),
             ],
           ),
           const SizedBox(height: AppSpacing.p24),
           Text(
             'Your intelligent study abroad assistant is ready to help draft SOPs, evaluate resumes, and prepare for interviews.',
-            style: AppTypography.bodyMedium.copyWith(color: Colors.white.withOpacity(0.9), height: 1.5),
+            style: AppTypography.bodyMedium
+                .copyWith(color: Colors.white.withOpacity(0.9), height: 1.5),
           ),
         ],
       ),
@@ -160,7 +178,8 @@ class CopilotHomeScreen extends ConsumerWidget {
 
   Widget _buildQuickActions(BuildContext context, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -240,7 +259,9 @@ class CopilotHomeScreen extends ConsumerWidget {
             child: Icon(icon, color: color, size: 24),
           ),
           const SizedBox(height: AppSpacing.p16),
-          Text(title, style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.bold)),
+          Text(title,
+              style: AppTypography.labelLarge
+                  .copyWith(fontWeight: FontWeight.bold)),
         ],
       ),
     );
@@ -248,7 +269,8 @@ class CopilotHomeScreen extends ConsumerWidget {
 
   Widget _buildInsightsTile(BuildContext context, data, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
       child: SquircleCard(
         padding: const EdgeInsets.all(AppSpacing.p24),
         child: Column(
@@ -278,7 +300,10 @@ class CopilotHomeScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.p12),
-                    Expanded(child: Text(insight, style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary, height: 1.5))),
+                    Expanded(
+                        child: Text(insight,
+                            style: AppTypography.bodyMedium.copyWith(
+                                color: AppColors.textSecondary, height: 1.5))),
                   ],
                 ),
               ),

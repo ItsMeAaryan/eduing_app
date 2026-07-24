@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/profile_model.dart';
 
-final profileProvider = StateNotifierProvider<ProfileNotifier, ProfileData>((ref) {
+final profileProvider =
+    StateNotifierProvider<ProfileNotifier, ProfileData>((ref) {
   return ProfileNotifier();
 });
 

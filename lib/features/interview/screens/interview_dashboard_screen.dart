@@ -78,13 +78,18 @@ class InterviewDashboardScreen extends ConsumerWidget {
   Widget _buildHeroCard(BuildContext context, bool isDark) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p8),
+      margin: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.p24, vertical: AppSpacing.p8),
       padding: const EdgeInsets.all(AppSpacing.p32),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E), // Explicit dark mode for the hero to simulate camera/audio feel
+        color: const Color(
+            0xFF1E1E1E), // Explicit dark mode for the hero to simulate camera/audio feel
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.15), blurRadius: 30, offset: const Offset(0, 15)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.15),
+              blurRadius: 30,
+              offset: const Offset(0, 15)),
         ],
       ),
       child: Column(
@@ -108,11 +113,13 @@ class InterviewDashboardScreen extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: AppSpacing.p32),
-          Text('AI Video & Audio Practice', style: AppTypography.titleLarge.copyWith(color: Colors.white)),
+          Text('AI Video & Audio Practice',
+              style: AppTypography.titleLarge.copyWith(color: Colors.white)),
           const SizedBox(height: AppSpacing.p12),
           Text(
             'Practice admission and visa questions in a simulated video call environment. Get instant AI grading on clarity, structure, and delivery.',
-            style: AppTypography.bodyMedium.copyWith(color: Colors.white70, height: 1.5),
+            style: AppTypography.bodyMedium
+                .copyWith(color: Colors.white70, height: 1.5),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppSpacing.p32),
@@ -129,9 +136,11 @@ class InterviewDashboardScreen extends ConsumerWidget {
     ).animate().fade().slideY(begin: 0.05);
   }
 
-  Widget _buildSessionHistory(BuildContext context, List<InterviewSession> sessions, bool isDark) {
+  Widget _buildSessionHistory(
+      BuildContext context, List<InterviewSession> sessions, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.p24, AppSpacing.p24, AppSpacing.p24, 0),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.p24, AppSpacing.p24, AppSpacing.p24, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -141,7 +150,9 @@ class InterviewDashboardScreen extends ConsumerWidget {
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.p32),
-                child: Text('No sessions recorded yet.', style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                child: Text('No sessions recorded yet.',
+                    style: AppTypography.bodyMedium
+                        .copyWith(color: AppColors.textSecondary)),
               ),
             )
           else
@@ -161,7 +172,9 @@ class InterviewDashboardScreen extends ConsumerWidget {
                           shape: BoxShape.circle,
                         ),
                         child: Center(
-                          child: Text('${sess.score}', style: AppTypography.titleMedium.copyWith(color: AppColors.primary)),
+                          child: Text('${sess.score}',
+                              style: AppTypography.titleMedium
+                                  .copyWith(color: AppColors.primary)),
                         ),
                       ),
                       const SizedBox(width: AppSpacing.p16),
@@ -169,13 +182,19 @@ class InterviewDashboardScreen extends ConsumerWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(sess.questionTitle, style: AppTypography.labelLarge, maxLines: 1, overflow: TextOverflow.ellipsis),
+                            Text(sess.questionTitle,
+                                style: AppTypography.labelLarge,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis),
                             const SizedBox(height: AppSpacing.p4),
-                            Text('Practiced on ${sess.date}', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                            Text('Practiced on ${sess.date}',
+                                style: AppTypography.caption
+                                    .copyWith(color: AppColors.textSecondary)),
                           ],
                         ),
                       ),
-                      const Icon(Iconsax.arrow_right_3, color: AppColors.textSecondary, size: 20),
+                      const Icon(Iconsax.arrow_right_3,
+                          color: AppColors.textSecondary, size: 20),
                     ],
                   ),
                 ),

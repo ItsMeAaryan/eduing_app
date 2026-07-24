@@ -11,7 +11,8 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return repository.authStateChanges;
 });
 
-final authControllerProvider = StateNotifierProvider<AuthController, AsyncValue<void>>((ref) {
+final authControllerProvider =
+    StateNotifierProvider<AuthController, AsyncValue<void>>((ref) {
   return AuthController(ref.watch(authRepositoryProvider));
 });
 
@@ -30,7 +31,8 @@ class AuthController extends StateNotifier<AsyncValue<void>> {
     }
   }
 
-  Future<void> registerWithEmail(String email, String password, String fullName) async {
+  Future<void> registerWithEmail(
+      String email, String password, String fullName) async {
     try {
       state = const AsyncLoading();
       await _repository.registerWithEmail(email, password, fullName);

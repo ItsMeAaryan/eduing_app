@@ -10,9 +10,10 @@ class StorageRepository {
   String? get _uid => _auth.currentUser?.uid;
 
   /// Uploads a file and returns its download URL
-  Future<String> uploadFile(String path, File file, {void Function(double)? onProgress}) async {
+  Future<String> uploadFile(String path, File file,
+      {void Function(double)? onProgress}) async {
     if (_uid == null) throw Exception('User not authenticated');
-    
+
     final ref = _storage.ref().child('users/\$_uid/\$path');
     final uploadTask = ref.putFile(file);
 
@@ -28,7 +29,8 @@ class StorageRepository {
   }
 
   /// Replaces an existing file at the given path
-  Future<String> replaceFile(String path, File file, {void Function(double)? onProgress}) async {
+  Future<String> replaceFile(String path, File file,
+      {void Function(double)? onProgress}) async {
     return await uploadFile(path, file, onProgress: onProgress);
   }
 

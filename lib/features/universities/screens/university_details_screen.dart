@@ -37,7 +37,8 @@ class UniversityDetailsScreen extends ConsumerWidget {
               _buildSliverAppBar(context, university, ref, isDark),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.p24, AppSpacing.p24, AppSpacing.p24, 120),
+                  padding: const EdgeInsets.fromLTRB(
+                      AppSpacing.p24, AppSpacing.p24, AppSpacing.p24, 120),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -62,7 +63,8 @@ class UniversityDetailsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context, University university, WidgetRef ref, bool isDark) {
+  Widget _buildSliverAppBar(
+      BuildContext context, University university, WidgetRef ref, bool isDark) {
     final notifier = ref.read(universitiesProvider.notifier);
     return SliverAppBar(
       expandedHeight: 360,
@@ -74,7 +76,9 @@ class UniversityDetailsScreen extends ConsumerWidget {
         child: AppIconButton(
           icon: Iconsax.arrow_left_2,
           isFilled: true,
-          backgroundColor: isDark ? AppColors.darkSurface.withOpacity(0.8) : Colors.white.withOpacity(0.8),
+          backgroundColor: isDark
+              ? AppColors.darkSurface.withOpacity(0.8)
+              : Colors.white.withOpacity(0.8),
           onPressed: () => context.pop(),
         ),
       ),
@@ -83,9 +87,13 @@ class UniversityDetailsScreen extends ConsumerWidget {
           padding: const EdgeInsets.only(right: 16.0),
           child: AppIconButton(
             icon: university.isFavorite ? Iconsax.heart5 : Iconsax.heart,
-            color: university.isFavorite ? AppColors.error : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
+            color: university.isFavorite
+                ? AppColors.error
+                : (isDark ? AppColors.darkTextPrimary : AppColors.textPrimary),
             isFilled: true,
-            backgroundColor: isDark ? AppColors.darkSurface.withOpacity(0.8) : Colors.white.withOpacity(0.8),
+            backgroundColor: isDark
+                ? AppColors.darkSurface.withOpacity(0.8)
+                : Colors.white.withOpacity(0.8),
             onPressed: () => notifier.toggleFavorite(university.id),
           ),
         ),
@@ -99,7 +107,8 @@ class UniversityDetailsScreen extends ConsumerWidget {
               child: Image.network(
                 university.imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(color: Colors.grey.shade300),
+                errorBuilder: (_, __, ___) =>
+                    Container(color: Colors.grey.shade300),
               ),
             ),
             Container(
@@ -133,7 +142,9 @@ class UniversityDetailsScreen extends ConsumerWidget {
               height: 80,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border, width: 2),
+                border: Border.all(
+                    color: isDark ? AppColors.darkBorder : AppColors.border,
+                    width: 2),
                 image: DecorationImage(
                   image: NetworkImage(university.logoUrl),
                   fit: BoxFit.cover,
@@ -147,12 +158,14 @@ class UniversityDetailsScreen extends ConsumerWidget {
                 children: [
                   Text(
                     university.name,
-                    style: AppTypography.display.copyWith(fontWeight: FontWeight.w800, letterSpacing: -1),
+                    style: AppTypography.display.copyWith(
+                        fontWeight: FontWeight.w800, letterSpacing: -1),
                   ),
                   const SizedBox(height: AppSpacing.p8),
                   Text(
                     university.location,
-                    style: AppTypography.titleMedium.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.titleMedium
+                        .copyWith(color: AppColors.textSecondary),
                   ),
                 ],
               ),
@@ -162,7 +175,11 @@ class UniversityDetailsScreen extends ConsumerWidget {
         const SizedBox(height: AppSpacing.p24),
         Text(
           university.description,
-          style: AppTypography.bodyLarge.copyWith(height: 1.6, color: isDark ? AppColors.darkTextSecondary : AppColors.textSecondary),
+          style: AppTypography.bodyLarge.copyWith(
+              height: 1.6,
+              color: isDark
+                  ? AppColors.darkTextSecondary
+                  : AppColors.textSecondary),
         ),
       ],
     ).animate().fade().slideY(begin: 0.1);
@@ -222,7 +239,11 @@ class UniversityDetailsScreen extends ConsumerWidget {
     ).animate().fade(delay: 100.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildBentoBox(bool isDark, {required IconData icon, required String title, required String value, Color? valueColor}) {
+  Widget _buildBentoBox(bool isDark,
+      {required IconData icon,
+      required String title,
+      required String value,
+      Color? valueColor}) {
     return SquircleCard(
       padding: const EdgeInsets.all(AppSpacing.p20),
       child: Column(
@@ -230,9 +251,13 @@ class UniversityDetailsScreen extends ConsumerWidget {
         children: [
           Icon(icon, color: AppColors.textSecondary, size: 24),
           const SizedBox(height: AppSpacing.p16),
-          Text(title, style: AppTypography.labelMedium.copyWith(color: AppColors.textSecondary)),
+          Text(title,
+              style: AppTypography.labelMedium
+                  .copyWith(color: AppColors.textSecondary)),
           const SizedBox(height: AppSpacing.p4),
-          Text(value, style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.bold, color: valueColor)),
+          Text(value,
+              style: AppTypography.titleLarge
+                  .copyWith(fontWeight: FontWeight.bold, color: valueColor)),
         ],
       ),
     );
@@ -249,11 +274,14 @@ class UniversityDetailsScreen extends ConsumerWidget {
           runSpacing: AppSpacing.p12,
           children: university.coursesList.map((course) {
             return Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
               decoration: BoxDecoration(
                 color: isDark ? AppColors.darkSurface : AppColors.surface,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.5)),
+                border: Border.all(
+                    color: (isDark ? AppColors.darkBorder : AppColors.border)
+                        .withOpacity(0.5)),
               ),
               child: Text(course, style: AppTypography.labelMedium),
             );
@@ -272,15 +300,16 @@ class UniversityDetailsScreen extends ConsumerWidget {
           Text('Campus Facilities', style: AppTypography.titleLarge),
           const SizedBox(height: AppSpacing.p20),
           ...university.facilities.map((f) => Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.p12),
-            child: Row(
-              children: [
-                const Icon(Iconsax.verify, color: AppColors.success, size: 20),
-                const SizedBox(width: AppSpacing.p12),
-                Text(f, style: AppTypography.bodyMedium),
-              ],
-            ),
-          )),
+                padding: const EdgeInsets.only(bottom: AppSpacing.p12),
+                child: Row(
+                  children: [
+                    const Icon(Iconsax.verify,
+                        color: AppColors.success, size: 20),
+                    const SizedBox(width: AppSpacing.p12),
+                    Text(f, style: AppTypography.bodyMedium),
+                  ],
+                ),
+              )),
         ],
       ),
     ).animate().fade(delay: 300.ms).slideY(begin: 0.1);
@@ -300,22 +329,28 @@ class UniversityDetailsScreen extends ConsumerWidget {
             children: [
               const Icon(Iconsax.magic_star, color: Colors.white, size: 24),
               const SizedBox(width: AppSpacing.p12),
-              Text('AI Analysis', style: AppTypography.titleLarge.copyWith(color: Colors.white)),
+              Text('AI Analysis',
+                  style:
+                      AppTypography.titleLarge.copyWith(color: Colors.white)),
               const Spacer(),
-              Text('${university.aiMatch}% Match', style: AppTypography.titleLarge.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+              Text('${university.aiMatch}% Match',
+                  style: AppTypography.titleLarge.copyWith(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
             ],
           ),
           const SizedBox(height: AppSpacing.p24),
           Text(
             'Based on your profile, this university is a strong match. Your academics align with their acceptance criteria, and their programs match your career goals.',
-            style: AppTypography.bodyMedium.copyWith(color: Colors.white.withOpacity(0.9), height: 1.5),
+            style: AppTypography.bodyMedium
+                .copyWith(color: Colors.white.withOpacity(0.9), height: 1.5),
           ),
         ],
       ),
     ).animate().fade(delay: 400.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildFloatingActionBar(BuildContext context, University university, WidgetRef ref, bool isDark) {
+  Widget _buildFloatingActionBar(
+      BuildContext context, University university, WidgetRef ref, bool isDark) {
     return Positioned(
       bottom: AppSpacing.p24,
       left: AppSpacing.p24,
@@ -327,9 +362,12 @@ class UniversityDetailsScreen extends ConsumerWidget {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.p16),
             decoration: BoxDecoration(
-              color: (isDark ? AppColors.darkSurface : AppColors.surface).withOpacity(0.8),
+              color: (isDark ? AppColors.darkSurface : AppColors.surface)
+                  .withOpacity(0.8),
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: (isDark ? AppColors.darkBorder : AppColors.border).withOpacity(0.2)),
+              border: Border.all(
+                  color: (isDark ? AppColors.darkBorder : AppColors.border)
+                      .withOpacity(0.2)),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
@@ -343,8 +381,10 @@ class UniversityDetailsScreen extends ConsumerWidget {
                 AppIconButton(
                   icon: Iconsax.arrange_square,
                   isFilled: true,
-                  backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
-                  onPressed: () => context.push('/compare', extra: [university.id, university.id == '1' ? '2' : '1']),
+                  backgroundColor:
+                      isDark ? AppColors.darkBackground : AppColors.background,
+                  onPressed: () => context.push('/compare',
+                      extra: [university.id, university.id == '1' ? '2' : '1']),
                 ),
                 const SizedBox(width: AppSpacing.p16),
                 Expanded(
@@ -352,11 +392,13 @@ class UniversityDetailsScreen extends ConsumerWidget {
                     text: 'Start Application',
                     icon: Iconsax.document_text,
                     onPressed: () {
-                      ref.read(applicationsNotifierProvider.notifier).createApplication(
-                        universityName: university.name,
-                        course: university.course,
-                        deadline: '01 Dec 2025',
-                      );
+                      ref
+                          .read(applicationsNotifierProvider.notifier)
+                          .createApplication(
+                            universityName: university.name,
+                            course: university.course,
+                            deadline: '01 Dec 2025',
+                          );
                       context.go('/applications');
                     },
                   ),

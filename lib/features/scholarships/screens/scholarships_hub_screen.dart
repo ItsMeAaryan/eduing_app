@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
+import '../../../core/theme/spacing/app_spacing.dart';
 import '../../universities/widgets/filter_chip.dart';
 import '../providers/scholarships_provider.dart';
 import '../models/scholarship_model.dart';
@@ -13,11 +14,18 @@ class ScholarshipsHubScreen extends ConsumerStatefulWidget {
   const ScholarshipsHubScreen({super.key});
 
   @override
-  ConsumerState<ScholarshipsHubScreen> createState() => _ScholarshipsHubScreenState();
+  ConsumerState<ScholarshipsHubScreen> createState() =>
+      _ScholarshipsHubScreenState();
 }
 
 class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
-  final List<String> _filters = ['All', 'Full Tuition', 'Partial', 'STEM', 'Merit-Based'];
+  final List<String> _filters = [
+    'All',
+    'Full Tuition',
+    'Partial',
+    'STEM',
+    'Merit-Based'
+  ];
   String _selectedFilter = 'All';
 
   @override
@@ -33,7 +41,8 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
           icon: const Icon(Iconsax.arrow_left_2, color: AppColors.textPrimary),
           onPressed: () => context.pop(),
         ),
-        title: Text('Scholarship Hub', style: AppTypography.title.copyWith(fontSize: 16)),
+        title: Text('Scholarship Hub',
+            style: AppTypography.title.copyWith(fontSize: 16)),
         centerTitle: true,
         actions: [
           IconButton(
@@ -70,7 +79,10 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
         gradient: AppColors.aiGradient,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: AppColors.primary.withOpacity(0.3), blurRadius: 20, offset: const Offset(0, 10)),
+          BoxShadow(
+              color: AppColors.primary.withOpacity(0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 10)),
         ],
       ),
       child: Column(
@@ -80,11 +92,16 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
             children: [
               const Icon(Iconsax.wallet_money, color: Colors.white, size: 24),
               const SizedBox(width: 12),
-              Text('Estimated Funding', style: AppTypography.title.copyWith(color: Colors.white)),
+              Text('Estimated Funding',
+                  style: AppTypography.title.copyWith(color: Colors.white)),
             ],
-          ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds),
+          )
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .shimmer(duration: 2.seconds),
           const SizedBox(height: 8),
-          Text(data.estimatedFunding, style: AppTypography.headline.copyWith(fontSize: 36, color: Colors.white)),
+          Text(data.estimatedFunding,
+              style: AppTypography.headline
+                  .copyWith(fontSize: 36, color: Colors.white)),
           const SizedBox(height: 24),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -105,7 +122,9 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
       children: [
         Text(value, style: AppTypography.title.copyWith(color: Colors.white)),
         const SizedBox(height: 4),
-        Text(label, style: AppTypography.caption.copyWith(color: Colors.white70, fontSize: 10)),
+        Text(label,
+            style: AppTypography.caption
+                .copyWith(color: Colors.white70, fontSize: 10)),
       ],
     );
   }
@@ -122,12 +141,14 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
         ),
         child: Row(
           children: [
-            const Icon(Iconsax.search_normal, color: AppColors.textSecondary, size: 20),
+            const Icon(Iconsax.search_normal,
+                color: AppColors.textSecondary, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 'Search scholarships...',
-                style: AppTypography.body.copyWith(color: AppColors.textSecondary, fontSize: 14),
+                style: AppTypography.body
+                    .copyWith(color: AppColors.textSecondary, fontSize: 14),
               ),
             ),
             const Icon(Iconsax.filter, color: AppColors.primary, size: 20),
@@ -167,7 +188,8 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
         children: [
           Row(
             children: [
-              const Icon(Iconsax.magic_star, color: AppColors.primary, size: 20),
+              const Icon(Iconsax.magic_star,
+                  color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
               Text('AI Funding Advisor', style: AppTypography.title),
             ],
@@ -183,7 +205,7 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
                 return Container(
                   width: 280,
                   margin: const EdgeInsets.only(right: 16),
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppSpacing.p16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
@@ -196,17 +218,36 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(color: AppColors.success.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
-                            child: Text(rec.type, style: AppTypography.caption.copyWith(color: AppColors.success, fontWeight: FontWeight.bold, fontSize: 10)),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                                color: AppColors.success.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Text(rec.type,
+                                style: AppTypography.caption.copyWith(
+                                    color: AppColors.success,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 10)),
                           ),
-                          Text(rec.estimatedSavings, style: AppTypography.caption.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                          Text(rec.estimatedSavings,
+                              style: AppTypography.caption.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                       const SizedBox(height: 12),
-                      Text(rec.scholarshipName, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      Text(rec.scholarshipName,
+                          style: AppTypography.label
+                              .copyWith(fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
-                      Expanded(child: Text(rec.reasoning, style: AppTypography.caption.copyWith(color: AppColors.textSecondary), maxLines: 2, overflow: TextOverflow.ellipsis)),
+                      Expanded(
+                          child: Text(rec.reasoning,
+                              style: AppTypography.caption
+                                  .copyWith(color: AppColors.textSecondary),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis)),
                     ],
                   ),
                 );
@@ -237,12 +278,15 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
       onTap: () => context.push('/scholarship/${s.id}'),
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.p16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
+            BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 20,
+                offset: const Offset(0, 10)),
           ],
         ),
         child: Column(
@@ -260,16 +304,25 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(s.name, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
+                      Text(s.name,
+                          style: AppTypography.label
+                              .copyWith(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 4),
-                      Text(s.organization, style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                      Text(s.organization,
+                          style: AppTypography.caption
+                              .copyWith(color: AppColors.textSecondary)),
                     ],
                   ),
                 ),
                 IconButton(
-                  icon: Icon(s.isSaved ? Iconsax.heart5 : Iconsax.heart, color: s.isSaved ? AppColors.error : AppColors.textSecondary),
+                  icon: Icon(s.isSaved ? Iconsax.heart5 : Iconsax.heart,
+                      color: s.isSaved
+                          ? AppColors.error
+                          : AppColors.textSecondary),
                   onPressed: () {
-                    ref.read(scholarshipsProvider.notifier).toggleSaveStatus(s.id);
+                    ref
+                        .read(scholarshipsProvider.notifier)
+                        .toggleSaveStatus(s.id);
                   },
                 ),
               ],
@@ -281,23 +334,35 @@ class _ScholarshipsHubScreenState extends ConsumerState<ScholarshipsHubScreen> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Amount', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                    Text('Amount',
+                        style: AppTypography.caption
+                            .copyWith(color: AppColors.textSecondary)),
                     const SizedBox(height: 4),
-                    Text(s.fundingAmount, style: AppTypography.label.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                    Text(s.fundingAmount,
+                        style: AppTypography.label.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold)),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('AI Match', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                    Text('AI Match',
+                        style: AppTypography.caption
+                            .copyWith(color: AppColors.textSecondary)),
                     const SizedBox(height: 4),
-                    Text('${s.aiMatchScore}%', style: AppTypography.label.copyWith(color: AppColors.success, fontWeight: FontWeight.bold)),
+                    Text('${s.aiMatchScore}%',
+                        style: AppTypography.label.copyWith(
+                            color: AppColors.success,
+                            fontWeight: FontWeight.bold)),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text('Deadline', style: AppTypography.caption.copyWith(color: AppColors.textSecondary)),
+                    Text('Deadline',
+                        style: AppTypography.caption
+                            .copyWith(color: AppColors.textSecondary)),
                     const SizedBox(height: 4),
                     Text(s.deadline, style: AppTypography.label),
                   ],

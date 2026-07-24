@@ -20,8 +20,9 @@ class AppDivider extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final dividerColor = color ?? (isDark ? AppColors.darkBorder : AppColors.border);
-    
+    final dividerColor =
+        color ?? (isDark ? AppColors.darkBorder : AppColors.border);
+
     return Divider(
       height: height,
       thickness: thickness,

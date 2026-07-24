@@ -58,20 +58,28 @@ class DocumentPreviewScreen extends ConsumerWidget {
                 '${targetDoc.name.replaceAll(' ', '_')}.pdf',
               );
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Downloaded to ${downloadedFile.path}'), backgroundColor: AppColors.success));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Downloaded to ${downloadedFile.path}'),
+                    backgroundColor: AppColors.success));
               }
-            } else if (targetDoc.localPath != null && File(targetDoc.localPath!).existsSync()) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Local file available at ${targetDoc.localPath}')));
+            } else if (targetDoc.localPath != null &&
+                File(targetDoc.localPath!).existsSync()) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content:
+                      Text('Local file available at ${targetDoc.localPath}')));
             }
           } catch (e) {
             if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Download failed: $e'), backgroundColor: AppColors.error));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Download failed: $e'),
+                  backgroundColor: AppColors.error));
             }
           }
         },
         backgroundColor: AppColors.primary,
         icon: const Icon(Iconsax.document_download, color: Colors.white),
-        label: Text('Download', style: AppTypography.labelLarge.copyWith(color: Colors.white)),
+        label: Text('Download',
+            style: AppTypography.labelLarge.copyWith(color: Colors.white)),
       ),
       body: SafeArea(
         child: Column(
@@ -96,7 +104,8 @@ class DocumentPreviewScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, WidgetRef ref, AppDocument targetDoc, bool isDark) {
+  Widget _buildHeader(
+      BuildContext context, WidgetRef ref, AppDocument targetDoc, bool isDark) {
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.p24),
       child: Row(
@@ -120,7 +129,9 @@ class DocumentPreviewScreen extends ConsumerWidget {
             icon: Iconsax.share,
             isFilled: true,
             backgroundColor: isDark ? AppColors.darkSurface : AppColors.surface,
-            onPressed: () => ref.read(documentsNotifierProvider.notifier).shareDocument(targetDoc.id),
+            onPressed: () => ref
+                .read(documentsNotifierProvider.notifier)
+                .shareDocument(targetDoc.id),
           ),
         ],
       ),
@@ -135,16 +146,19 @@ class DocumentPreviewScreen extends ConsumerWidget {
       if (['jpg', 'jpeg', 'png'].contains(ext)) {
         childWidget = Image.file(File(document.localPath!), fit: BoxFit.cover);
       } else {
-        childWidget = _buildPlaceholder(document.name, 'Local File: ${document.localPath}');
+        childWidget = _buildPlaceholder(
+            document.name, 'Local File: ${document.localPath}');
       }
     } else if (document.previewUrl.isNotEmpty) {
       childWidget = Image.network(
         document.previewUrl,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => _buildPlaceholder('Document Preview', 'Tap to download'),
+        errorBuilder: (_, __, ___) =>
+            _buildPlaceholder('Document Preview', 'Tap to download'),
       );
     } else {
-      childWidget = _buildPlaceholder('Document Uploaded', 'Processing preview...');
+      childWidget =
+          _buildPlaceholder('Document Uploaded', 'Processing preview...');
     }
 
     return Container(
@@ -154,7 +168,8 @@ class DocumentPreviewScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : AppColors.surface,
         borderRadius: BorderRadius.circular(32),
-        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+        border:
+            Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(32),
@@ -162,7 +177,7 @@ class DocumentPreviewScreen extends ConsumerWidget {
       ),
     ).animate().fade().scale();
   }
-  
+
   Widget _buildPlaceholder(String title, String subtitle) {
     return Center(
       child: Column(
@@ -172,7 +187,9 @@ class DocumentPreviewScreen extends ConsumerWidget {
           const SizedBox(height: AppSpacing.p16),
           Text(title, style: AppTypography.titleLarge),
           const SizedBox(height: AppSpacing.p8),
-          Text(subtitle, style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+          Text(subtitle,
+              style: AppTypography.bodyMedium
+                  .copyWith(color: AppColors.textSecondary)),
         ],
       ),
     );
@@ -180,7 +197,8 @@ class DocumentPreviewScreen extends ConsumerWidget {
 
   Widget _buildMetadata(AppDocument document, bool isDark) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.p24, AppSpacing.p32, AppSpacing.p24, 0),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.p24, AppSpacing.p32, AppSpacing.p24, 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -191,20 +209,23 @@ class DocumentPreviewScreen extends ConsumerWidget {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p12, vertical: AppSpacing.p8),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.p12, vertical: AppSpacing.p8),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     document.category,
-                    style: AppTypography.labelMedium.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold),
+                    style: AppTypography.labelMedium.copyWith(
+                        color: AppColors.primary, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const Spacer(),
                 Text(
                   '${document.size} • ${document.uploadDate}',
-                  style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                  style: AppTypography.bodyMedium
+                      .copyWith(color: AppColors.textSecondary),
                 ),
               ],
             ),
@@ -217,14 +238,18 @@ class DocumentPreviewScreen extends ConsumerWidget {
   Widget _buildAIAnalysis(AppDocument document, bool isDark) {
     final analysis = document.aiAnalysis;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(AppSpacing.p24, AppSpacing.p32, AppSpacing.p24, 0),
+      padding: const EdgeInsets.fromLTRB(
+          AppSpacing.p24, AppSpacing.p32, AppSpacing.p24, 0),
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.p24),
         decoration: BoxDecoration(
           gradient: AppColors.aiGradient,
           borderRadius: BorderRadius.circular(32),
           boxShadow: [
-            BoxShadow(color: AppColors.primary.withOpacity(0.2), blurRadius: 20, offset: const Offset(0, 10)),
+            BoxShadow(
+                color: AppColors.primary.withOpacity(0.2),
+                blurRadius: 20,
+                offset: const Offset(0, 10)),
           ],
         ),
         child: Column(
@@ -234,17 +259,21 @@ class DocumentPreviewScreen extends ConsumerWidget {
               children: [
                 const Icon(Iconsax.magic_star, color: Colors.white, size: 24),
                 const SizedBox(width: AppSpacing.p12),
-                Text('AI Document Audit', style: AppTypography.titleLarge.copyWith(color: Colors.white)),
+                Text('AI Document Audit',
+                    style:
+                        AppTypography.titleLarge.copyWith(color: Colors.white)),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.p12, vertical: 6),
                   decoration: BoxDecoration(
                     color: Colors.white24,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     '${document.aiQualityScore}% Quality',
-                    style: AppTypography.labelMedium.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: AppTypography.labelMedium.copyWith(
+                        color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -254,7 +283,8 @@ class DocumentPreviewScreen extends ConsumerWidget {
               analysis.recommendations.isNotEmpty
                   ? analysis.recommendations.first
                   : 'Document legibility and resolution satisfy standard university submission guidelines.',
-              style: AppTypography.bodyMedium.copyWith(color: Colors.white.withOpacity(0.9), height: 1.5),
+              style: AppTypography.bodyMedium
+                  .copyWith(color: Colors.white.withOpacity(0.9), height: 1.5),
             ),
           ],
         ),

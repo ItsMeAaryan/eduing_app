@@ -41,8 +41,10 @@ class _PremiumApplicationCardState extends State<PremiumApplicationCard> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final textColor =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final secondaryTextColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
 
     final scale = _isPressed ? 0.98 : (_isHovered ? 1.01 : 1.0);
 
@@ -95,7 +97,8 @@ class _PremiumApplicationCardState extends State<PremiumApplicationCard> {
                                 const SizedBox(height: AppSpacing.p4),
                                 Text(
                                   widget.course,
-                                  style: AppTypography.bodyMedium.copyWith(color: secondaryTextColor),
+                                  style: AppTypography.bodyMedium
+                                      .copyWith(color: secondaryTextColor),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -119,18 +122,22 @@ class _PremiumApplicationCardState extends State<PremiumApplicationCard> {
                             children: [
                               Text(
                                 "Deadline",
-                                style: AppTypography.labelMedium.copyWith(color: secondaryTextColor),
+                                style: AppTypography.labelMedium
+                                    .copyWith(color: secondaryTextColor),
                               ),
                               const SizedBox(height: AppSpacing.p4),
                               Text(
                                 widget.deadline,
-                                style: AppTypography.titleMedium.copyWith(color: textColor, fontWeight: FontWeight.bold),
+                                style: AppTypography.titleMedium.copyWith(
+                                    color: textColor,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
                           Text(
                             "${(widget.progress * 100).toInt()}%",
-                            style: AppTypography.titleMedium.copyWith(color: textColor, fontWeight: FontWeight.bold),
+                            style: AppTypography.titleMedium.copyWith(
+                                color: textColor, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
@@ -143,7 +150,7 @@ class _PremiumApplicationCardState extends State<PremiumApplicationCard> {
                   ),
                 ),
               ),
-              
+
               // Floating Interlocking Logo
               Positioned(
                 top: 0,

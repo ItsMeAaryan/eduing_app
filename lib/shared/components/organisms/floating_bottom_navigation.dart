@@ -18,11 +18,14 @@ class FloatingBottomNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final navColor = isDark ? AppColors.darkSurface.withOpacity(0.8) : AppColors.surface.withOpacity(0.85);
+    final navColor = isDark
+        ? AppColors.darkSurface.withOpacity(0.8)
+        : AppColors.surface.withOpacity(0.85);
 
     return SafeArea(
       child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
+        margin: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.p24, vertical: AppSpacing.p16),
         decoration: BoxDecoration(
           borderRadius: AppRadius.b100,
           boxShadow: AppShadow.float(context),
@@ -32,7 +35,8 @@ class FloatingBottomNavigation extends StatelessWidget {
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 16.0, sigmaY: 16.0),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
+              padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
               color: navColor,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -100,17 +104,21 @@ class _NavItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
+
     const activeColor = AppColors.primary;
-    final inactiveColor = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
-    final activeBg = isDark ? AppColors.primary.withOpacity(0.2) : AppColors.primary.withOpacity(0.1);
+    final inactiveColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final activeBg = isDark
+        ? AppColors.primary.withOpacity(0.2)
+        : AppColors.primary.withOpacity(0.1);
 
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.p16, vertical: AppSpacing.p8),
         decoration: BoxDecoration(
           color: isActive ? activeBg : Colors.transparent,
           borderRadius: AppRadius.b100,

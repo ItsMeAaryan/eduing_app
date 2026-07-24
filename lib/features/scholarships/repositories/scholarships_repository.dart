@@ -5,7 +5,8 @@ class ScholarshipRepository extends BaseRepository<Map<String, dynamic>> {
   ScholarshipRepository() : super('scholarships');
 
   @override
-  Map<String, dynamic> fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  Map<String, dynamic> fromFirestore(
+      DocumentSnapshot<Map<String, dynamic>> doc) {
     return doc.data() ?? {};
   }
 

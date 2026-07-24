@@ -1,7 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/planner_model.dart';
 
-final plannerProvider = StateNotifierProvider<PlannerNotifier, PlannerDashboardData>((ref) {
+final plannerProvider =
+    StateNotifierProvider<PlannerNotifier, PlannerDashboardData>((ref) {
   return PlannerNotifier();
 });
 
@@ -11,7 +12,7 @@ class PlannerNotifier extends StateNotifier<PlannerDashboardData> {
   static PlannerDashboardData _initialData() {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
+
     final allEvents = [
       PlannerEvent(
         id: '1',
@@ -55,9 +56,17 @@ class PlannerNotifier extends StateNotifier<PlannerDashboardData> {
       ),
     ];
 
-    final todayAgenda = allEvents.where((e) => e.date.year == today.year && e.date.month == today.month && e.date.day == today.day).toList();
-    final upcomingDeadlines = allEvents.where((e) => e.type == EventType.application || e.type == EventType.scholarship).toList();
-    
+    final todayAgenda = allEvents
+        .where((e) =>
+            e.date.year == today.year &&
+            e.date.month == today.month &&
+            e.date.day == today.day)
+        .toList();
+    final upcomingDeadlines = allEvents
+        .where((e) =>
+            e.type == EventType.application || e.type == EventType.scholarship)
+        .toList();
+
     return PlannerDashboardData(
       todayAgenda: todayAgenda,
       upcomingDeadlines: upcomingDeadlines,
@@ -101,10 +110,19 @@ class PlannerNotifier extends StateNotifier<PlannerDashboardData> {
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    
+
     state = PlannerDashboardData(
-      todayAgenda: updatedEvents.where((e) => e.date.year == today.year && e.date.month == today.month && e.date.day == today.day).toList(),
-      upcomingDeadlines: updatedEvents.where((e) => e.type == EventType.application || e.type == EventType.scholarship).toList(),
+      todayAgenda: updatedEvents
+          .where((e) =>
+              e.date.year == today.year &&
+              e.date.month == today.month &&
+              e.date.day == today.day)
+          .toList(),
+      upcomingDeadlines: updatedEvents
+          .where((e) =>
+              e.type == EventType.application ||
+              e.type == EventType.scholarship)
+          .toList(),
       completedTasks: updatedEvents.where((e) => e.isCompleted).length,
       pendingTasks: updatedEvents.where((e) => !e.isCompleted).length,
       aiPriorityScore: state.aiPriorityScore,

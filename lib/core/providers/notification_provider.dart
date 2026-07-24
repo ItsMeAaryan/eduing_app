@@ -4,7 +4,8 @@ import '../services/notifications/background_task_service.dart';
 import '../../features/settings/providers/settings_provider.dart';
 
 final notificationServiceProvider = Provider((ref) => NotificationService());
-final backgroundTaskServiceProvider = Provider((ref) => BackgroundTaskService());
+final backgroundTaskServiceProvider =
+    Provider((ref) => BackgroundTaskService());
 
 final notificationInitializationProvider = FutureProvider<void>((ref) async {
   final notifService = ref.watch(notificationServiceProvider);

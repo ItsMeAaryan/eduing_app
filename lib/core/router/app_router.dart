@@ -51,11 +51,12 @@ class GoRouterRefreshStream extends ChangeNotifier {
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
-  
+
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
-    refreshListenable: GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
+    refreshListenable:
+        GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
     redirect: (context, state) {
       final user = FirebaseAuth.instance.currentUser;
       final isLoggingIn = state.matchedLocation == '/login';

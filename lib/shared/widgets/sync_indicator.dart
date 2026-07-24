@@ -13,7 +13,7 @@ class SyncIndicator extends ConsumerWidget {
     return syncStateAsync.when(
       data: (state) {
         if (state == SyncState.online) return const SizedBox.shrink();
-        
+
         Color bgColor;
         String text;
         IconData icon;

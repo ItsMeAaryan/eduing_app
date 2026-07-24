@@ -4,7 +4,8 @@ import '../repositories/storage_repository.dart';
 
 final storageRepositoryProvider = Provider((ref) => StorageRepository());
 
-final storageControllerProvider = StateNotifierProvider<StorageController, AsyncValue<String?>>((ref) {
+final storageControllerProvider =
+    StateNotifierProvider<StorageController, AsyncValue<String?>>((ref) {
   return StorageController(ref.watch(storageRepositoryProvider));
 });
 

@@ -19,8 +19,10 @@ class PlannerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final textColor = isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
-    final secondaryTextColor = isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
+    final textColor =
+        isDark ? AppColors.darkTextPrimary : AppColors.textPrimary;
+    final secondaryTextColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.textSecondary;
 
     return SquircleCard(
       padding: const EdgeInsets.all(AppSpacing.p16),
@@ -33,9 +35,11 @@ class PlannerCard extends StatelessWidget {
             children: [
               Text(
                 type,
-                style: AppTypography.labelMedium.copyWith(color: AppColors.primary),
+                style: AppTypography.labelMedium
+                    .copyWith(color: AppColors.primary),
               ),
-              Icon(Icons.calendar_today_outlined, size: 16, color: secondaryTextColor),
+              Icon(Icons.calendar_today_outlined,
+                  size: 16, color: secondaryTextColor),
             ],
           ),
           const SizedBox(height: AppSpacing.p12),
