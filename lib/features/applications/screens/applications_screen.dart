@@ -6,8 +6,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
-import '../../universities/widgets/filter_chip.dart';
+import '../../../core/theme/spacing/app_spacing.dart';
+import '../../../shared/components/atoms/app_text_field.dart';
+import '../../../shared/components/organisms/premium_application_card.dart';
+
+import '../../../shared/components/atoms/status_pill.dart';
+import '../../../shared/components/atoms/app_button.dart';
 import '../providers/applications_provider.dart';
+import '../models/university_application.dart';
 
 class ApplicationsScreen extends ConsumerStatefulWidget {
   const ApplicationsScreen({super.key});
@@ -17,166 +23,236 @@ class ApplicationsScreen extends ConsumerStatefulWidget {
 }
 
 class _ApplicationsScreenState extends ConsumerState<ApplicationsScreen> {
-  final List<String> _filters = ['All', 'Draft', 'Submitted', 'Review', 'Accepted', 'Rejected'];
-  String _selectedFilter = 'All';
-
-  void _showAddApplicationDialog() {
-    final uniController = TextEditingController();
-    final courseController = TextEditingController();
-    final deadlineController = TextEditingController(text: '01 Dec 2025');
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).cardColor,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) {
-        return Padding(
-          padding: EdgeInsets.only(
-            left: 24, right: 24, top: 24,
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('Create New Application', style: AppTypography.headline),
-              const SizedBox(height: 16),
-              TextField(
-                controller: uniController,
-                decoration: const InputDecoration(labelText: 'University Name', hintText: 'e.g. Oxford University'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: courseController,
-                decoration: const InputDecoration(labelText: 'Degree / Course', hintText: 'e.g. M.Sc. Data Science'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: deadlineController,
-                decoration: const InputDecoration(labelText: 'Application Deadline'),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: () {
-                  final uniName = uniController.text.trim();
-                  final course = courseController.text.trim();
-                  if (uniName.isEmpty || course.isEmpty) return;
-
-                  ref.read(applicationsNotifierProvider.notifier).createApplication(
-                        universityName: uniName,
-                        course: course,
-                        deadline: deadlineController.text.trim(),
-                      );
-                  ctx.pop();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Created application for $uniName')),
-                  );
-                },
-                icon: const Icon(Iconsax.add_circle),
-                label: const Text('Add Application'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
+  final TextEditingController _searchController = TextEditingController();
+  
   @override
   Widget build(BuildContext context) {
     final applications = ref.watch(applicationsNotifierProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final filteredApps = _selectedFilter == 'All'
-        ? applications
-        : applications.where((a) => a.status.name.toLowerCase() == _selectedFilter.toLowerCase()).toList();
+    final inReviewApps = applications.where((a) => a.status == ApplicationStatus.review || a.status == ApplicationStatus.interview).toList();
+    final actionRequiredApps = applications.where((a) => a.status == ApplicationStatus.draft).toList();
+    final submittedApps = applications.where((a) => a.status == ApplicationStatus.submitted).toList();
+    final decidedApps = applications.where((a) => a.status == ApplicationStatus.accepted || a.status == ApplicationStatus.rejected || a.status == ApplicationStatus.scholarship).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Application Tracker'),
-        actions: [
-          IconButton(
-            icon: const Icon(Iconsax.add),
-            onPressed: _showAddApplicationDialog,
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showAddApplicationDialog,
-        icon: const Icon(Iconsax.add),
-        label: const Text('New Application'),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {}, // To be wired up
         backgroundColor: AppColors.primary,
+        child: const Icon(Iconsax.add, color: Colors.white),
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
+      body: SafeArea(
+        bottom: false,
+        child: Column(
+          children: [
+            // Floating Header
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.p24),
               child: Row(
-                children: _filters.map((filter) {
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8.0),
-                    child: AppFilterChip(
-                      label: filter,
-                      isSelected: _selectedFilter == filter,
-                      onTap: () {
-                        setState(() => _selectedFilter = filter);
-                      },
-                    ),
-                  );
-                }).toList(),
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Applications', style: AppTypography.display),
+                      const SizedBox(height: AppSpacing.p4),
+                      Text('${applications.length} Total Applications', style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary)),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Iconsax.sort),
+                        onPressed: () {},
+                      ),
+                      const SizedBox(width: AppSpacing.p8),
+                      IconButton(
+                        icon: const Icon(Iconsax.filter),
+                        onPressed: () {},
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
-          ),
-          Expanded(
-            child: filteredApps.isEmpty
-                ? Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Iconsax.folder_cross, size: 64, color: AppColors.textSecondary),
-                        const SizedBox(height: 16),
-                        Text('No applications found', style: AppTypography.subheading),
-                        const SizedBox(height: 8),
-                        Text('Tap + to start tracking a new university application.', style: AppTypography.caption),
-                      ],
+            
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+              child: AppTextField(
+                controller: _searchController,
+                hintText: 'Search by University, Course, or Country...',
+                prefixIcon: Iconsax.search_normal,
+              ),
+            ),
+            
+            const SizedBox(height: AppSpacing.p24),
+            
+            // Summary Chips
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+              child: Row(
+                children: [
+                  _SummaryChip(label: 'Total', count: applications.length.toString(), color: AppColors.primary),
+                  const SizedBox(width: AppSpacing.p12),
+                  _SummaryChip(label: 'Action Required', count: actionRequiredApps.length.toString(), color: AppColors.error),
+                  const SizedBox(width: AppSpacing.p12),
+                  _SummaryChip(label: 'In Review', count: inReviewApps.length.toString(), color: AppColors.warning),
+                  const SizedBox(width: AppSpacing.p12),
+                  _SummaryChip(label: 'Decided', count: decidedApps.length.toString(), color: AppColors.success),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: AppSpacing.p32),
+            
+            // Content
+            Expanded(
+              child: applications.isEmpty
+                  ? _buildEmptyState(isDark)
+                  : SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (actionRequiredApps.isNotEmpty) ...[
+                            _buildSectionHeader('Action Required'),
+                            ...actionRequiredApps.map((app) => _buildApplicationCard(context, app)),
+                            const SizedBox(height: AppSpacing.p32),
+                          ],
+                          if (inReviewApps.isNotEmpty) ...[
+                            _buildSectionHeader('In Review'),
+                            ...inReviewApps.map((app) => _buildApplicationCard(context, app)),
+                            const SizedBox(height: AppSpacing.p32),
+                          ],
+                          if (submittedApps.isNotEmpty) ...[
+                            _buildSectionHeader('Submitted'),
+                            ...submittedApps.map((app) => _buildApplicationCard(context, app)),
+                            const SizedBox(height: AppSpacing.p32),
+                          ],
+                          if (decidedApps.isNotEmpty) ...[
+                            _buildSectionHeader('Decisions'),
+                            ...decidedApps.map((app) => _buildApplicationCard(context, app)),
+                            const SizedBox(height: AppSpacing.p48), // Bottom padding
+                          ],
+                        ],
+                      ),
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    itemCount: filteredApps.length,
-                    itemBuilder: (context, index) {
-                      final app = filteredApps[index];
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        child: ListTile(
-                          onTap: () {
-                            context.push('/applications/details', extra: app);
-                          },
-                          title: Text(app.university.name, style: AppTypography.label.copyWith(fontWeight: FontWeight.bold)),
-                          subtitle: Text('${app.course} • Deadline: ${app.deadline}', style: AppTypography.caption),
-                          trailing: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary.withOpacity(0.12),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              app.status.name.toUpperCase(),
-                              style: AppTypography.caption.copyWith(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 10),
-                            ),
-                          ),
-                        ),
-                      ).animate().fade().slideY(begin: 0.05);
-                    },
-                  ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.p16),
+      child: Text(title, style: AppTypography.titleLarge),
+    );
+  }
+
+  Widget _buildApplicationCard(BuildContext context, UniversityApplication app) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.p16),
+      child: PremiumApplicationCard(
+        logoUrl: app.university.logoUrl.isNotEmpty ? app.university.logoUrl : 'https://placehold.co/100x100/png',
+        universityName: app.university.name,
+        course: app.course,
+        status: _mapStatus(app.status),
+        deadline: app.deadline,
+        progress: app.progress,
+        onTap: () => context.push('/applications/details', extra: app),
+        onMenuTap: () {},
+      ),
+    ).animate().fade().slideY(begin: 0.1, duration: 400.ms, curve: Curves.easeOutCubic);
+  }
+
+  Widget _buildEmptyState(bool isDark) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.p32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.darkSurface : AppColors.surface,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Iconsax.folder_add, size: 48, color: AppColors.primary),
+            ),
+            const SizedBox(height: AppSpacing.p24),
+            Text('No Applications Yet', style: AppTypography.titleLarge),
+            const SizedBox(height: AppSpacing.p8),
+            Text(
+              'Your application workspace is empty. Explore universities to start your admission journey.',
+              textAlign: TextAlign.center,
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: AppSpacing.p32),
+            AppButton(
+              text: 'Explore Universities',
+              onPressed: () => context.go('/universities'),
+              icon: Iconsax.building,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  StatusType _mapStatus(ApplicationStatus status) {
+    switch(status) {
+      case ApplicationStatus.draft: return StatusType.draft;
+      case ApplicationStatus.submitted: return StatusType.submitted;
+      case ApplicationStatus.review: return StatusType.underReview;
+      case ApplicationStatus.interview: return StatusType.underReview;
+      case ApplicationStatus.accepted: return StatusType.accepted;
+      case ApplicationStatus.scholarship: return StatusType.accepted;
+      case ApplicationStatus.rejected: return StatusType.rejected;
+      default: return StatusType.inProgress;
+    }
+  }
+}
+
+class _SummaryChip extends StatelessWidget {
+  final String label;
+  final String count;
+  final Color color;
+
+  const _SummaryChip({required this.label, required this.count, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.darkSurface : AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Text(
+              count,
+              style: AppTypography.labelLarge.copyWith(color: color, fontWeight: FontWeight.bold),
+            ),
           ),
+          const SizedBox(width: AppSpacing.p12),
+          Text(label, style: AppTypography.labelMedium.copyWith(color: isDark ? AppColors.darkTextPrimary : AppColors.textPrimary)),
         ],
       ),
     );
