@@ -1,108 +1,104 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'colors/app_colors.dart';
-import 'typography/app_typography.dart';
-import 'app_radius.dart';
+import 'app_colors.dart';
 
 class AppTheme {
-  static ThemeData get lightTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.light,
-      colorScheme: const ColorScheme.light(
-        primary: AppColors.primary,
-        secondary: AppColors.secondary,
-        surface: AppColors.surface,
-        error: AppColors.error,
-        onSurface: AppColors.textPrimary,
-      ),
-      scaffoldBackgroundColor: AppColors.background,
-      textTheme: GoogleFonts.poppinsTextTheme()
-          .copyWith(
-            displayLarge: AppTypography.display,
-            headlineLarge: AppTypography.headline,
-            titleLarge: AppTypography.titleLarge,
-            titleMedium: AppTypography.titleMedium,
-            titleSmall: AppTypography.titleSmall,
-            bodyLarge: AppTypography.bodyLarge,
-            bodyMedium: AppTypography.bodyMedium,
-            bodySmall: AppTypography.bodySmall,
-            labelLarge: AppTypography.labelLarge,
-            labelMedium: AppTypography.labelMedium,
-          )
-          .apply(
-            bodyColor: AppColors.textPrimary,
-            displayColor: AppColors.textPrimary,
-          ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.textPrimary),
-      ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.border,
-        thickness: 1,
-        space: 1,
-      ),
-      cardTheme: CardThemeData(
-        color: AppColors.surface,
-        elevation: 0,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppRadius.b24,
-        ),
-      ),
-    );
-  }
+  AppTheme._();
 
   static ThemeData get darkTheme {
+    final baseTextTheme = GoogleFonts.interTextTheme(ThemeData.dark().textTheme);
+
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      scaffoldBackgroundColor: AppColors.background,
+      primaryColor: AppColors.primaryAccent,
       colorScheme: const ColorScheme.dark(
-        primary: AppColors.primary,
-        secondary: AppColors.secondary,
-        surface: AppColors.darkSurface,
-        error: AppColors.error,
-        onSurface: AppColors.darkTextPrimary,
+        primary: AppColors.primaryAccent,
+        surface: AppColors.surface,
+        error: AppColors.red,
+        onPrimary: AppColors.background,
+        onSurface: AppColors.text,
+        onError: AppColors.text,
       ),
-      scaffoldBackgroundColor: AppColors.darkBackground,
-      textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme)
-          .copyWith(
-            displayLarge: AppTypography.display,
-            headlineLarge: AppTypography.headline,
-            titleLarge: AppTypography.titleLarge,
-            titleMedium: AppTypography.titleMedium,
-            titleSmall: AppTypography.titleSmall,
-            bodyLarge: AppTypography.bodyLarge,
-            bodyMedium: AppTypography.bodyMedium,
-            bodySmall: AppTypography.bodySmall,
-            labelLarge: AppTypography.labelLarge,
-            labelMedium: AppTypography.labelMedium,
-          )
-          .apply(
-            bodyColor: AppColors.darkTextPrimary,
-            displayColor: AppColors.darkTextPrimary,
-          ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        centerTitle: true,
-        iconTheme: IconThemeData(color: AppColors.darkTextPrimary),
-      ),
-      dividerTheme: const DividerThemeData(
-        color: AppColors.darkBorder,
-        thickness: 1,
-        space: 1,
-      ),
-      cardTheme: CardThemeData(
-        color: AppColors.darkSurface,
-        elevation: 0,
-        margin: EdgeInsets.zero,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppRadius.b24,
+      textTheme: baseTextTheme.copyWith(
+        displayLarge: baseTextTheme.displayLarge?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -1.5,
         ),
+        displayMedium: baseTextTheme.displayMedium?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -1.0,
+        ),
+        displaySmall: baseTextTheme.displaySmall?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5,
+        ),
+        headlineLarge: baseTextTheme.headlineLarge?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5,
+        ),
+        headlineMedium: baseTextTheme.headlineMedium?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5,
+        ),
+        headlineSmall: baseTextTheme.headlineSmall?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5,
+        ),
+        titleLarge: baseTextTheme.titleLarge?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5,
+        ),
+        titleMedium: baseTextTheme.titleMedium?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5,
+        ),
+        titleSmall: baseTextTheme.titleSmall?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w900,
+          letterSpacing: -0.5,
+        ),
+        bodyLarge: baseTextTheme.bodyLarge?.copyWith(
+          color: AppColors.text,
+          letterSpacing: 0,
+        ),
+        bodyMedium: baseTextTheme.bodyMedium?.copyWith(
+          color: AppColors.text,
+          letterSpacing: 0,
+        ),
+        bodySmall: baseTextTheme.bodySmall?.copyWith(
+          color: AppColors.text,
+          letterSpacing: 0,
+        ),
+        labelLarge: baseTextTheme.labelLarge?.copyWith( // All uppercase labels
+          color: AppColors.text,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.2,
+        ),
+        labelMedium: baseTextTheme.labelMedium?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.0,
+        ),
+        labelSmall: baseTextTheme.labelSmall?.copyWith(
+          color: AppColors.text,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 0.8,
+        ),
+      ),
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.background,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AppColors.text),
       ),
     );
   }
