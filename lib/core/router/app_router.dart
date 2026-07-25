@@ -7,32 +7,32 @@ import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/home/screens/dashboard_screen.dart';
 import '../../features/discover/screens/discover_screen.dart';
 import '../../features/universities/screens/compare_universities_screen.dart';
-import '../../features/universities/screens/university_details_screen.dart';
 import '../../features/applications/screens/applications_screen.dart';
 import '../../features/applications/screens/application_details_screen.dart';
 import '../../features/documents/screens/documents_screen.dart';
 import '../../features/documents/screens/document_preview_screen.dart';
 import '../../features/vault/screens/vault_screen.dart';
-import '../../features/resume/screens/resume_dashboard_screen.dart';
+import '../../features/resume/screens/resume_screen.dart';
 import '../../features/resume/screens/resume_preview_screen.dart';
 import '../../features/resume/screens/ai_resume_review_screen.dart';
-import '../../features/sop/screens/sop_dashboard_screen.dart';
+import '../../features/sop/screens/sop_screen.dart';
 import '../../features/sop/screens/sop_preview_screen.dart';
 import '../../features/sop/screens/ai_sop_review_screen.dart';
-import '../../features/interview/screens/interview_dashboard_screen.dart';
+import '../../features/interview/screens/interview_screen.dart';
 import '../../features/interview/screens/question_practice_screen.dart';
 import '../../features/interview/screens/mock_interview_screen.dart';
 import '../../features/interview/screens/interview_report_screen.dart';
 import '../../features/interview/models/interview_model.dart';
-import '../../features/scholarships/screens/scholarships_hub_screen.dart';
+import '../../features/scholarships/screens/scholarships_screen.dart';
 import '../../features/scholarships/screens/scholarship_details_screen.dart';
 import '../../features/scholarships/screens/scholarship_comparison_screen.dart';
 import '../../features/copilot/screens/copilot_screen.dart';
 import '../../features/copilot/screens/copilot_chat_screen.dart';
 import '../../features/copilot/screens/copilot_settings_screen.dart';
-import '../../features/planner/screens/planner_dashboard_screen.dart';
+import '../../features/planner/screens/planner_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
-import '../../features/settings/screens/settings_dashboard_screen.dart';
+import '../../features/settings/screens/settings_screen.dart';
+import '../../features/discover/screens/uni_detail_screen.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/register_screen.dart';
@@ -116,11 +116,11 @@ class AppRouter {
       ),
       GoRoute(
         path: '/resume',
-        builder: (context, state) => const ResumeDashboardScreen(),
+        builder: (context, state) => const ResumeScreen(),
       ),
       GoRoute(
         path: '/sop',
-        builder: (context, state) => const SopDashboardScreen(),
+        builder: (context, state) => const SOPScreen(),
       ),
       GoRoute(
         path: '/profile',
@@ -167,7 +167,7 @@ class AppRouter {
           ),
           GoRoute(
             path: '/resume/builder',
-            builder: (context, state) => const ResumeDashboardScreen(),
+            builder: (context, state) => const ResumeScreen(),
           ),
           GoRoute(
             path: '/resume/preview',
@@ -179,7 +179,7 @@ class AppRouter {
           ),
           GoRoute(
             path: '/sop/builder',
-            builder: (context, state) => const SopDashboardScreen(),
+            builder: (context, state) => const SOPScreen(),
           ),
           GoRoute(
             path: '/sop/preview',
@@ -191,7 +191,7 @@ class AppRouter {
           ),
           GoRoute(
             path: '/interview',
-            builder: (context, state) => const InterviewDashboardScreen(),
+            builder: (context, state) => const InterviewScreen(),
           ),
           GoRoute(
             path: '/interview/practice',
@@ -210,7 +210,7 @@ class AppRouter {
           ),
           GoRoute(
             path: '/scholarships',
-            builder: (context, state) => const ScholarshipsHubScreen(),
+            builder: (context, state) => const ScholarshipsScreen(),
           ),
           GoRoute(
             path: '/scholarships/compare',
@@ -241,11 +241,11 @@ class AppRouter {
           ),
           GoRoute(
             path: '/settings',
-            builder: (context, state) => const SettingsDashboardScreen(),
+            builder: (context, state) => const SettingsScreen(),
           ),
           GoRoute(
             path: '/planner',
-            builder: (context, state) => const PlannerDashboardScreen(),
+            builder: (context, state) => const PlannerScreen(),
           ),
           GoRoute(
             path: '/notifications',
@@ -257,7 +257,7 @@ class AppRouter {
         path: '/university/:id',
         builder: (context, state) {
           final id = state.pathParameters['id']!;
-          return UniversityDetailsScreen(universityId: id);
+          return UniDetailScreen(universityId: id);
         },
       ),
       GoRoute(
