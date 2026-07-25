@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:iconsax/iconsax.dart';
 import 'dart:ui';
-import '../../core/theme/colors/app_colors.dart';
-
+import '../../core/theme/neo_design_system.dart';
 import 'sync_indicator.dart';
 
 class MainLayout extends StatelessWidget {
@@ -15,13 +13,23 @@ class MainLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      body: Column(
+      backgroundColor: NeoThemeData.of(context).bg,
+      body: Stack(
         children: [
-          const SyncIndicator(),
-          Expanded(child: child),
+          Column(
+            children: [
+              const SyncIndicator(),
+              Expanded(child: child),
+            ],
+          ),
+          const Positioned(
+            bottom: 16,
+            left: 16,
+            right: 16,
+            child: FloatingBottomNav(),
+          ),
         ],
       ),
-      bottomNavigationBar: const FloatingBottomNav(),
     );
   }
 }
@@ -32,130 +40,101 @@ class FloatingBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String location = GoRouterState.of(context).uri.toString();
+    final t = NeoThemeData.of(context);
+    final dark = t.isDark;
 
-    int currentIndex = 0;
-    if (location.startsWith('/universities')) currentIndex = 1;
-    if (location.startsWith('/applications')) currentIndex = 2;
-    if (location.startsWith('/ai')) currentIndex = 3;
-    if (location.startsWith('/planner')) currentIndex = 4;
-    if (location.startsWith('/profile')) currentIndex = 5;
+    String active = "home";
+    if (location.startsWith('/discover')) active = "discover";
+    if (location.startsWith('/applications')) active = "apps";
+    if (location.startsWith('/copilot')) active = "ai";
+    if (location.startsWith('/planner')) active = "plan";
 
-    return SafeArea(
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        height: 64,
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.9),
-          borderRadius: BorderRadius.circular(32),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            ),
-          ],
+    final tabs = [
+      {"id": "home", "icon": "⊞", "label": "Home", "route": "/"},
+      {"id": "discover", "icon": "🏛", "label": "Discover", "route": "/discover"},
+      {"id": "apps", "icon": "📋", "label": "Apply", "route": "/applications"},
+      {"id": "ai", "icon": "✦", "label": "Copilot", "route": "/copilot"},
+      {"id": "plan", "icon": "📅", "label": "Planner", "route": "/planner"},
+    ];
+
+    return Container(
+      height: 64,
+      decoration: BoxDecoration(
+        color: dark ? const Color(0xEB1C1C1F) : const Color(0xEBFFFFFF),
+        borderRadius: BorderRadius.circular(32),
+        border: Border.all(
+          color: dark ? Colors.white.withValues(alpha: 0.06) : Colors.black.withValues(alpha: 0.06),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(32),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _NavItem(
-                  icon: Iconsax.home,
-                  label: 'Home',
-                  isSelected: currentIndex == 0,
-                  onTap: () => context.go('/'),
-                ),
-                _NavItem(
-                  icon: Iconsax.building,
-                  label: 'Universities',
-                  isSelected: currentIndex == 1,
-                  onTap: () => context.go('/universities'),
-                ),
-                _NavItem(
-                  icon: Iconsax.document,
-                  label: 'Applications',
-                  isSelected: currentIndex == 2,
-                  onTap: () => context.go('/applications'),
-                ),
-                _NavItem(
-                  icon: Iconsax.magic_star,
-                  label: 'AI Copilot',
-                  isSelected: currentIndex == 3,
-                  onTap: () => context.go('/ai'),
-                ),
-                _NavItem(
-                  icon: Iconsax.calendar_1,
-                  label: 'Planner',
-                  isSelected: currentIndex == 4,
-                  onTap: () => context.go('/planner'),
-                ),
-                _NavItem(
-                  icon: Iconsax.profile_circle,
-                  label: 'Profile',
-                  isSelected: currentIndex == 5,
-                  onTap: () => context.go('/profile'),
-                ),
+        boxShadow: dark
+            ? [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.5), blurRadius: 32, offset: const Offset(0, 8)),
+                BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.04), blurRadius: 0, spreadRadius: 1),
+              ]
+            : [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.12), blurRadius: 32, offset: const Offset(0, 8)),
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04), blurRadius: 0, spreadRadius: 1),
               ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(32),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: tabs.map((tab) {
+                final isActive = tab["id"] == active;
+                return GestureDetector(
+                  onTap: () => context.go(tab["route"]!),
+                  behavior: HitTestBehavior.opaque,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    constraints: const BoxConstraints(minWidth: 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? (dark
+                              ? NeoColors.purple.withValues(alpha: 0.2)
+                              : NeoColors.purple.withValues(alpha: 0.12))
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          tab["icon"]!,
+                          style: TextStyle(
+                            fontSize: isActive ? 18 : 16,
+                            color: isActive ? (dark ? Colors.white : Colors.black) : t.sub,
+                          ),
+                        ),
+                        if (isActive)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 3),
+                            child: Text(
+                              tab["label"]!,
+                              style: const TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                color: NeoColors.purple,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeInOut,
-        padding: EdgeInsets.symmetric(
-          horizontal: isSelected ? 20 : 12,
-          vertical: 12,
-        ),
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : Colors.transparent,
-          borderRadius: BorderRadius.circular(100),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? Colors.white : AppColors.textSecondary,
-              size: 24,
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 4),
-              Text(
-                label,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ],
         ),
       ),
     );
