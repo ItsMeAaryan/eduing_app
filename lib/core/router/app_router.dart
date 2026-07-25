@@ -12,6 +12,7 @@ import '../../features/applications/screens/applications_screen.dart';
 import '../../features/applications/screens/application_details_screen.dart';
 import '../../features/documents/screens/documents_screen.dart';
 import '../../features/documents/screens/document_preview_screen.dart';
+import '../../features/vault/screens/vault_screen.dart';
 import '../../features/resume/screens/resume_dashboard_screen.dart';
 import '../../features/resume/screens/resume_preview_screen.dart';
 import '../../features/resume/screens/ai_resume_review_screen.dart';
@@ -26,11 +27,11 @@ import '../../features/interview/models/interview_model.dart';
 import '../../features/scholarships/screens/scholarships_hub_screen.dart';
 import '../../features/scholarships/screens/scholarship_details_screen.dart';
 import '../../features/scholarships/screens/scholarship_comparison_screen.dart';
-import '../../features/copilot/screens/copilot_home_screen.dart';
-import '../../features/copilot/screens/chat_screen.dart';
+import '../../features/copilot/screens/copilot_screen.dart';
+import '../../features/copilot/screens/copilot_chat_screen.dart';
 import '../../features/copilot/screens/copilot_settings_screen.dart';
 import '../../features/planner/screens/planner_dashboard_screen.dart';
-import '../../features/profile/screens/profile_dashboard_screen.dart';
+import '../../features/profile/screens/profile_screen.dart';
 import '../../features/settings/screens/settings_dashboard_screen.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
@@ -111,7 +112,7 @@ class AppRouter {
       // New requested routes for vault, resume, sop
       GoRoute(
         path: '/vault',
-        builder: (context, state) => const DocumentsScreen(),
+        builder: (context, state) => const VaultScreen(),
       ),
       GoRoute(
         path: '/resume',
@@ -123,7 +124,7 @@ class AppRouter {
       ),
       GoRoute(
         path: '/profile',
-        builder: (context, state) => const ProfileDashboardScreen(),
+        builder: (context, state) => const ProfileScreen(),
       ),
       ShellRoute(
         builder: (context, state, child) {
@@ -224,7 +225,7 @@ class AppRouter {
           ),
           GoRoute(
             path: '/copilot',
-            builder: (context, state) => const CopilotHomeScreen(),
+            builder: (context, state) => const CopilotScreen(),
           ),
           GoRoute(
             path: '/copilot/chat',
