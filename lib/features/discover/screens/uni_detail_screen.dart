@@ -120,7 +120,7 @@ class _UniDetailScreenState extends State<UniDetailScreen> {
                               {'label': 'Match', 'value': '96%', 'color': NeoColors.green},
                               {'label': 'Fees', 'value': '₹18L', 'color': NeoColors.blue},
                               {'label': 'Seats', 'value': '120', 'color': NeoColors.purple},
-                              {'label': 'Cutoff', 'value': '260', 'color': Color(0xFFFF6B35)}, // orange
+                              {'label': 'Cutoff', 'value': '260', 'color': const Color(0xFFFF6B35)}, // orange
                             ].map((s) {
                               final c = s['color'] as Color;
                               return Expanded(

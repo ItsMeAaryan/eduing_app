@@ -3,18 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/neo_design_system.dart' hide Badge;
 import '../../../core/theme/neo_design_system.dart' as neo show Badge;
-import '../providers/v4_scholarships_provider.dart';
+import '../providers/scholarships_provider.dart';
 
-class ScholarshipsScreen extends ConsumerWidget {
+class ScholarshipsScreen extends ConsumerStatefulWidget {
   const ScholarshipsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(v4ScholarshipsProvider);
-    final notifier = ref.read(v4ScholarshipsProvider.notifier);
-    final scholarships = ref.watch(v4FilteredScholarshipsProvider);
+  ConsumerState<ScholarshipsScreen> createState() => _ScholarshipsScreenState();
+}
 
-    final filters = ["All", "Government", "Private", "Corporate", "Need-Based"];
+class _ScholarshipsScreenState extends ConsumerState<ScholarshipsScreen> {
+  String _filter = "All";
+  final List<String> _filters = ["All", "Government", "Private", "Corporate", "Need-Based"];
+
+  @override
+  Widget build(BuildContext context) {
+    final data = ref.watch(scholarshipsProvider);
+    final scholarships = _filter == "All" ? data.scholarships : data.scholarships.where((s) => s.coverage == _filter).toList();
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -139,10 +144,10 @@ class ScholarshipsScreen extends ConsumerWidget {
                       scrollDirection: Axis.horizontal,
                       padding: const EdgeInsets.only(bottom: 18),
                       child: Row(
-                        children: filters.map((f) {
-                          final isSelected = state.filter == f;
+                        children: _filters.map((f) {
+                          final isSelected = _filter == f;
                           return GestureDetector(
-                            onTap: () => notifier.setFilter(f),
+                            onTap: () => setState(() => _filter = f),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               height: 32,
@@ -172,7 +177,12 @@ class ScholarshipsScreen extends ConsumerWidget {
                     ),
 
                     // Scholarship cards
-                    ...scholarships.map((s) {
+                    ...scholarships.asMap().entries.map((entry) {
+                      final i = entry.key;
+                      final s = entry.value;
+                      final colors = [NeoColors.green, NeoColors.purple, NeoColors.blue, const Color(0xFFFF3B7A), const Color(0xFFFF6B35)];
+                      final color = colors[i % colors.length];
+
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 14),
                         child: NotchedCard(
@@ -195,8 +205,8 @@ class ScholarshipsScreen extends ConsumerWidget {
                                           width: 44,
                                           height: 44,
                                           decoration: BoxDecoration(
-                                            color: s.color.withValues(alpha: 0.09), // 18 hex
-                                            border: Border.all(color: s.color.withValues(alpha: 0.2)), // 33 hex
+                                            color: color.withValues(alpha: 0.09), // 18 hex
+                                            border: Border.all(color: color.withValues(alpha: 0.2)), // 33 hex
                                             borderRadius: BorderRadius.circular(14),
                                           ),
                                           alignment: Alignment.center,
@@ -209,14 +219,14 @@ class ScholarshipsScreen extends ConsumerWidget {
                                             children: [
                                               Text(s.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Colors.white)),
                                               const SizedBox(height: 2),
-                                              Text(s.org, style: const TextStyle(fontSize: 11, color: NeoColors.subDark)),
+                                              Text(s.organization, style: const TextStyle(fontSize: 11, color: NeoColors.subDark)),
                                             ],
                                           ),
                                         ),
                                         Column(
                                           crossAxisAlignment: CrossAxisAlignment.end,
                                           children: [
-                                            Text(s.amount, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: s.color)),
+                                            Text(s.fundingAmount, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: color)),
                                             const Text('per year', style: TextStyle(fontSize: 10, color: NeoColors.subDark)),
                                           ],
                                         ),
@@ -225,9 +235,9 @@ class ScholarshipsScreen extends ConsumerWidget {
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
-                                        Expanded(child: ProgressBar(value: s.match.toDouble(), color: s.color, height: 4)),
+                                        Expanded(child: ProgressBar(value: s.aiMatchScore.toDouble(), color: color, height: 4)),
                                         const SizedBox(width: 8),
-                                        Text('${s.match}% match', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: s.color)),
+                                        Text('${s.aiMatchScore}% match', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w900, color: color)),
                                       ],
                                     ),
                                     const SizedBox(height: 8),
@@ -236,7 +246,7 @@ class ScholarshipsScreen extends ConsumerWidget {
                                       children: [
                                         Row(
                                           children: [
-                                            neo.Badge(label: s.type, color: s.color),
+                                            neo.Badge(label: s.coverage, color: color),
                                             const SizedBox(width: 6),
                                             neo.Badge(label: 'Due ${s.deadline}', color: NeoColors.subDark),
                                           ],
@@ -251,8 +261,8 @@ class ScholarshipsScreen extends ConsumerWidget {
                                 right: -10,
                                 child: FloatingActionBtn(
                                   icon: '→',
-                                  bg: s.color,
-                                  color: s.color == NeoColors.yellow ? Colors.black : Colors.white,
+                                  bg: color,
+                                  color: color == NeoColors.yellow ? Colors.black : Colors.white,
                                   onClick: () {},
                                 ),
                               ),
