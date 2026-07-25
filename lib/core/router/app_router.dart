@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../../features/notifications/screens/notifications_screen.dart';
-import '../../features/dashboard/screens/dashboard_screen.dart';
+import '../../features/home/screens/dashboard_screen.dart';
+import '../../features/discover/screens/discover_screen.dart';
 import '../../features/universities/screens/compare_universities_screen.dart';
-import '../../features/universities/screens/universities_screen.dart';
 import '../../features/universities/screens/university_details_screen.dart';
 import '../../features/applications/screens/applications_screen.dart';
 import '../../features/applications/screens/application_details_screen.dart';
@@ -28,10 +31,13 @@ import '../../features/copilot/screens/chat_screen.dart';
 import '../../features/copilot/screens/copilot_settings_screen.dart';
 import '../../features/planner/screens/planner_dashboard_screen.dart';
 import '../../features/profile/screens/profile_dashboard_screen.dart';
-import 'dart:async';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../features/settings/screens/settings_dashboard_screen.dart';
-import '../../features/auth/screens/auth_screen.dart';
+import '../../features/auth/screens/splash_screen.dart';
+import '../../features/auth/screens/login_screen.dart';
+import '../../features/auth/screens/register_screen.dart';
+import '../../features/auth/screens/otp_screen.dart';
+import '../../features/auth/screens/onboarding_screen.dart';
+import '../../features/auth/screens/forgot_password_screen.dart';
 import '../../shared/widgets/main_layout.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -54,24 +60,70 @@ class AppRouter {
 
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/',
+    initialLocation: '/splash',
     refreshListenable:
         GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
     redirect: (context, state) {
       final user = FirebaseAuth.instance.currentUser;
-      final isLoggingIn = state.matchedLocation == '/login';
-      if (user == null && !isLoggingIn) {
-        return '/login';
+      final authRoutes = ['/splash', '/login', '/register', '/otp', '/onboarding', '/forgot-password'];
+      final isAuthRoute = authRoutes.contains(state.matchedLocation);
+
+      if (user == null && !isAuthRoute) {
+        return '/splash';
       }
-      if (user != null && isLoggingIn) {
-        return '/';
+      if (user != null && isAuthRoute) {
+        return '/home';
       }
       return null;
     },
     routes: [
       GoRoute(
+        path: '/splash',
+        builder: (context, state) => const SplashScreen(),
+      ),
+      GoRoute(
         path: '/login',
-        builder: (context, state) => const AuthScreen(),
+        builder: (context, state) => const LoginScreen(),
+      ),
+      GoRoute(
+        path: '/register',
+        builder: (context, state) => const RegisterScreen(),
+      ),
+      GoRoute(
+        path: '/otp',
+        builder: (context, state) => const OTPScreen(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => ForgotPasswordScreen(
+          onNavigateToLogin: () => context.go('/login'),
+        ),
+      ),
+      // Dashboard out of ShellRoute to prevent duplicate bottom nav
+      GoRoute(
+        path: '/home',
+        builder: (context, state) => const DashboardScreen(),
+      ),
+      // New requested routes for vault, resume, sop
+      GoRoute(
+        path: '/vault',
+        builder: (context, state) => const DocumentsScreen(),
+      ),
+      GoRoute(
+        path: '/resume',
+        builder: (context, state) => const ResumeDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/sop',
+        builder: (context, state) => const SopDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileDashboardScreen(),
       ),
       ShellRoute(
         builder: (context, state, child) {
@@ -80,13 +132,16 @@ class AppRouter {
         routes: [
           GoRoute(
             path: '/',
-            builder: (context, state) => const DashboardScreen(),
+            redirect: (context, state) => '/home',
+          ),
+          GoRoute(
+            path: '/discover',
+            builder: (context, state) => const DiscoverScreen(),
           ),
           GoRoute(
             path: '/universities',
-            builder: (context, state) => const UniversitiesScreen(),
+            builder: (context, state) => const DiscoverScreen(), // As requested: /universities -> DiscoverScreen
           ),
-          // Add placeholder routes here
           GoRoute(
             path: '/applications',
             builder: (context, state) => const ApplicationsScreen(),
@@ -168,20 +223,20 @@ class AppRouter {
             },
           ),
           GoRoute(
-            path: '/ai',
+            path: '/copilot',
             builder: (context, state) => const CopilotHomeScreen(),
           ),
           GoRoute(
-            path: '/ai/chat',
+            path: '/copilot/chat',
             builder: (context, state) => const CopilotChatScreen(),
           ),
           GoRoute(
-            path: '/ai/settings',
+            path: '/copilot/settings',
             builder: (context, state) => const CopilotSettingsScreen(),
           ),
           GoRoute(
-            path: '/profile',
-            builder: (context, state) => const ProfileDashboardScreen(),
+            path: '/ai',
+            redirect: (context, state) => '/copilot',
           ),
           GoRoute(
             path: '/settings',
