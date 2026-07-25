@@ -7,6 +7,7 @@ class NeoColors {
   static const Color bgDark = Color(0xFF0C0C0E);
   static const Color surfLight = Color(0xFFFFFFFF);
   static const Color surfDark = Color(0xFF1C1C1F);
+  static const Color surfDark2 = Color(0xFF222222); // From specs
   static const Color surf2Light = Color(0xFFE8E8ED);
   static const Color surf2Dark = Color(0xFF2C2C30);
 
@@ -315,6 +316,7 @@ class FloatingActionBtn extends StatefulWidget {
   final Color bg;
   final double size;
   final VoidCallback? onClick;
+  final Color? color;
 
   const FloatingActionBtn({
     super.key,
@@ -322,6 +324,7 @@ class FloatingActionBtn extends StatefulWidget {
     this.bg = NeoColors.purple,
     this.size = 44,
     this.onClick,
+    this.color,
   });
 
   @override
@@ -360,7 +363,7 @@ class _FloatingActionBtnState extends State<FloatingActionBtn> {
           alignment: Alignment.center,
           child: Text(
             widget.icon,
-            style: TextStyle(fontSize: widget.size * 0.42, color: Colors.white),
+            style: TextStyle(fontSize: widget.size * 0.42, color: widget.color ?? Colors.white),
           ),
         ),
       ),
@@ -628,6 +631,51 @@ class _NeoInputState extends State<NeoInput> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class GreenBtn extends StatelessWidget {
+  final String label;
+  final VoidCallback? onClick;
+  final bool small;
+  final bool disabled;
+  final TextStyle? style;
+
+  const GreenBtn({
+    super.key,
+    required this.label,
+    this.onClick,
+    this.small = false,
+    this.disabled = false,
+    this.style,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: disabled ? null : onClick,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        height: small ? 32 : 52,
+        padding: EdgeInsets.symmetric(horizontal: small ? 16 : 24),
+        decoration: BoxDecoration(
+          color: disabled ? NeoColors.surf2Dark : NeoColors.green,
+          borderRadius: BorderRadius.circular(small ? 16 : 26),
+          boxShadow: disabled
+              ? []
+              : [BoxShadow(color: NeoColors.green.withValues(alpha: 0.27), blurRadius: 20, offset: const Offset(0, 4))], // 44 hex approx
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          label,
+          style: style ?? TextStyle(
+            fontSize: small ? 12 : 15,
+            fontWeight: FontWeight.w800,
+            color: disabled ? Colors.white30 : Colors.black,
+          ),
+        ),
       ),
     );
   }
