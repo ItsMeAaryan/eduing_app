@@ -67,16 +67,16 @@ class AppRouter {
 
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: '/splash',
+    initialLocation: '/',
     refreshListenable:
         GoRouterRefreshStream(FirebaseAuth.instance.authStateChanges()),
     redirect: (context, state) {
       final user = FirebaseAuth.instance.currentUser;
-      final authRoutes = ['/splash', '/login', '/register', '/otp', '/onboarding', '/forgot-password'];
+      final authRoutes = ['/', '/login', '/register', '/otp', '/onboarding', '/forgot-password'];
       final isAuthRoute = authRoutes.contains(state.matchedLocation);
 
       if (user == null && !isAuthRoute) {
-        return '/splash';
+        return '/';
       }
       if (user != null && isAuthRoute) {
         return '/home';
@@ -85,7 +85,7 @@ class AppRouter {
     },
     routes: [
       GoRoute(
-        path: '/splash',
+        path: '/',
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
@@ -137,10 +137,7 @@ class AppRouter {
           return MainLayout(child: child);
         },
         routes: [
-          GoRoute(
-            path: '/',
-            redirect: (context, state) => '/home',
-          ),
+          // removed path: '/' since it is now splash out of ShellRoute
           GoRoute(
             path: '/discover',
             builder: (context, state) => const DiscoverScreen(),

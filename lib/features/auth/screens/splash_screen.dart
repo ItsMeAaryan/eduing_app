@@ -164,7 +164,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           const SizedBox(height: 20),
                           // Floating sticker cards
                           SizedBox(
-                            height: 180,
+                            height: 160,
                             child: Stack(
                               clipBehavior: Clip.none,
                               children: [
@@ -265,12 +265,14 @@ class _SplashScreenState extends State<SplashScreen> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          GreenButton(
-                            label: 'Continue with Apple',
-                            icon: '🍎',
-                            onClick: () => context.go('/register'),
-                          ),
-                          const SizedBox(height: 10),
+                          if (Theme.of(context).platform == TargetPlatform.iOS) ...[
+                            GreenButton(
+                              label: 'Continue with Apple',
+                              icon: '🍎',
+                              onClick: () => context.go('/register'),
+                            ),
+                            const SizedBox(height: 10),
+                          ],
                           GhostButton(
                             label: 'Continue with Google',
                             icon: 'G',
