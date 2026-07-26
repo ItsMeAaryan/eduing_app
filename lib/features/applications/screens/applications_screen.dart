@@ -150,15 +150,15 @@ class ApplicationsScreen extends ConsumerWidget {
                       ...currentApps.map((a) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 14),
-                          child: NotchedCard(
-                            bg: NeoColors.surfDark,
-                            notchPos: 'br',
-                            notchSize: 44,
-                            padding: const EdgeInsets.all(16),
-                            child: Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                Column(
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              NotchedCard(
+                                bg: NeoColors.surfDark,
+                                notchPos: 'br',
+                                notchSize: 44,
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
@@ -231,17 +231,17 @@ class ApplicationsScreen extends ConsumerWidget {
                                     ),
                                   ],
                                 ),
-                                Positioned(
-                                  bottom: -26,
-                                  right: -26,
-                                  child: FloatingActionBtn(
-                                    icon: a.status == 'OFFER' ? '✓' : '→',
-                                    bg: a.color,
-                                    onClick: () => context.push('/application/${a.id}'),
-                                  ),
+                              ),
+                              Positioned(
+                                bottom: -10, // Adjust to overlap the notch
+                                right: -10,
+                                child: FloatingActionBtn(
+                                  icon: a.status == 'OFFER' ? '✓' : '→',
+                                  bg: a.color,
+                                  onClick: () => context.push('/application/${a.id}'),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         );
                       }),

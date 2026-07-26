@@ -59,86 +59,86 @@ class CopilotScreen extends StatelessWidget {
                     ),
 
                     // Hero readiness card
-                    NotchedCard(
-                      bg: Colors.transparent, // Background handled by inner container
-                      padding: EdgeInsets.zero,
-                      child: Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [NeoColors.purple, NeoColors.blue],
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'OVERALL READINESS',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white.withValues(alpha: 0.6),
-                                letterSpacing: 10 * 0.1,
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        NotchedCard(
+                          bg: Colors.transparent, // Background handled by inner container
+                          padding: EdgeInsets.zero,
+                          child: Container(
+                            padding: const EdgeInsets.all(20),
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [NeoColors.purple, NeoColors.blue],
                               ),
                             ),
-                            const SizedBox(height: 6),
-                            const Text(
-                              '82%',
-                              style: TextStyle(
-                                fontSize: 48,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
-                                letterSpacing: -2,
-                                height: 1,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              'SOP, resume & interview ready',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Colors.white.withValues(alpha: 0.6),
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            ProgressBar(value: 82, color: Colors.white.withValues(alpha: 0.9), height: 4),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Powered by Gemini AI',
-                                  style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.4)),
-                                ),
-                                Text(
-                                  '3 tasks left',
+                                  'OVERALL READINESS',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.w800,
-                                    color: Colors.white.withValues(alpha: 0.8),
+                                    color: Colors.white.withValues(alpha: 0.6),
+                                    letterSpacing: 10 * 0.1,
                                   ),
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  '82%',
+                                  style: TextStyle(
+                                    fontSize: 48,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    letterSpacing: -2,
+                                    height: 1,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'SOP, resume & interview ready',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: Colors.white.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                                const SizedBox(height: 14),
+                                ProgressBar(value: 82, color: Colors.white.withValues(alpha: 0.9), height: 4),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Powered by Gemini AI',
+                                      style: TextStyle(fontSize: 11, color: Colors.white.withValues(alpha: 0.4)),
+                                    ),
+                                    Text(
+                                      '3 tasks left',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white.withValues(alpha: 0.8),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
-                      Positioned(
-                        bottom: -10,
-                        right: -10,
-                        child: FloatingActionBtn(
-                          icon: '✦',
-                          bg: NeoColors.green,
-                          onClick: () {}, // Handled by outer wrapper or default
+                        Positioned(
+                          bottom: -10,
+                          right: -10,
+                          child: FloatingActionBtn(
+                            icon: '✦',
+                            bg: NeoColors.green,
+                            onClick: () {}, // Handled by outer wrapper or default
+                          ),
                         ),
-                      ),
                       ],
-                    ),
                     ),
                     const SizedBox(height: 14),
 

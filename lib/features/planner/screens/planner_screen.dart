@@ -99,45 +99,49 @@ class PlannerScreen extends ConsumerWidget {
                         return Expanded(
                           child: Row(
                             children: [
-                              Column(
-                                children: [
-                                  Container(
-                                    width: 32,
-                                    height: 32,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: isDone ? NeoColors.green : isActive ? NeoColors.purple : NeoColors.surfDark2,
-                                      border: Border.all(
-                                        color: isActive ? NeoColors.purple : isDone ? Colors.transparent : NeoColors.borderDark,
-                                        width: 2,
+                              Flexible(
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: isDone ? NeoColors.green : isActive ? NeoColors.purple : NeoColors.surfDark2,
+                                        border: Border.all(
+                                          color: isActive ? NeoColors.purple : isDone ? Colors.transparent : NeoColors.borderDark,
+                                          width: 2,
+                                        ),
+                                        boxShadow: [
+                                          if (isActive) BoxShadow(color: NeoColors.purple.withValues(alpha: 0.4), blurRadius: 16),
+                                          if (isDone) BoxShadow(color: NeoColors.green.withValues(alpha: 0.27), blurRadius: 8),
+                                        ],
                                       ),
-                                      boxShadow: [
-                                        if (isActive) BoxShadow(color: NeoColors.purple.withValues(alpha: 0.4), blurRadius: 16),
-                                        if (isDone) BoxShadow(color: NeoColors.green.withValues(alpha: 0.27), blurRadius: 8),
-                                      ],
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      isDone ? '✓' : isActive ? '⟳' : '',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: isDone || isActive ? Colors.black : Colors.transparent, // Wait, active uses purple? Spec: done: ✓, active: ⟳. React uses font-size 14. We can use white or black. Wait React uses default color, so black if bg is bright.
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        isDone ? '✓' : isActive ? '⟳' : '',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: isDone || isActive ? Colors.black : Colors.transparent,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  Text(
-                                    m['label'] as String,
-                                    style: TextStyle(
-                                      fontSize: 8,
-                                      fontWeight: FontWeight.w800,
-                                      color: isDone ? NeoColors.green : isActive ? NeoColors.purple : NeoColors.subDark,
-                                      letterSpacing: 8 * 0.03,
+                                    const SizedBox(height: 6),
+                                    FittedBox(
+                                      fit: BoxFit.scaleDown,
+                                      child: Text(
+                                        m['label'] as String,
+                                        style: TextStyle(
+                                          fontSize: 9,
+                                          fontWeight: FontWeight.w800,
+                                          color: isDone ? NeoColors.green : isActive ? NeoColors.purple : NeoColors.subDark,
+                                          letterSpacing: 9 * 0.03,
+                                        ),
+                                        maxLines: 1,
+                                      ),
                                     ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.visible,
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                               if (i < milestones.length - 1)
                                 Expanded(
@@ -283,9 +287,15 @@ class PlannerScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 2),
-                                Text(
-                                  '📅 ${task.date}',
-                                  style: const TextStyle(fontSize: 11, color: NeoColors.subDark),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.calendar_today, size: 12, color: NeoColors.subDark),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      task.date,
+                                      style: const TextStyle(fontSize: 11, color: NeoColors.subDark),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

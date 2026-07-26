@@ -115,19 +115,18 @@ class FloatingBottomNav extends StatelessWidget {
                             color: isActive ? (dark ? Colors.white : Colors.black) : t.sub,
                           ),
                         ),
-                        if (isActive)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 3),
-                            child: Text(
-                              tab["label"]!,
-                              style: const TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w800,
-                                color: NeoColors.purple,
-                                letterSpacing: 0.3,
-                              ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 3),
+                          child: Text(
+                            tab["label"]!,
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: isActive ? NeoColors.purple : t.sub,
+                              letterSpacing: 0.3,
                             ),
                           ),
+                        ),
                       ],
                     ),
                   ),

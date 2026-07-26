@@ -43,15 +43,12 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: String.fromEnvironment('FIREBASE_ANDROID_API_KEY',
-        defaultValue: 'AIzaSyA1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6'),
-    appId: String.fromEnvironment('FIREBASE_ANDROID_APP_ID',
-        defaultValue: '1:100000000000:android:eduingapp12345'),
-    messagingSenderId: _messagingSenderId,
-    projectId: _projectId,
-    storageBucket: _storageBucket,
+    apiKey: 'AIzaSyD6KlMuxPAaJJw_5Q2rya8Q56dgoUfXYSo',
+    appId: '1:475439810258:android:1f857c89272e89ad2c4f0b',
+    messagingSenderId: '475439810258',
+    projectId: 'eduing-platform',
+    storageBucket: 'eduing-platform.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: String.fromEnvironment('FIREBASE_IOS_API_KEY',
         defaultValue: 'AIzaSyA1b2C3d4E5f6G7h8I9j0K1l2M3n4O5p6'),

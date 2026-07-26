@@ -203,9 +203,9 @@ class _PillBtnState extends State<PillBtn> {
             ? null
             : [
                 BoxShadow(
-                  color: bgColor.withValues(alpha: 0.26), // roughly 44 hex
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
+                  color: bgColor.withValues(alpha: 0.3),
+                  blurRadius: 8,
+                  spreadRadius: 0,
                 )
               ],
       ),
@@ -300,7 +300,7 @@ class NotchedCard extends StatelessWidget {
             width: n,
             height: n,
             decoration: BoxDecoration(
-              color: t.bg,
+              color: Theme.of(context).scaffoldBackgroundColor,
               shape: BoxShape.circle,
             ),
           ),

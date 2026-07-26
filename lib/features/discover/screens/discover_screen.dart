@@ -66,7 +66,7 @@ class DiscoverScreen extends ConsumerWidget {
                             border: Border.all(color: NeoColors.borderDark),
                           ),
                           alignment: Alignment.center,
-                          child: const Text('🔖', style: TextStyle(fontSize: 16)),
+                          child: const Icon(Icons.bookmark_border, size: 16, color: Colors.white),
                         ),
                       ],
                     ),
@@ -283,12 +283,10 @@ class DiscoverScreen extends ConsumerWidget {
                                               const Spacer(),
                                               GestureDetector(
                                                 onTap: () => notifier.toggleSaved(u.id),
-                                                child: Text(
-                                                  '🔖',
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    color: isSaved ? Colors.white : Colors.white.withValues(alpha: 0.4), // Simulated grayscale
-                                                  ),
+                                                child: Icon(
+                                                  isSaved ? Icons.bookmark : Icons.bookmark_border,
+                                                  size: 18,
+                                                  color: Colors.white,
                                                 ),
                                               ),
                                               const SizedBox(width: 44), // space for FAB

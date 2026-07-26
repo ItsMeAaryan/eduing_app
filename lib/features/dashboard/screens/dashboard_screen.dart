@@ -96,55 +96,53 @@ class DashboardScreen extends ConsumerWidget {
                 ],
               ),
               const SizedBox(height: 20),
-
-              // Readiness hero card
-              NotchedCard(
-                bg: NeoColors.purple,
-                notchPos: "br",
-                notchSize: 56,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Badge(
-                      label: "ADMISSION READINESS",
-                      color: Colors.white,
-                      bg: Colors.white.withValues(alpha: 0.15),
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  NotchedCard(
+                    bg: NeoColors.purple,
+                    notchPos: "br",
+                    notchSize: 56,
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Badge(
+                          label: "ADMISSION READINESS",
+                          color: Colors.white,
+                          bg: Colors.white.withValues(alpha: 0.15),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          "${stats.profileStrength.toInt()}%",
+                          style: const TextStyle(
+                            fontSize: 48,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: -2,
+                            height: 1.0,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          "4 tasks left · Fall 2027",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.6),
+                          ),
+                        ),
+                        const SizedBox(height: 14),
+                        ProgressBar(
+                          value: stats.profileStrength,
+                          color: Colors.white,
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "${stats.profileStrength.toInt()}%",
-                      style: const TextStyle(
-                        fontSize: 48,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: -2,
-                        height: 1.0,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "4 tasks left · Fall 2027",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white.withValues(alpha: 0.6),
-                      ),
-                    ),
-                    const SizedBox(height: 14),
-                    ProgressBar(
-                      value: stats.profileStrength,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
-              ),
-              // Floating Yellow arrow
-              Transform.translate(
-                offset: const Offset(0, -32),
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 8),
+                  ),
+                  // Floating Yellow arrow
+                  Positioned(
+                    bottom: -26,
+                    right: 8,
                     child: FloatingActionBtn(
                       icon: "→",
                       bg: NeoColors.yellow,
@@ -152,9 +150,9 @@ class DashboardScreen extends ConsumerWidget {
                       onClick: () {},
                     ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: -10),
+              const SizedBox(height: 26),
 
               // Stats Row
               Row(
