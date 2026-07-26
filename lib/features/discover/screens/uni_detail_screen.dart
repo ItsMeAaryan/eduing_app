@@ -109,7 +109,7 @@ class _UniDetailScreenState extends State<UniDetailScreen> {
                                   ],
                                 ),
                               ),
-                              const neo.Badge(label: 'NIRF #1', color: NeoColors.green),
+                              neo.Badge(label: 'NIRF #1', color: NeoColors.green),
                             ],
                           ),
                           const SizedBox(height: 14),
