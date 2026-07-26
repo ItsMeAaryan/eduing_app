@@ -2,6 +2,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../repositories/auth_repository.dart';
 
+final guestModeProvider = NotifierProvider<GuestModeNotifier, bool>(() {
+  return GuestModeNotifier();
+});
+
+class GuestModeNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
+  void update(bool value) => state = value;
+}
+
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository();
 });
@@ -29,6 +39,15 @@ class AuthController extends Notifier<AsyncValue<void>> {
     try {
       state = const AsyncLoading();
       await _repository.signInWithEmail(email, password);
+      state = const AsyncData(null);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+  Future<void> signInWithGoogle() async {
+    try {
+      state = const AsyncLoading();
+      await _repository.signInWithGoogle();
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);

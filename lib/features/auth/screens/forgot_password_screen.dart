@@ -36,10 +36,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           onPressed: widget.onNavigateToLogin,
         ),
       ),
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
+          reverse: true,
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 80),
+          padding: EdgeInsets.fromLTRB(20, 16, 20, 80 + MediaQuery.of(context).viewInsets.bottom + 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [

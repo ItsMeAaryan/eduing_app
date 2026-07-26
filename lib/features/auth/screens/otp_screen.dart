@@ -42,10 +42,16 @@ class _OTPScreenState extends State<OTPScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        bottom: false, // The numpad handles bottom safe area itself essentially
-        child: Column(
-          children: [
+      resizeToAvoidBottomInset: true,
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: SafeArea(
+            bottom: false, // The numpad handles bottom safe area itself essentially
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
             // Header
             Padding(
               padding: const EdgeInsets.only(top: 6, left: 22, right: 22),
@@ -109,12 +115,11 @@ class _OTPScreenState extends State<OTPScreen> {
             ),
 
             // Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(top: 24, left: 22, right: 22),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 24, left: 22, right: 22),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
                     const Text(
                       'Enter\nVerification\nCode',
                       style: TextStyle(
@@ -229,13 +234,14 @@ class _OTPScreenState extends State<OTPScreen> {
                   ],
                 ),
               ),
-            ),
 
-            // Custom Numpad
-            CustomNumpad(onKeyPress: _handleNum),
-          ],
+              // Custom Numpad
+              CustomNumpad(onKeyPress: _handleNum),
+            ],
+          ),
         ),
       ),
-    );
+    ),
+  );
   }
 }

@@ -76,7 +76,11 @@ class AppRouter {
       final isAuthRoute = authRoutes.contains(state.matchedLocation);
 
       if (user == null && !isAuthRoute) {
-        return '/';
+        // Allow unauthenticated users (guests) to view main app routes
+        final mainRoutes = ['/home', '/discover', '/universities', '/applications', '/copilot', '/planner', '/vault', '/resume', '/sop', '/profile'];
+        if (!mainRoutes.contains(state.matchedLocation) && !state.matchedLocation.startsWith('/application/')) {
+          return '/';
+        }
       }
       if (user != null && isAuthRoute) {
         return '/home';

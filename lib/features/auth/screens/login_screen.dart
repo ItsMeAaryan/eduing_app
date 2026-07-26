@@ -5,14 +5,17 @@ import '../../../core/widgets/green_button.dart';
 import '../../../core/widgets/ghost_button.dart';
 import '../../../core/widgets/glow_input.dart';
 
-class LoginScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
+
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   String _email = '';
   String _pass = '';
   bool _loading = false;
@@ -20,6 +23,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<void>>(
+      authControllerProvider,
+      (_, state) {
+        state.whenOrNull(
+          error: (error, _) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error.toString())),
+            );
+          },
+        );
+      },
+    );
+
     return Scaffold(
       backgroundColor: AppColors.background,
       resizeToAvoidBottomInset: true,
@@ -120,7 +136,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     const GreenButton(label: 'Continue with Apple', icon: '🍎'),
                     const SizedBox(height: 10),
                   ],
-                  const GhostButton(label: 'Continue with Google', icon: 'G'),
+                  GhostButton(
+                    label: 'Continue with Google',
+                    icon: 'G',
+                    onClick: () {
+                      ref.read(authControllerProvider.notifier).signInWithGoogle();
+                    },
+                  ),
                   const SizedBox(height: 24),
 
                   // Divider

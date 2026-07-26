@@ -5,15 +5,17 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/green_button.dart';
 import '../../../core/widgets/ghost_button.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends ConsumerState<SplashScreen> {
   int _idx = 0;
   Timer? _timer;
 
@@ -62,6 +64,19 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<void>>(
+      authControllerProvider,
+      (_, state) {
+        state.whenOrNull(
+          error: (error, _) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error.toString())),
+            );
+          },
+        );
+      },
+    );
+
     final slide = _slides[_idx];
     final bg = slide['bg'] as Color;
     final textColor = slide['textColor'] as Color;
@@ -223,46 +238,13 @@ class _SplashScreenState extends State<SplashScreen> {
                       top: false,
                       child: Column(
                         children: [
-                          // Continue as guest
-                          GestureDetector(
-                            onTap: () => context.go('/home'),
-                            behavior: HitTestBehavior.opaque,
-                            child: SizedBox(
-                              height: 40,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    width: 16,
-                                    height: 16,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: _idx == 0 ? Colors.black.withValues(alpha: 0.4) : AppColors.text30,
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      '👤',
-                                      style: TextStyle(
-                                        fontSize: 8,
-                                        color: _idx == 0 ? Colors.black.withValues(alpha: 0.5) : AppColors.text60,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'Continue As Guest',
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w700,
-                                      color: _idx == 0 ? Colors.black.withValues(alpha: 0.6) : AppColors.text60,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                          GhostButton(
+                            label: 'Continue As Guest',
+                            icon: '👤',
+                            onClick: () {
+                              ref.read(guestModeProvider.notifier).update(true);
+                              context.go('/home');
+                            },
                           ),
                           const SizedBox(height: 10),
                           if (Theme.of(context).platform == TargetPlatform.iOS) ...[
@@ -273,18 +255,20 @@ class _SplashScreenState extends State<SplashScreen> {
                             ),
                             const SizedBox(height: 10),
                           ],
-                          GhostButton(
+                          GreenButton(
                             label: 'Continue with Google',
                             icon: 'G',
-                            onClick: () => context.go('/register'),
+                            onClick: () {
+                              ref.read(authControllerProvider.notifier).signInWithGoogle();
+                            },
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 20),
                           RichText(
                             textAlign: TextAlign.center,
                             text: TextSpan(
                               style: TextStyle(
-                                fontSize: 13,
-                                color: _idx == 0 ? Colors.black.withValues(alpha: 0.5) : AppColors.text60,
+                                fontSize: 15,
+                                color: _idx == 0 ? Colors.black.withValues(alpha: 0.7) : Colors.white,
                                 fontFamily: 'Inter',
                               ),
                               children: [
@@ -297,10 +281,9 @@ class _SplashScreenState extends State<SplashScreen> {
                                     child: Text(
                                       'Log in',
                                       style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w800,
-                                        color: _idx == 0 ? AppColors.background : AppColors.text,
-                                        decoration: TextDecoration.underline,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: _idx == 0 ? AppColors.background : AppColors.primaryAccent,
                                         fontFamily: 'Inter',
                                       ),
                                     ),

@@ -25,9 +25,11 @@ class AuthRepository {
   Future<UserCredential?> signInWithGoogle() async {
     try {
       if (!_isGoogleSignInInitialized) {
-        await _googleSignIn.initialize();
+        // TODO: This requires SHA-1 fingerprint in Firebase Console
+        // await _googleSignIn.initialize();
         _isGoogleSignInInitialized = true;
       }
+      
       final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
@@ -42,7 +44,8 @@ class AuthRepository {
       }
       return userCredential;
     } catch (e) {
-      throw e.toString();
+      // TODO: The actual SHA-1 fix must be done in Firebase Console
+      throw Exception('Google Sign-In failed: $e');
     }
   }
 

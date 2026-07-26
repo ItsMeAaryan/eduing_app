@@ -5,14 +5,17 @@ import '../../../core/widgets/green_button.dart';
 import '../../../core/widgets/ghost_button.dart';
 import '../../../core/widgets/glow_input.dart';
 
-class RegisterScreen extends StatefulWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/auth_provider.dart';
+
+class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   String _name = '';
   String _email = '';
   String _pass = '';
@@ -20,101 +23,116 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<void>>(
+      authControllerProvider,
+      (_, state) {
+        state.whenOrNull(
+          error: (error, _) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error.toString())),
+            );
+          },
+        );
+      },
+    );
+
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: SafeArea(
-        bottom: false,
+      resizeToAvoidBottomInset: true,
+      body: SingleChildScrollView(
+        reverse: true,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(22, 0, 22, 28),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Back
-              Padding(
-                padding: const EdgeInsets.only(top: 6, bottom: 24),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => context.go('/splash'),
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: const BoxDecoration(
-                          color: AppColors.surface,
-                          shape: BoxShape.circle,
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Back
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6, bottom: 24),
+                    child: Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () => context.go('/splash'),
+                          child: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: const BoxDecoration(
+                              color: AppColors.surface,
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: const Icon(
+                              Icons.arrow_back,
+                              color: AppColors.text,
+                              size: 14,
+                            ),
+                          ),
                         ),
-                        alignment: Alignment.center,
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: AppColors.text,
-                          size: 14,
+                        const SizedBox(width: 12),
+                        const Text(
+                          'CREATE ACCOUNT',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.text60,
+                            letterSpacing: 13 * 0.04,
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                    const SizedBox(width: 12),
-                    const Text(
-                      'CREATE ACCOUNT',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.text60,
-                        letterSpacing: 13 * 0.04,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  ),
 
-              // Progress
-              Container(
-                height: 3,
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-                margin: const EdgeInsets.only(bottom: 28),
-                alignment: Alignment.centerLeft,
-                child: FractionallySizedBox(
-                  widthFactor: 0.66,
-                  child: Container(
+                  // Progress
+                  Container(
+                    height: 3,
                     decoration: BoxDecoration(
-                      color: AppColors.primaryAccent,
+                      color: AppColors.surface,
                       borderRadius: BorderRadius.circular(2),
                     ),
+                    margin: const EdgeInsets.only(bottom: 28),
+                    alignment: Alignment.centerLeft,
+                    child: FractionallySizedBox(
+                      widthFactor: 0.66,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryAccent,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
 
-              RichText(
-                text: const TextSpan(
-                  style: TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -1,
-                    height: 1.1,
-                    fontFamily: 'Inter',
+                  RichText(
+                    text: const TextSpan(
+                      style: TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -1,
+                        height: 1.1,
+                        fontFamily: 'Inter',
+                      ),
+                      children: [
+                        TextSpan(text: 'Create account,\n', style: TextStyle(color: AppColors.text)),
+                        TextSpan(text: 'start exploring.', style: TextStyle(color: AppColors.primaryAccent)),
+                      ],
+                    ),
                   ),
-                  children: [
-                    TextSpan(text: 'Create account,\n', style: TextStyle(color: AppColors.text)),
-                    TextSpan(text: 'start exploring.', style: TextStyle(color: AppColors.primaryAccent)),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 6),
-              const Text(
-                'Join thousands of students getting into top universities.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: AppColors.text60,
-                ),
-              ),
-              const SizedBox(height: 28),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Join thousands of students getting into top universities.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.text60,
+                    ),
+                  ),
+                  const SizedBox(height: 28),
 
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
+                  // Form
                       GlowInput(
                         label: 'FULL NAME',
                         placeholder: 'Aaryan Sharma',
@@ -179,61 +197,71 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                    ],
+                  GreenButton(
+                    label: 'Create Account',
+                    loading: _loading,
+                    disabled: _name.isEmpty || _email.isEmpty || _pass.length < 8,
+                    onClick: () {
+                      setState(() => _loading = true);
+                      Future.delayed(const Duration(milliseconds: 1200), () {
+                        if (context.mounted) {
+                          setState(() => _loading = false);
+                          context.go('/otp');
+                        }
+                      });
+                    },
                   ),
-                ),
-              ),
-
-              GreenButton(
-                label: 'Create Account',
-                loading: _loading,
-                disabled: _name.isEmpty || _email.isEmpty || _pass.length < 8,
-                onClick: () {
-                  setState(() => _loading = true);
-                  Future.delayed(const Duration(milliseconds: 1200), () {
-                    if (context.mounted) {
-                      setState(() => _loading = false);
-                      context.go('/otp');
-                    }
-                  });
-                },
-              ),
-              const SizedBox(height: 12),
-              const GhostButton(label: 'Continue with Apple', icon: '🍎'),
-              const SizedBox(height: 10),
-              const GhostButton(label: 'Continue with Google', icon: 'G'),
-              const SizedBox(height: 16),
-              
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppColors.text60,
-                    fontFamily: 'Inter',
+                  const SizedBox(height: 12),
+                  if (Theme.of(context).platform == TargetPlatform.iOS) ...[
+                    const GhostButton(label: 'Continue with Apple', icon: '🍎'),
+                    const SizedBox(height: 10),
+                  ],
+                  GhostButton(
+                    label: 'Continue with Google',
+                    icon: 'G',
+                    onClick: () {
+                      ref.read(authControllerProvider.notifier).signInWithGoogle();
+                    },
                   ),
-                  children: [
-                    const TextSpan(text: 'Already have an account? '),
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.baseline,
-                      baseline: TextBaseline.alphabetic,
-                      child: GestureDetector(
-                        onTap: () => context.go('/login'),
-                        child: const Text(
-                          'Log in',
-                          style: TextStyle(
-                            color: AppColors.text,
-                            fontWeight: FontWeight.w800,
-                            decoration: TextDecoration.underline,
-                            fontFamily: 'Inter',
-                          ),
+                  const SizedBox(height: 16),
+                  
+                  Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).padding.bottom + 16,
+                    ),
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.text60,
+                          fontFamily: 'Inter',
                         ),
+                        children: [
+                          const TextSpan(text: 'Already have an account? '),
+                          WidgetSpan(
+                            alignment: PlaceholderAlignment.baseline,
+                            baseline: TextBaseline.alphabetic,
+                            child: GestureDetector(
+                              onTap: () => context.go('/login'),
+                              child: const Text(
+                                'Log in',
+                                style: TextStyle(
+                                  color: AppColors.text,
+                                  fontWeight: FontWeight.w800,
+                                  decoration: TextDecoration.underline,
+                                  fontFamily: 'Inter',
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
