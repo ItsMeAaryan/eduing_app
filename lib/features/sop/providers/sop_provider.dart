@@ -19,18 +19,20 @@ final sopsStreamProvider = StreamProvider<List<UserSop>>((ref) {
   return repo.getSopsStream();
 });
 
-final sopProvider = StateNotifierProvider<SopNotifier, UserSop>((ref) {
-  final repo = ref.watch(sopRepositoryProvider);
-  final aiService = ref.watch(aiServiceProvider);
-  return SopNotifier(repo, aiService);
+final sopProvider = NotifierProvider<SopNotifier, UserSop>(() {
+  return SopNotifier();
 });
 
-class SopNotifier extends StateNotifier<UserSop> {
-  final SopRepository _repository;
-  final AIService _aiService;
+class SopNotifier extends Notifier<UserSop> {
+  late final SopRepository _repository;
+  late final AIService _aiService;
 
-  SopNotifier(this._repository, this._aiService) : super(_initialData()) {
+  @override
+  UserSop build() {
+    _repository = ref.watch(sopRepositoryProvider);
+    _aiService = ref.watch(aiServiceProvider);
     _loadFromFirestore();
+    return _initialData();
   }
 
   static UserSop _initialData() {

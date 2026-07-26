@@ -48,17 +48,20 @@ class PlannerState {
   }
 }
 
-class PlannerNotifier extends StateNotifier<PlannerState> {
-  PlannerNotifier() : super(const PlannerState(
-    tasks: [
-      PlannerTask(id: '1', title: 'Upload Passport', tag: 'REQUIRED', date: 'Tomorrow', color: NeoColors.red, done: false),
-      PlannerTask(id: '2', title: 'Finish BITS SOP', tag: 'HIGH', date: 'Jul 24', color: Color(0xFFFF6B35), done: false),
-      PlannerTask(id: '3', title: 'Mock Interview Practice', tag: 'MEDIUM', date: 'Jul 24', color: NeoColors.blue, done: false),
-      PlannerTask(id: '4', title: 'Stanford App Deadline', tag: 'DEADLINE', date: 'Jul 27', color: NeoColors.purple, done: true),
-      PlannerTask(id: '5', title: 'STEM Grant Deadline', tag: 'DEADLINE', date: 'Jul 29', color: Color(0xFFFF3B7A), done: false),
-      PlannerTask(id: '6', title: 'IIT Bombay Application', tag: 'IN PROGRESS', date: 'Aug 15', color: NeoColors.green, done: false),
-    ],
-  ));
+class PlannerNotifier extends Notifier<PlannerState> {
+  @override
+  PlannerState build() {
+    return const PlannerState(
+      tasks: [
+        PlannerTask(id: '1', title: 'Upload Passport', tag: 'REQUIRED', date: 'Tomorrow', color: NeoColors.red, done: false),
+        PlannerTask(id: '2', title: 'Finish BITS SOP', tag: 'HIGH', date: 'Jul 24', color: Color(0xFFFF6B35), done: false),
+        PlannerTask(id: '3', title: 'Mock Interview Practice', tag: 'MEDIUM', date: 'Jul 24', color: NeoColors.blue, done: false),
+        PlannerTask(id: '4', title: 'Stanford App Deadline', tag: 'DEADLINE', date: 'Jul 27', color: NeoColors.purple, done: true),
+        PlannerTask(id: '5', title: 'STEM Grant Deadline', tag: 'DEADLINE', date: 'Jul 29', color: Color(0xFFFF3B7A), done: false),
+        PlannerTask(id: '6', title: 'IIT Bombay Application', tag: 'IN PROGRESS', date: 'Aug 15', color: NeoColors.green, done: false),
+      ],
+    );
+  }
 
   void setView(String view) {
     state = state.copyWith(view: view);
@@ -71,6 +74,6 @@ class PlannerNotifier extends StateNotifier<PlannerState> {
   }
 }
 
-final plannerProvider = StateNotifierProvider<PlannerNotifier, PlannerState>((ref) {
+final plannerProvider = NotifierProvider<PlannerNotifier, PlannerState>(() {
   return PlannerNotifier();
 });

@@ -14,17 +14,19 @@ final applicationsStreamProvider =
 });
 
 final applicationsNotifierProvider =
-    StateNotifierProvider<ApplicationsNotifier, List<UniversityApplication>>(
-        (ref) {
-  final repo = ref.watch(applicationRepositoryProvider);
-  return ApplicationsNotifier(repo);
+    NotifierProvider<ApplicationsNotifier, List<UniversityApplication>>(
+        () {
+  return ApplicationsNotifier();
 });
 
-class ApplicationsNotifier extends StateNotifier<List<UniversityApplication>> {
-  final ApplicationRepository _repository;
+class ApplicationsNotifier extends Notifier<List<UniversityApplication>> {
+  late final ApplicationRepository _repository;
 
-  ApplicationsNotifier(this._repository) : super([]) {
+  @override
+  List<UniversityApplication> build() {
+    _repository = ref.watch(applicationRepositoryProvider);
     _loadInitialData();
+    return [];
   }
 
   void _loadInitialData() {

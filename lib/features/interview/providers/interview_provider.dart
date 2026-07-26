@@ -15,18 +15,20 @@ final interviewSessionsStreamProvider =
 });
 
 final interviewNotifierProvider =
-    StateNotifierProvider<InterviewNotifier, List<InterviewSession>>((ref) {
-  final repo = ref.watch(interviewRepositoryProvider);
-  final aiService = ref.watch(aiServiceProvider);
-  return InterviewNotifier(repo, aiService);
+    NotifierProvider<InterviewNotifier, List<InterviewSession>>(() {
+  return InterviewNotifier();
 });
 
-class InterviewNotifier extends StateNotifier<List<InterviewSession>> {
-  final InterviewRepository _repository;
-  final AIService _aiService;
+class InterviewNotifier extends Notifier<List<InterviewSession>> {
+  late final InterviewRepository _repository;
+  late final AIService _aiService;
 
-  InterviewNotifier(this._repository, this._aiService) : super([]) {
+  @override
+  List<InterviewSession> build() {
+    _repository = ref.watch(interviewRepositoryProvider);
+    _aiService = ref.watch(aiServiceProvider);
     _loadInitialSessions();
+    return [];
   }
 
   void _loadInitialSessions() {

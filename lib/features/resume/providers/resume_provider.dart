@@ -14,18 +14,20 @@ final resumesStreamProvider = StreamProvider<List<UserResume>>((ref) {
   return repo.getResumesStream();
 });
 
-final resumeProvider = StateNotifierProvider<ResumeNotifier, UserResume>((ref) {
-  final repo = ref.watch(resumeRepositoryProvider);
-  final aiService = ref.watch(aiServiceProvider);
-  return ResumeNotifier(repo, aiService);
+final resumeProvider = NotifierProvider<ResumeNotifier, UserResume>(() {
+  return ResumeNotifier();
 });
 
-class ResumeNotifier extends StateNotifier<UserResume> {
-  final ResumeRepository _repository;
-  final AIService _aiService;
+class ResumeNotifier extends Notifier<UserResume> {
+  late final ResumeRepository _repository;
+  late final AIService _aiService;
 
-  ResumeNotifier(this._repository, this._aiService) : super(_initialData()) {
+  @override
+  UserResume build() {
+    _repository = ref.watch(resumeRepositoryProvider);
+    _aiService = ref.watch(aiServiceProvider);
     _loadFromFirestore();
+    return _initialData();
   }
 
   static UserResume _initialData() {

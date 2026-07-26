@@ -12,14 +12,18 @@ final authStateProvider = StreamProvider<User?>((ref) {
 });
 
 final authControllerProvider =
-    StateNotifierProvider<AuthController, AsyncValue<void>>((ref) {
-  return AuthController(ref.watch(authRepositoryProvider));
+    NotifierProvider<AuthController, AsyncValue<void>>(() {
+  return AuthController();
 });
 
-class AuthController extends StateNotifier<AsyncValue<void>> {
-  final AuthRepository _repository;
+class AuthController extends Notifier<AsyncValue<void>> {
+  late final AuthRepository _repository;
 
-  AuthController(this._repository) : super(const AsyncData(null));
+  @override
+  AsyncValue<void> build() {
+    _repository = ref.watch(authRepositoryProvider);
+    return const AsyncData(null);
+  }
 
   Future<void> signInWithEmail(String email, String password) async {
     try {

@@ -44,25 +44,27 @@ class VaultState {
   }
 }
 
-class VaultNotifier extends StateNotifier<VaultState> {
-  VaultNotifier()
-      : super(const VaultState(
-          docs: [
-            DocumentModel(id: '1', name: '10th Marksheet', cat: 'Academic', status: 'VERIFIED', icon: '📄', color: NeoColors.green),
-            DocumentModel(id: '2', name: '12th Marksheet', cat: 'Academic', status: 'VERIFIED', icon: '📄', color: NeoColors.green),
-            DocumentModel(id: '3', name: 'Aadhaar Card', cat: 'Identity', status: 'PENDING', icon: '🪪', color: NeoColors.yellow),
-            DocumentModel(id: '4', name: 'Passport', cat: 'Identity', status: 'MISSING', icon: '📘', color: NeoColors.red),
-            DocumentModel(id: '5', name: 'JEE Scorecard', cat: 'Academic', status: 'VERIFIED', icon: '📊', color: NeoColors.green),
-            DocumentModel(id: '6', name: 'Income Certificate', cat: 'Financial', status: 'PENDING', icon: '💰', color: NeoColors.yellow),
-          ],
-        ));
+class VaultNotifier extends Notifier<VaultState> {
+  @override
+  VaultState build() {
+    return const VaultState(
+      docs: [
+        DocumentModel(id: '1', name: '10th Marksheet', cat: 'Academic', status: 'VERIFIED', icon: '📄', color: NeoColors.green),
+        DocumentModel(id: '2', name: '12th Marksheet', cat: 'Academic', status: 'VERIFIED', icon: '📄', color: NeoColors.green),
+        DocumentModel(id: '3', name: 'Aadhaar Card', cat: 'Identity', status: 'PENDING', icon: '🪪', color: NeoColors.yellow),
+        DocumentModel(id: '4', name: 'Passport', cat: 'Identity', status: 'MISSING', icon: '📘', color: NeoColors.red),
+        DocumentModel(id: '5', name: 'JEE Scorecard', cat: 'Academic', status: 'VERIFIED', icon: '📊', color: NeoColors.green),
+        DocumentModel(id: '6', name: 'Income Certificate', cat: 'Financial', status: 'PENDING', icon: '💰', color: NeoColors.yellow),
+      ],
+    );
+  }
 
   void setTab(String tab) => state = state.copyWith(currentTab: tab);
   
   void setQuery(String q) => state = state.copyWith(query: q);
 }
 
-final vaultProvider = StateNotifierProvider<VaultNotifier, VaultState>((ref) {
+final vaultProvider = NotifierProvider<VaultNotifier, VaultState>(() {
   return VaultNotifier();
 });
 

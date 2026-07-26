@@ -2,13 +2,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/scholarship_model.dart';
 
 final scholarshipsProvider =
-    StateNotifierProvider<ScholarshipsNotifier, ScholarshipDashboardData>(
-        (ref) {
+    NotifierProvider<ScholarshipsNotifier, ScholarshipDashboardData>(() {
   return ScholarshipsNotifier();
 });
 
-class ScholarshipsNotifier extends StateNotifier<ScholarshipDashboardData> {
-  ScholarshipsNotifier() : super(_initialData());
+class ScholarshipsNotifier extends Notifier<ScholarshipDashboardData> {
+  @override
+  ScholarshipDashboardData build() {
+    return _initialData();
+  }
 
   static ScholarshipDashboardData _initialData() {
     return const ScholarshipDashboardData(

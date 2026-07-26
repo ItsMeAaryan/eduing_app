@@ -6,15 +6,18 @@ import '../repositories/settings_repository.dart';
 final settingsRepositoryProvider = Provider((ref) => SettingsRepository());
 
 final settingsProvider =
-    StateNotifierProvider<SettingsNotifier, AppSettings>((ref) {
-  return SettingsNotifier(ref.watch(settingsRepositoryProvider));
+    NotifierProvider<SettingsNotifier, AppSettings>(() {
+  return SettingsNotifier();
 });
 
-class SettingsNotifier extends StateNotifier<AppSettings> {
-  final SettingsRepository _repository;
+class SettingsNotifier extends Notifier<AppSettings> {
+  late final SettingsRepository _repository;
 
-  SettingsNotifier(this._repository) : super(const AppSettings()) {
+  @override
+  AppSettings build() {
+    _repository = ref.watch(settingsRepositoryProvider);
     _init();
+    return const AppSettings();
   }
 
   Future<void> _init() async {

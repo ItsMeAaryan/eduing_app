@@ -314,7 +314,7 @@ class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
                       itemBuilder: (context, index) {
                         final doc = filteredDocuments[index];
                         final progressState =
-                            ref.watch(activeUploadProgressProvider(doc.id));
+                            ref.watch(activeUploadProgressProvider)[doc.id];
 
                         return Padding(
                           padding:

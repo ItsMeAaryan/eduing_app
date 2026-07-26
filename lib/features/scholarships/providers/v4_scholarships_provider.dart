@@ -39,23 +39,26 @@ class V4ScholarshipsState {
   }
 }
 
-class V4ScholarshipsNotifier extends StateNotifier<V4ScholarshipsState> {
-  V4ScholarshipsNotifier() : super(const V4ScholarshipsState(
-    scholarships: [
-      V4Scholarship(name: 'STEM Innovators Grant', org: 'Govt of India', amount: '₹2L', match: 94, deadline: 'Jul 29', color: NeoColors.green, type: 'Government'),
-      V4Scholarship(name: 'Merit Excellence Fund', org: 'BITS Foundation', amount: '₹1.5L', match: 87, deadline: 'Aug 10', color: NeoColors.purple, type: 'Private'),
-      V4Scholarship(name: 'National Science Talent', org: 'DST India', amount: '₹50K', match: 79, deadline: 'Aug 20', color: NeoColors.blue, type: 'Government'),
-      V4Scholarship(name: 'Women in Tech Award', org: 'Google India', amount: '₹3L', match: 72, deadline: 'Sep 1', color: Color(0xFFFF3B7A), type: 'Corporate'),
-      V4Scholarship(name: 'Sports Excellence Grant', org: 'SAI', amount: '₹75K', match: 65, deadline: 'Sep 15', color: Color(0xFFFF6B35), type: 'Government'),
-    ],
-  ));
+class V4ScholarshipsNotifier extends Notifier<V4ScholarshipsState> {
+  @override
+  V4ScholarshipsState build() {
+    return const V4ScholarshipsState(
+      scholarships: [
+        V4Scholarship(name: 'STEM Innovators Grant', org: 'Govt of India', amount: '₹2L', match: 94, deadline: 'Jul 29', color: NeoColors.green, type: 'Government'),
+        V4Scholarship(name: 'Merit Excellence Fund', org: 'BITS Foundation', amount: '₹1.5L', match: 87, deadline: 'Aug 10', color: NeoColors.purple, type: 'Private'),
+        V4Scholarship(name: 'National Science Talent', org: 'DST India', amount: '₹50K', match: 79, deadline: 'Aug 20', color: NeoColors.blue, type: 'Government'),
+        V4Scholarship(name: 'Women in Tech Award', org: 'Google India', amount: '₹3L', match: 72, deadline: 'Sep 1', color: Color(0xFFFF3B7A), type: 'Corporate'),
+        V4Scholarship(name: 'Sports Excellence Grant', org: 'SAI', amount: '₹75K', match: 65, deadline: 'Sep 15', color: Color(0xFFFF6B35), type: 'Government'),
+      ],
+    );
+  }
 
   void setFilter(String filter) {
     state = state.copyWith(filter: filter);
   }
 }
 
-final v4ScholarshipsProvider = StateNotifierProvider<V4ScholarshipsNotifier, V4ScholarshipsState>((ref) {
+final v4ScholarshipsProvider = NotifierProvider<V4ScholarshipsNotifier, V4ScholarshipsState>(() {
   return V4ScholarshipsNotifier();
 });
 

@@ -17,15 +17,17 @@ class CopilotChatState {
   }
 }
 
-class CopilotChatNotifier extends StateNotifier<CopilotChatState> {
-  CopilotChatNotifier()
-      : super(const CopilotChatState(
-          messages: [
-            ChatMessage(from: 'ai', text: 'Hey Aaryan 👋 I\'m your AI admission strategist. What do you need help with today?'),
-            ChatMessage(from: 'user', text: 'What are my chances at BITS Pilani CSE?'),
-            ChatMessage(from: 'ai', text: 'Based on your profile — JEE score, 12th marks, and extracurriculars — I estimate a 78% admission probability for BITS Pilani CSE. Your rank needs to be under 2,500 for Pilani campus. Want me to break down what you can improve?'),
-          ],
-        ));
+class CopilotChatNotifier extends Notifier<CopilotChatState> {
+  @override
+  CopilotChatState build() {
+    return const CopilotChatState(
+      messages: [
+        ChatMessage(from: 'ai', text: 'Hey Aaryan 👋 I\'m your AI admission strategist. What do you need help with today?'),
+        ChatMessage(from: 'user', text: 'What are my chances at BITS Pilani CSE?'),
+        ChatMessage(from: 'ai', text: 'Based on your profile — JEE score, 12th marks, and extracurriculars — I estimate a 78% admission probability for BITS Pilani CSE. Your rank needs to be under 2,500 for Pilani campus. Want me to break down what you can improve?'),
+      ],
+    );
+  }
 
   void sendMessage(String text) {
     if (text.trim().isEmpty) return;
@@ -38,6 +40,6 @@ class CopilotChatNotifier extends StateNotifier<CopilotChatState> {
   }
 }
 
-final copilotChatProvider = StateNotifierProvider<CopilotChatNotifier, CopilotChatState>((ref) {
+final copilotChatProvider = NotifierProvider<CopilotChatNotifier, CopilotChatState>(() {
   return CopilotChatNotifier();
 });

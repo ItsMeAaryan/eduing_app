@@ -28,10 +28,13 @@ class ProfileState {
   }
 }
 
-class ProfileNotifier extends StateNotifier<ProfileState> {
-  ProfileNotifier() : super(const ProfileState());
+class ProfileNotifier extends Notifier<ProfileState> {
+  @override
+  ProfileState build() {
+    return const ProfileState();
+  }
 }
 
-final profileProvider = StateNotifierProvider<ProfileNotifier, ProfileState>((ref) {
+final profileProvider = NotifierProvider<ProfileNotifier, ProfileState>(() {
   return ProfileNotifier();
 });

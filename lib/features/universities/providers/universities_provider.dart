@@ -2,16 +2,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../shared/models/university_model.dart';
 
 final universitiesProvider =
-    StateNotifierProvider<UniversitiesNotifier, List<University>>((ref) {
+    NotifierProvider<UniversitiesNotifier, List<University>>(() {
   return UniversitiesNotifier();
 });
 
-class UniversitiesNotifier extends StateNotifier<List<University>> {
+class UniversitiesNotifier extends Notifier<List<University>> {
   List<University> _allUniversities = _initialData;
   String _currentQuery = '';
   String _currentCategory = 'All';
 
-  UniversitiesNotifier() : super(_initialData);
+  @override
+  List<University> build() {
+    return _initialData;
+  }
 
   void setUniversities(List<University> list) {
     _allUniversities = list;

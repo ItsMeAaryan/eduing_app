@@ -13,19 +13,21 @@ final chatSessionsStreamProvider = StreamProvider<List<ChatSession>>((ref) {
 });
 
 final copilotProvider =
-    StateNotifierProvider<CopilotNotifier, CopilotDashboardData>((ref) {
-  final repo = ref.watch(copilotRepositoryProvider);
-  final aiService = ref.watch(aiServiceProvider);
-  return CopilotNotifier(repo, aiService);
+    NotifierProvider<CopilotNotifier, CopilotDashboardData>(() {
+  return CopilotNotifier();
 });
 
-class CopilotNotifier extends StateNotifier<CopilotDashboardData> {
-  final CopilotRepository _repository;
-  final AIService _aiService;
+class CopilotNotifier extends Notifier<CopilotDashboardData> {
+  late final CopilotRepository _repository;
+  late final AIService _aiService;
   String _activeSessionId = 'session_default';
 
-  CopilotNotifier(this._repository, this._aiService) : super(_initialData()) {
+  @override
+  CopilotDashboardData build() {
+    _repository = ref.watch(copilotRepositoryProvider);
+    _aiService = ref.watch(aiServiceProvider);
     _loadSessionsFromFirestore();
+    return _initialData();
   }
 
   static CopilotDashboardData _initialData() {

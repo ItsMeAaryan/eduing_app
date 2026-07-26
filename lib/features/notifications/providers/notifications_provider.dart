@@ -1,8 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/notification_item.dart';
 
-class NotificationsNotifier extends StateNotifier<List<NotificationItem>> {
-  NotificationsNotifier() : super(_initialData);
+class NotificationsNotifier extends Notifier<List<NotificationItem>> {
+  @override
+  List<NotificationItem> build() {
+    return _initialData;
+  }
 
   static final List<NotificationItem> _initialData = [
     NotificationItem(
@@ -56,6 +59,6 @@ class NotificationsNotifier extends StateNotifier<List<NotificationItem>> {
 }
 
 final notificationsProvider =
-    StateNotifierProvider<NotificationsNotifier, List<NotificationItem>>((ref) {
+    NotifierProvider<NotificationsNotifier, List<NotificationItem>>(() {
   return NotificationsNotifier();
 });

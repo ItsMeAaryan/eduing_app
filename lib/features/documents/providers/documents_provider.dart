@@ -14,24 +14,37 @@ final documentsStreamProvider = StreamProvider<List<AppDocument>>((ref) {
   return repo.getDocumentsStream();
 });
 
-final activeUploadProgressProvider =
-    StateProvider.family<UploadProgress?, String>((ref, docId) => null);
+class UploadProgressNotifier extends Notifier<Map<String, UploadProgress?>> {
+  @override
+  Map<String, UploadProgress?> build() => {};
 
-final documentsNotifierProvider =
-    StateNotifierProvider<DocumentsNotifier, List<AppDocument>>((ref) {
-  final repo = ref.watch(documentRepositoryProvider);
-  final storageService = ref.watch(documentStorageServiceProvider);
-  return DocumentsNotifier(repo, storageService, ref);
+  void updateProgress(String docId, UploadProgress? progress) {
+    state = {
+      ...state,
+      docId: progress,
+    };
+  }
+}
+
+final activeUploadProgressProvider = NotifierProvider<UploadProgressNotifier, Map<String, UploadProgress?>>(() {
+  return UploadProgressNotifier();
 });
 
-class DocumentsNotifier extends StateNotifier<List<AppDocument>> {
-  final DocumentRepository _repository;
-  final DocumentStorageService _storageService;
-  final Ref _ref;
+final documentsNotifierProvider =
+    NotifierProvider<DocumentsNotifier, List<AppDocument>>(() {
+  return DocumentsNotifier();
+});
 
-  DocumentsNotifier(this._repository, this._storageService, this._ref)
-      : super([]) {
+class DocumentsNotifier extends Notifier<List<AppDocument>> {
+  late final DocumentRepository _repository;
+  late final DocumentStorageService _storageService;
+
+  @override
+  List<AppDocument> build() {
+    _repository = ref.watch(documentRepositoryProvider);
+    _storageService = ref.watch(documentStorageServiceProvider);
     _loadInitialData();
+    return [];
   }
 
   void _loadInitialData() {
@@ -74,7 +87,7 @@ class DocumentsNotifier extends StateNotifier<List<AppDocument>> {
     _storageService
         .uploadDocument(uid: uid, docId: docId, file: file)
         .listen((progress) async {
-      _ref.read(activeUploadProgressProvider(docId).notifier).state = progress;
+      ref.read(activeUploadProgressProvider.notifier).updateProgress(docId, progress);
 
       if (progress.isCompleted && progress.downloadUrl != null) {
         final updatedDoc = initialDoc.copyWith(
@@ -85,7 +98,7 @@ class DocumentsNotifier extends StateNotifier<List<AppDocument>> {
 
         // Sync to Firestore
         await _repository.create(docId, updatedDoc);
-        _ref.read(activeUploadProgressProvider(docId).notifier).state = null;
+        ref.read(activeUploadProgressProvider.notifier).updateProgress(docId, null);
       }
     });
   }

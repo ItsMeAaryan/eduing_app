@@ -5,14 +5,18 @@ import '../repositories/storage_repository.dart';
 final storageRepositoryProvider = Provider((ref) => StorageRepository());
 
 final storageControllerProvider =
-    StateNotifierProvider<StorageController, AsyncValue<String?>>((ref) {
-  return StorageController(ref.watch(storageRepositoryProvider));
+    NotifierProvider<StorageController, AsyncValue<String?>>(() {
+  return StorageController();
 });
 
-class StorageController extends StateNotifier<AsyncValue<String?>> {
-  final StorageRepository _repository;
+class StorageController extends Notifier<AsyncValue<String?>> {
+  late final StorageRepository _repository;
 
-  StorageController(this._repository) : super(const AsyncData(null));
+  @override
+  AsyncValue<String?> build() {
+    _repository = ref.watch(storageRepositoryProvider);
+    return const AsyncData(null);
+  }
 
   Future<String?> uploadProfileImage(File file) async {
     return _upload('profile/avatar.png', file);

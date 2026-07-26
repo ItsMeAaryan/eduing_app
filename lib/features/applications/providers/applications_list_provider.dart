@@ -44,23 +44,25 @@ class ApplicationsState {
   }
 }
 
-class ApplicationsNotifier extends StateNotifier<ApplicationsState> {
-  ApplicationsNotifier()
-      : super(const ApplicationsState(
-          apps: [
-            ApplicationModel(id: '1', name: 'BITS Pilani', course: 'B.Tech CSE', progress: 91, deadline: 'Aug 30', color: NeoColors.green, status: 'IN PROGRESS', type: 'active'),
-            ApplicationModel(id: '2', name: 'IIT Bombay', course: 'B.Tech EE', progress: 67, deadline: 'Sep 15', color: NeoColors.blue, status: 'IN PROGRESS', type: 'active'),
-            ApplicationModel(id: '3', name: 'Delhi University', course: 'B.Sc Honours', progress: 45, deadline: 'Oct 1', color: NeoColors.purple, status: 'DRAFT', type: 'active'),
-            ApplicationModel(id: '4', name: 'VIT Vellore', course: 'B.Tech CSE', progress: 100, deadline: 'Accept by Aug 10', color: NeoColors.yellow, status: 'OFFER', type: 'offers'),
-            ApplicationModel(id: '5', name: 'Manipal Uni', course: 'B.Tech IT', progress: 100, deadline: 'Accept by Aug 20', color: Color(0xFFFF3B7A), status: 'OFFER', type: 'offers'),
-            ApplicationModel(id: '6', name: 'Amity University', course: 'BCA', progress: 100, deadline: 'Withdrawn Jul 1', color: NeoColors.subDark, status: 'WITHDRAWN', type: 'withdrawn'),
-          ],
-        ));
+class ApplicationsNotifier extends Notifier<ApplicationsState> {
+  @override
+  ApplicationsState build() {
+    return const ApplicationsState(
+      apps: [
+        ApplicationModel(id: '1', name: 'BITS Pilani', course: 'B.Tech CSE', progress: 91, deadline: 'Aug 30', color: NeoColors.green, status: 'IN PROGRESS', type: 'active'),
+        ApplicationModel(id: '2', name: 'IIT Bombay', course: 'B.Tech EE', progress: 67, deadline: 'Sep 15', color: NeoColors.blue, status: 'IN PROGRESS', type: 'active'),
+        ApplicationModel(id: '3', name: 'Delhi University', course: 'B.Sc Honours', progress: 45, deadline: 'Oct 1', color: NeoColors.purple, status: 'DRAFT', type: 'active'),
+        ApplicationModel(id: '4', name: 'VIT Vellore', course: 'B.Tech CSE', progress: 100, deadline: 'Accept by Aug 10', color: NeoColors.yellow, status: 'OFFER', type: 'offers'),
+        ApplicationModel(id: '5', name: 'Manipal Uni', course: 'B.Tech IT', progress: 100, deadline: 'Accept by Aug 20', color: Color(0xFFFF3B7A), status: 'OFFER', type: 'offers'),
+        ApplicationModel(id: '6', name: 'Amity University', course: 'BCA', progress: 100, deadline: 'Withdrawn Jul 1', color: NeoColors.subDark, status: 'WITHDRAWN', type: 'withdrawn'),
+      ],
+    );
+  }
 
   void setTab(String tab) => state = state.copyWith(currentTab: tab);
 }
 
-final applicationsListProvider = StateNotifierProvider<ApplicationsNotifier, ApplicationsState>((ref) {
+final applicationsListProvider = NotifierProvider<ApplicationsNotifier, ApplicationsState>(() {
   return ApplicationsNotifier();
 });
 
