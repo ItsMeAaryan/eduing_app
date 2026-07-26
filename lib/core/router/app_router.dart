@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/home/screens/dashboard_screen.dart';
@@ -64,6 +65,7 @@ class GoRouterRefreshStream extends ChangeNotifier {
 
 class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>();
+  static SharedPreferences? prefs;
 
   static final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -82,8 +84,15 @@ class AppRouter {
           return '/';
         }
       }
-      if (user != null && isAuthRoute) {
+      if (user != null && isAuthRoute && state.matchedLocation != '/onboarding') {
         return '/home';
+      }
+      
+      if (state.matchedLocation == '/onboarding') {
+        final bool onboardingCompleted = prefs?.getBool('onboarding_completed') ?? false;
+        if (onboardingCompleted) {
+          return '/home';
+        }
       }
       return null;
     },

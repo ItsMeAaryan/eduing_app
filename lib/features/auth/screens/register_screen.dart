@@ -20,6 +20,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   String _email = '';
   String _pass = '';
   bool _loading = false;
+  bool _obscurePassword = true;
+  bool _acceptedTerms = false;
+  bool _triedSubmit = false;
 
   @override
   Widget build(BuildContext context) {
@@ -38,20 +41,18 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      resizeToAvoidBottomInset: true,
-      body: SingleChildScrollView(
-        reverse: true,
-        child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Back
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Back
                   Padding(
                     padding: const EdgeInsets.only(top: 6, bottom: 24),
                     child: Row(
@@ -151,7 +152,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         placeholder: 'Min. 8 characters',
                         value: _pass,
                         onChange: (v) => setState(() => _pass = v),
-                        obscureText: true,
+                        obscureText: _obscurePassword,
+                        right: IconButton(
+                          icon: Icon(
+                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            color: Colors.white54,
+                          ),
+                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        ),
                       ),
 
                       // Password strength
@@ -179,29 +187,67 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         const SizedBox(height: 14),
                       ],
                       
-                      RichText(
-                        text: const TextSpan(
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.text30,
-                            height: 1.6,
-                            fontFamily: 'Inter',
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Checkbox(
+                            value: _acceptedTerms,
+                            onChanged: (v) => setState(() => _acceptedTerms = v ?? false),
+                            activeColor: const Color(0xFF3DFF54),
+                            checkColor: Colors.black,
+                            side: BorderSide(
+                              color: _triedSubmit && !_acceptedTerms ? AppColors.red : Colors.white30, 
+                              width: 1.5,
+                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
                           ),
-                          children: [
-                            TextSpan(text: 'By continuing you agree to our '),
-                            TextSpan(text: 'Terms', style: TextStyle(color: AppColors.primaryAccent)),
-                            TextSpan(text: ' & '),
-                            TextSpan(text: 'Privacy Policy', style: TextStyle(color: AppColors.primaryAccent)),
-                            TextSpan(text: '.'),
-                          ],
-                        ),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () => setState(() => _acceptedTerms = !_acceptedTerms),
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 12),
+                                child: RichText(
+                                  text: const TextSpan(
+                                    style: TextStyle(color: Colors.white54, fontSize: 13),
+                                    children: [
+                                      TextSpan(text: 'I agree to the '),
+                                      TextSpan(text: 'Terms of Service',
+                                        style: TextStyle(color: Color(0xFF3DFF54), 
+                                        decoration: TextDecoration.underline)),
+                                      TextSpan(text: ' and '),
+                                      TextSpan(text: 'Privacy Policy',
+                                        style: TextStyle(color: Color(0xFF3DFF54),
+                                        decoration: TextDecoration.underline)),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+            AnimatedPadding(
+              duration: const Duration(milliseconds: 200),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                left: 22,
+                right: 22,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
                   GreenButton(
                     label: 'Create Account',
                     loading: _loading,
-                    disabled: _name.isEmpty || _email.isEmpty || _pass.length < 8,
+                    disabled: _name.isEmpty || _email.isEmpty || _pass.length < 8 || !_acceptedTerms,
                     onClick: () {
+                      setState(() => _triedSubmit = true);
+                      if (!_acceptedTerms) return;
                       setState(() => _loading = true);
                       Future.delayed(const Duration(milliseconds: 1200), () {
                         if (context.mounted) {
@@ -225,44 +271,39 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   ),
                   const SizedBox(height: 16),
                   
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).padding.bottom + 16,
-                    ),
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.text60,
-                          fontFamily: 'Inter',
-                        ),
-                        children: [
-                          const TextSpan(text: 'Already have an account? '),
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.baseline,
-                            baseline: TextBaseline.alphabetic,
-                            child: GestureDetector(
-                              onTap: () => context.go('/login'),
-                              child: const Text(
-                                'Log in',
-                                style: TextStyle(
-                                  color: AppColors.text,
-                                  fontWeight: FontWeight.w800,
-                                  decoration: TextDecoration.underline,
-                                  fontFamily: 'Inter',
-                                ),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.text60,
+                        fontFamily: 'Inter',
+                      ),
+                      children: [
+                        const TextSpan(text: 'Already have an account? '),
+                        WidgetSpan(
+                          alignment: PlaceholderAlignment.baseline,
+                          baseline: TextBaseline.alphabetic,
+                          child: GestureDetector(
+                            onTap: () => context.go('/login'),
+                            child: const Text(
+                              'Log in',
+                              style: TextStyle(
+                                color: AppColors.text,
+                                fontWeight: FontWeight.w800,
+                                decoration: TextDecoration.underline,
+                                fontFamily: 'Inter',
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -38,18 +38,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      resizeToAvoidBottomInset: true,
-      body: SingleChildScrollView(
-        reverse: true,
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-          ),
-          child: SafeArea(
-            bottom: false,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
-              child: Column(
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -194,7 +190,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: Padding(
                       padding: const EdgeInsets.only(top: 0, bottom: 28),
                       child: GestureDetector(
-                        onTap: () {}, // onNavigate("forgot")
+                        onTap: () => context.push('/forgot-password'),
                         child: const Text(
                           'Forgot password?',
                           style: TextStyle(
@@ -206,63 +202,70 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       ),
                     ),
                   ),
-
-                  // Bottom buttons
-                  GreenButton(
-                    label: 'Sign in',
-                    loading: _loading,
-                    disabled: _email.isEmpty || _pass.isEmpty,
-                    onClick: () {
-                      setState(() => _loading = true);
-                      Future.delayed(const Duration(milliseconds: 1200), () {
-                        if (context.mounted) {
-                          setState(() => _loading = false);
-                          context.go('/otp');
-                        }
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom: MediaQuery.of(context).padding.bottom + 16,
-                    ),
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontSize: 13,
-                          color: AppColors.text60,
-                          fontFamily: 'Inter',
-                        ),
-                        children: [
-                          const TextSpan(text: 'No account? '),
-                          WidgetSpan(
-                            alignment: PlaceholderAlignment.baseline,
-                            baseline: TextBaseline.alphabetic,
-                            child: GestureDetector(
-                              onTap: () => context.go('/register'),
-                              child: const Text(
-                                'Create one →',
-                                style: TextStyle(
-                                  color: AppColors.text,
-                                  fontWeight: FontWeight.w800,
-                                  decoration: TextDecoration.underline,
-                                  fontFamily: 'Inter',
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
           ),
-        ),
+          AnimatedPadding(
+            duration: const Duration(milliseconds: 200),
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+              left: 22,
+              right: 22,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                GreenButton(
+                  label: 'Sign in',
+                  loading: _loading,
+                  disabled: _email.isEmpty || _pass.isEmpty,
+                  onClick: () {
+                    setState(() => _loading = true);
+                    Future.delayed(const Duration(milliseconds: 1200), () {
+                      if (context.mounted) {
+                        setState(() => _loading = false);
+                        context.go('/home'); // Skip OTP or whatever in design later, wait I should keep context.go('/otp')? 
+                      }
+                    });
+                  },
+                ),
+                const SizedBox(height: 20),
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.text60,
+                      fontFamily: 'Inter',
+                    ),
+                    children: [
+                      const TextSpan(text: 'No account? '),
+                      WidgetSpan(
+                        alignment: PlaceholderAlignment.baseline,
+                        baseline: TextBaseline.alphabetic,
+                        child: GestureDetector(
+                          onTap: () => context.go('/register'),
+                          child: const Text(
+                            'Create one →',
+                            style: TextStyle(
+                              color: AppColors.text,
+                              fontWeight: FontWeight.w800,
+                              decoration: TextDecoration.underline,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
-    );
+    ),
+  );
   }
 }

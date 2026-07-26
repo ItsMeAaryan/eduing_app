@@ -36,15 +36,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           onPressed: widget.onNavigateToLogin,
         ),
       ),
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
-        child: SingleChildScrollView(
-          reverse: true,
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(20, 16, 20, 80 + MediaQuery.of(context).viewInsets.bottom + 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
               // Logo + headline
               Padding(
                 padding: const EdgeInsets.only(bottom: 28),
@@ -116,79 +118,93 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 controller: _emailController,
               ),
 
-              const SizedBox(height: 20),
-
-              // Notched send button
-              NotchedCard(
-                bg: NeoColors.red,
-                notchPos: "br",
-                notchSize: 52,
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Send Link",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      "Check your inbox",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white.withValues(alpha: 0.65),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
                   ],
                 ),
               ),
-              Transform.translate(
-                offset: const Offset(0, -31),
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: FloatingActionBtn(
-                      icon: "→",
-                      bg: t.surf,
-                      size: 52,
-                      onClick: () {
-                        // reset logic
-                      },
+            ),
+            AnimatedPadding(
+              duration: const Duration(milliseconds: 200),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                left: 20,
+                right: 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Notched send button
+                  NotchedCard(
+                    bg: NeoColors.red,
+                    notchPos: "br",
+                    notchSize: 52,
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Send Link",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          "Check your inbox",
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white.withValues(alpha: 0.65),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                      ],
                     ),
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-              // Back to Login
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Remembered it? ",
-                    style: TextStyle(fontSize: 13, color: t.sub),
-                  ),
-                  GestureDetector(
-                    onTap: widget.onNavigateToLogin,
-                    child: const Text(
-                      "Sign in →",
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: NeoColors.purple,
+                  Transform.translate(
+                    offset: const Offset(0, -31),
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: FloatingActionBtn(
+                          icon: "→",
+                          bg: t.surf,
+                          size: 52,
+                          onClick: () {
+                            // reset logic
+                          },
+                        ),
                       ),
                     ),
                   ),
+
+                  const SizedBox(height: 20),
+                  // Back to Login
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Remembered it? ",
+                        style: TextStyle(fontSize: 13, color: t.sub),
+                      ),
+                      GestureDetector(
+                        onTap: widget.onNavigateToLogin,
+                        child: const Text(
+                          "Sign in →",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: NeoColors.purple,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
