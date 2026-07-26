@@ -40,6 +40,12 @@ import '../../features/auth/screens/otp_screen.dart';
 import '../../features/auth/screens/onboarding_screen.dart';
 import '../../features/auth/screens/forgot_password_screen.dart';
 import '../../shared/widgets/main_layout.dart';
+import '../../features/applications/screens/app_detail_screen.dart';
+import '../../features/applications/screens/new_application_screen.dart';
+import '../../features/vault/screens/doc_upload_screen.dart';
+import '../../features/profile/screens/profile_setup_screen.dart';
+import '../../features/planner/screens/planner_calendar_screen.dart';
+import '../../features/profile/screens/student_id_screen.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _subscription;
@@ -238,6 +244,37 @@ class AppRouter {
           GoRoute(
             path: '/ai',
             redirect: (context, state) => '/copilot',
+          ),
+          GoRoute(
+            path: '/applications/new',
+            builder: (context, state) => const NewApplicationScreen(),
+          ),
+          GoRoute(
+            path: '/applications/:id',
+            builder: (context, state) {
+              final id = state.pathParameters['id']!;
+              return AppDetailScreen(id: id);
+            },
+          ),
+          GoRoute(
+            path: '/vault/upload',
+            builder: (context, state) => const DocUploadScreen(),
+          ),
+          GoRoute(
+            path: '/notifications',
+            builder: (context, state) => const NotificationsScreen(),
+          ),
+          GoRoute(
+            path: '/profile/setup',
+            builder: (context, state) => const ProfileSetupScreen(),
+          ),
+          GoRoute(
+            path: '/planner/calendar',
+            builder: (context, state) => const PlannerCalendarScreen(),
+          ),
+          GoRoute(
+            path: '/profile/student-id',
+            builder: (context, state) => const StudentIDScreen(),
           ),
           GoRoute(
             path: '/settings',
