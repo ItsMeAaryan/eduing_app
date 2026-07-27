@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/auth_provider.dart';
 
 class SplashScreen extends ConsumerWidget {
@@ -24,10 +25,27 @@ class SplashScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFF0A0A0A),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: Stack(
+        children: [
+          // Background Pulse Glow
+          Container(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: const Alignment(0.0, -0.3),
+                radius: 0.8,
+                colors: [
+                  const Color(0xFF3DFF54).withValues(alpha: 0.08),
+                  Colors.transparent,
+                ],
+              ),
+            ),
+          ).animate(onPlay: (c) => c.repeat(reverse: true))
+           .fadeIn(duration: 3000.ms, begin: 0.3),
+
+          SafeArea(
+            bottom: false,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // Top Section
             Padding(
@@ -48,33 +66,51 @@ class SplashScreen extends ConsumerWidget {
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
-                    child: RichText(
-                      text: const TextSpan(
-                        style: TextStyle(
-                          fontSize: 56,
-                          fontWeight: FontWeight.w900,
-                          height: 1.1,
-                          letterSpacing: -1.5,
-                          fontFamily: 'Inter',
-                        ),
-                        children: [
-                          TextSpan(
-                            text: 'Your admission\n',
-                            style: TextStyle(color: Colors.white),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'Your admission',
+                          style: TextStyle(
+                            fontSize: 56,
+                            fontWeight: FontWeight.w900,
+                            height: 1.1,
+                            letterSpacing: -1.5,
+                            fontFamily: 'Inter',
+                            color: Colors.white,
                           ),
-                          TextSpan(
-                            text: 'journey starts\n',
-                            style: TextStyle(color: Colors.white),
+                        ).animate()
+                         .fadeIn(delay: 0.ms, duration: 500.ms)
+                         .slideX(begin: -0.2, end: 0),
+                        const Text(
+                          'journey starts',
+                          style: TextStyle(
+                            fontSize: 56,
+                            fontWeight: FontWeight.w900,
+                            height: 1.1,
+                            letterSpacing: -1.5,
+                            fontFamily: 'Inter',
+                            color: Colors.white,
                           ),
-                          TextSpan(
-                            text: 'now.',
-                            style: TextStyle(
-                              color: Color(0xFF3DFF54),
-                              fontStyle: FontStyle.italic,
-                            ),
+                        ).animate()
+                         .fadeIn(delay: 150.ms, duration: 500.ms)
+                         .slideX(begin: -0.2, end: 0),
+                        const Text(
+                          'now.',
+                          style: TextStyle(
+                            fontSize: 56,
+                            fontWeight: FontWeight.w900,
+                            height: 1.1,
+                            letterSpacing: -1.5,
+                            fontFamily: 'Inter',
+                            color: Color(0xFF3DFF54),
+                            fontStyle: FontStyle.italic,
                           ),
-                        ],
-                      ),
+                        ).animate()
+                         .fadeIn(delay: 300.ms, duration: 500.ms)
+                         .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.0, 1.0)),
+                      ],
                     ),
                   ),
                 ],
@@ -97,6 +133,8 @@ class SplashScreen extends ConsumerWidget {
                         left: 10,
                         top: 20,
                         width: 130,
+                        delay: 100,
+                        moveYEnd: -6,
                       ),
                       _Sticker(
                         name: 'BITS Pilani',
@@ -105,6 +143,8 @@ class SplashScreen extends ConsumerWidget {
                         left: 90,
                         top: 50,
                         width: 140,
+                        delay: 200,
+                        moveYEnd: -8,
                       ),
                       _Sticker(
                         name: 'Delhi Uni',
@@ -113,6 +153,8 @@ class SplashScreen extends ConsumerWidget {
                         right: 5,
                         top: 10,
                         width: 120,
+                        delay: 300,
+                        moveYEnd: -5,
                       ),
                       _Sticker(
                         name: 'VIT Vellore',
@@ -121,6 +163,8 @@ class SplashScreen extends ConsumerWidget {
                         left: 20,
                         bottom: 10,
                         width: 130,
+                        delay: 150,
+                        moveYEnd: -7,
                       ),
                       _Sticker(
                         name: 'NIT Trichy',
@@ -130,6 +174,8 @@ class SplashScreen extends ConsumerWidget {
                         bottom: 20,
                         width: 130,
                         isHighlight: true,
+                        delay: 250,
+                        moveYEnd: -9,
                       ),
                     ],
                   ),
@@ -252,15 +298,17 @@ class SplashScreen extends ConsumerWidget {
                   SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
                 ],
               ),
-            ),
+            ).animate().fadeIn(delay: 600.ms, duration: 400.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOut),
           ],
         ),
+      ),
+        ],
       ),
     );
   }
 }
 
-class _Sticker extends StatelessWidget {
+class _Sticker extends StatefulWidget {
   final String name;
   final String tag;
   final double rotate;
@@ -270,6 +318,8 @@ class _Sticker extends StatelessWidget {
   final double? bottom;
   final double width;
   final bool isHighlight;
+  final int delay;
+  final double moveYEnd;
 
   const _Sticker({
     required this.name,
@@ -281,59 +331,107 @@ class _Sticker extends StatelessWidget {
     this.bottom,
     required this.width,
     this.isHighlight = false,
+    required this.delay,
+    required this.moveYEnd,
   });
 
   @override
+  State<_Sticker> createState() => _StickerState();
+}
+
+class _StickerState extends State<_Sticker> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTap() async {
+    await _controller.forward();
+    await _controller.reverse();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Positioned(
-      left: left,
-      right: right,
-      top: top,
-      bottom: bottom,
-      child: Transform.rotate(
-        angle: rotate * math.pi / 180,
-        child: Container(
-          width: width,
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: isHighlight ? const Color(0xFF3DFF54) : const Color(0xFF1A1A1A),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: isHighlight ? Colors.transparent : Colors.white10,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              CircleAvatar(
-                radius: 14,
-                backgroundColor: isHighlight ? Colors.black12 : const Color(0xFF2A4A2A),
-                child: Icon(
-                  Icons.account_balance,
-                  color: isHighlight ? Colors.black : Colors.white,
-                  size: 14,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                name,
-                style: TextStyle(
-                  color: isHighlight ? Colors.black : Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Text(
-                tag,
-                style: TextStyle(
-                  color: isHighlight ? Colors.black54 : Colors.white38,
-                  fontSize: 10,
-                ),
-              ),
-            ],
-          ),
+    Widget card = Container(
+      width: widget.width,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: widget.isHighlight ? const Color(0xFF3DFF54) : const Color(0xFF1A1A1A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: widget.isHighlight ? Colors.transparent : Colors.white10,
         ),
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          CircleAvatar(
+            radius: 14,
+            backgroundColor: widget.isHighlight ? Colors.black12 : const Color(0xFF2A4A2A),
+            child: Icon(
+              Icons.account_balance,
+              color: widget.isHighlight ? Colors.black : Colors.white,
+              size: 14,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            widget.name,
+            style: TextStyle(
+              color: widget.isHighlight ? Colors.black : Colors.white,
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          Text(
+            widget.tag,
+            style: TextStyle(
+              color: widget.isHighlight ? Colors.black54 : Colors.white38,
+              fontSize: 10,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return Positioned(
+      left: widget.left,
+      right: widget.right,
+      top: widget.top,
+      bottom: widget.bottom,
+      child: GestureDetector(
+        onTap: _onTap,
+        behavior: HitTestBehavior.opaque,
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: Transform.rotate(
+            angle: widget.rotate * math.pi / 180,
+            child: card,
+          ),
+        ),
+      )
+      .animate()
+      .fadeIn(duration: 400.ms, delay: widget.delay.ms)
+      .slideY(begin: 0.3, end: 0, curve: Curves.easeOutBack)
+      .then()
+      .animate(onPlay: (c) => c.repeat(reverse: true))
+      .moveY(begin: 0, end: widget.moveYEnd, duration: 3000.ms, curve: Curves.easeInOut),
     );
   }
 }
