@@ -11,10 +11,18 @@ class DiscoverScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(discoverProvider);
-    final notifier = ref.read(discoverProvider.notifier);
-    final unis = ref.watch(filteredUnisProvider);
-    final filters = ['All', 'Engineering', 'Management', 'Medicine', 'Law', 'Arts'];
+    final unis = ref.watch(filteredUniversitiesProvider);
+    final allAsync = ref.watch(allUniversitiesProvider);
+    final filters = [
+      'All',
+      'Engineering',
+      'Management',
+      'Medicine',
+      'Law',
+      'Arts'
+    ];
+    final selectedFilter = ref.watch(filterCategoryProvider);
+    final savedIds = ref.watch(savedUniversityIdsProvider);
 
     return Scaffold(
       backgroundColor: NeoColors.bgDark,
@@ -24,11 +32,11 @@ class DiscoverScreen extends ConsumerWidget {
           children: [
             Positioned.fill(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(18, 10, 18, 100), // padding for floating nav
+                padding: const EdgeInsets.fromLTRB(18, 10, 18, 100),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Header
+                    // ── Header ──
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +50,7 @@ class DiscoverScreen extends ConsumerWidget {
                                 fontSize: 10,
                                 fontWeight: FontWeight.w800,
                                 color: NeoColors.subDark,
-                                letterSpacing: 10 * 0.12,
+                                letterSpacing: 1.2,
                               ),
                             ),
                             SizedBox(height: 3),
@@ -58,89 +66,97 @@ class DiscoverScreen extends ConsumerWidget {
                           ],
                         ),
                         Container(
-                          width: 36,
-                          height: 36,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: NeoColors.surfDark,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: NeoColors.borderDark),
+                            color: NeoColors.green.withValues(alpha: 0.1),
+                            border: Border.all(
+                                color: NeoColors.green.withValues(alpha: 0.3)),
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          alignment: Alignment.center,
-                          child: const Icon(Icons.bookmark_border, size: 16, color: Colors.white),
+                          child: allAsync.when(
+                            data: (all) => Text(
+                              '${unis.length} Universities',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                            loading: () => const Text('... Universities',
+                                style: TextStyle(
+                                    fontSize: 13, color: Colors.white54)),
+                            error: (_, __) => const Text('Universities',
+                                style: TextStyle(
+                                    fontSize: 13, color: Colors.white54)),
+                          ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
 
-                    // Search bar
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            height: 46,
-                            decoration: BoxDecoration(
-                              color: NeoColors.surfDark,
-                              border: Border.all(color: NeoColors.borderDark, width: 1.5),
-                              borderRadius: BorderRadius.circular(23),
-                            ),
-                            padding: const EdgeInsets.symmetric(horizontal: 14),
-                            child: Row(
-                              children: [
-                                const Text('🔍', style: TextStyle(fontSize: 15, color: NeoColors.subDark)),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: TextField(
-                                    onChanged: notifier.setQuery,
-                                    style: const TextStyle(fontSize: 13, color: Colors.white),
-                                    decoration: const InputDecoration(
-                                      hintText: 'Search universities, programs...',
-                                      hintStyle: TextStyle(color: NeoColors.subDark, fontSize: 13),
-                                      border: InputBorder.none,
-                                      isDense: true,
-                                      contentPadding: EdgeInsets.zero,
-                                    ),
-                                  ),
-                                ),
-                              ],
+                    // ── Search ──
+                    Container(
+                      height: 46,
+                      decoration: BoxDecoration(
+                        color: NeoColors.surfDark,
+                        border: Border.all(color: NeoColors.borderDark),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: [
+                          const SizedBox(width: 14),
+                          const Icon(Icons.search,
+                              color: NeoColors.subDark, size: 18),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: TextField(
+                              onChanged: (v) => ref
+                                  .read(searchQueryProvider.notifier)
+                                  .set(v),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 14),
+                              decoration: const InputDecoration(
+                                hintText: 'Search universities...',
+                                hintStyle: TextStyle(
+                                    color: NeoColors.subDark, fontSize: 14),
+                                border: InputBorder.none,
+                                isDense: true,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 10),
-                        Container(
-                          width: 46,
-                          height: 46,
-                          decoration: const BoxDecoration(
-                            color: NeoColors.green,
-                            shape: BoxShape.circle,
-                          ),
-                          alignment: Alignment.center,
-                          child: const Text('⊟', style: TextStyle(fontSize: 16, color: Colors.black)),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
-                    // Filter chips
+                    // ── Filters ──
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.only(bottom: 4),
                       child: Row(
                         children: filters.map((f) {
-                          final isSelected = state.filter == f;
+                          final isSelected = selectedFilter == f;
                           return GestureDetector(
-                            onTap: () => notifier.setFilter(f),
+                            onTap: () => ref
+                                .read(filterCategoryProvider.notifier)
+                                .set(f),
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 200),
                               height: 32,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 14),
                               margin: const EdgeInsets.only(right: 8),
-                              padding: const EdgeInsets.symmetric(horizontal: 14),
                               decoration: BoxDecoration(
-                                color: isSelected ? NeoColors.green : NeoColors.surfDark,
-                                borderRadius: BorderRadius.circular(16),
+                                color: isSelected
+                                    ? NeoColors.surfDark2
+                                    : NeoColors.surfDark,
                                 border: Border.all(
-                                  color: isSelected ? NeoColors.green : NeoColors.borderDark,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : NeoColors.borderDark,
                                   width: 1.5,
                                 ),
+                                borderRadius: BorderRadius.circular(16),
                               ),
                               alignment: Alignment.center,
                               child: Text(
@@ -148,7 +164,9 @@ class DiscoverScreen extends ConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w800,
-                                  color: isSelected ? Colors.black : Colors.white60,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.white60,
                                 ),
                               ),
                             ),
@@ -156,180 +174,276 @@ class DiscoverScreen extends ConsumerWidget {
                         }).toList(),
                       ),
                     ),
-                    const SizedBox(height: 18),
-
-                    // Count + sort
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          '${unis.length} Universities',
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const Row(
-                          children: [
-                            Text(
-                              'Sort: Match',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                color: NeoColors.green,
-                              ),
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              '↓',
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: NeoColors.green,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
                     const SizedBox(height: 14),
 
-                    // University cards
-                    ...unis.map((u) {
-                      final isSaved = state.savedIds.contains(u.id);
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 14),
-                        child: NotchedCard(
-                          bg: NeoColors.surfDark,
-                          notchPos: 'br',
-                          notchSize: 44, // Match size of action bg
-                          padding: EdgeInsets.zero,
-                          child: Stack(
+                    // ── University list ──
+                    allAsync.when(
+                      loading: () => const Padding(
+                        padding: EdgeInsets.only(top: 40),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                              color: NeoColors.green),
+                        ),
+                      ),
+                      error: (e, _) => Padding(
+                        padding: const EdgeInsets.only(top: 40),
+                        child: Center(
+                          child: Column(
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                              const Icon(Icons.wifi_off,
+                                  color: Colors.white30, size: 40),
+                              const SizedBox(height: 12),
+                              const Text('Could not load universities',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold)),
+                              const SizedBox(height: 6),
+                              GestureDetector(
+                                onTap: () =>
+                                    ref.invalidate(allUniversitiesProvider),
+                                child: const Text('Tap to retry',
+                                    style: TextStyle(
+                                        color: NeoColors.green,
+                                        fontSize: 13)),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      data: (_) {
+                        if (unis.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 40),
+                            child: Center(
+                              child: Column(
+                                children: [
+                                  const Text('🔍',
+                                      style: TextStyle(fontSize: 40)),
+                                  const SizedBox(height: 16),
+                                  const Text('No universities found',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold)),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'No universities match your filters.\nCheck back soon as we add more.',
+                                    style: TextStyle(
+                                        color: Colors.white
+                                            .withValues(alpha: 0.6),
+                                        fontSize: 14),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        return Column(
+                          children: unis.map((u) {
+                            final id = u['id'] as String? ?? '';
+                            final name = u['name'] as String? ?? 'Unknown';
+                            final city = u['location']?['city'] as String? ?? '';
+                            final state =
+                                u['location']?['state'] as String? ?? '';
+                            final loc = [city, state]
+                                .where((s) => s.isNotEmpty)
+                                .join(', ');
+                            final nirf = u['rankings']?['nirfOverall'];
+                            final rank = nirf != null
+                                ? 'NIRF #$nirf'
+                                : 'Unranked';
+                            final type =
+                                u['type'] as String? ?? 'University';
+                            final fees = u['feesPerYear'] != null
+                                ? '₹${((u['feesPerYear'] as num) / 100000).toStringAsFixed(1)}L/yr'
+                                : '-';
+                            final seats = u['totalSeats'] ?? 0;
+                            final isSaved = savedIds.contains(id);
+
+                            // Color cycling based on type
+                            Color c = NeoColors.blue;
+                            if (type == 'Engineering') c = NeoColors.green;
+                            if (type == 'Management') c = NeoColors.purple;
+                            if (type == 'Medicine') c = NeoColors.red;
+                            if (type == 'Arts') c = NeoColors.yellow;
+
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 14),
+                              child: NotchedCard(
+                                bg: NeoColors.surfDark,
+                                notchPos: 'br',
+                                notchSize: 44,
+                                padding: EdgeInsets.zero,
+                                child: Stack(
                                   children: [
-                                    Container(
-                                      width: 48,
-                                      height: 48,
-                                      decoration: BoxDecoration(
-                                        color: u.color.withValues(alpha: 0.09), // 18 hex
-                                        borderRadius: BorderRadius.circular(16),
-                                        border: Border.all(color: u.color.withValues(alpha: 0.2)), // 33 hex
-                                      ),
-                                      alignment: Alignment.center,
-                                      child: const Text('🏛', style: TextStyle(fontSize: 22)),
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                    Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: Text(
-                                                  u.name,
-                                                  style: const TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w900,
-                                                    color: Colors.white,
-                                                  ),
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              neo.Badge(label: u.rank, color: u.color),
-                                            ],
+                                          Container(
+                                            width: 48,
+                                            height: 48,
+                                            decoration: BoxDecoration(
+                                              color: c.withValues(alpha: 0.09),
+                                              borderRadius:
+                                                  BorderRadius.circular(16),
+                                              border: Border.all(
+                                                  color: c.withValues(
+                                                      alpha: 0.2)),
+                                            ),
+                                            alignment: Alignment.center,
+                                            child: const Text('🏛',
+                                                style: TextStyle(
+                                                    fontSize: 22)),
                                           ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            '📍 ${u.loc}',
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: NeoColors.subDark,
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        name,
+                                                        style: const TextStyle(
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.w900,
+                                                          color: Colors.white,
+                                                        ),
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    neo.Badge(
+                                                        label: rank,
+                                                        color: c),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  loc.isNotEmpty
+                                                      ? '📍 $loc'
+                                                      : '📍 India',
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: NeoColors.subDark,
+                                                  ),
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: ProgressBar(
+                                                          value: 75,
+                                                          color: c,
+                                                          height: 4),
+                                                    ),
+                                                    const SizedBox(width: 8),
+                                                    Text(
+                                                      '75%',
+                                                      style: TextStyle(
+                                                        fontSize: 11,
+                                                        fontWeight:
+                                                            FontWeight.w900,
+                                                        color: c,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 8),
+                                                Row(
+                                                  children: [
+                                                    const Text('💰',
+                                                        style: TextStyle(
+                                                            fontSize: 10,
+                                                            color: NeoColors
+                                                                .subDark)),
+                                                    const SizedBox(width: 4),
+                                                    Text(fees,
+                                                        style: const TextStyle(
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            color: Colors
+                                                                .white60)),
+                                                    const SizedBox(width: 10),
+                                                    const Text('💺',
+                                                        style: TextStyle(
+                                                            fontSize: 10,
+                                                            color: NeoColors
+                                                                .subDark)),
+                                                    const SizedBox(width: 4),
+                                                    Text('$seats seats',
+                                                        style: const TextStyle(
+                                                            fontSize: 10,
+                                                            fontWeight:
+                                                                FontWeight.w700,
+                                                            color: Colors
+                                                                .white60)),
+                                                    const Spacer(),
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        ref
+                                                            .read(savedUniversityIdsProvider
+                                                                .notifier)
+                                                            .toggle(id);
+                                                      },
+                                                      child: Icon(
+                                                        isSaved
+                                                            ? Icons.bookmark
+                                                            : Icons
+                                                                .bookmark_border,
+                                                        size: 18,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 44),
+                                                  ],
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          const SizedBox(height: 10),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: ProgressBar(value: u.match.toDouble(), color: u.color, height: 4),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Text(
-                                                '${u.match}%',
-                                                style: TextStyle(
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w900,
-                                                  color: u.color,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 8),
-                                          Row(
-                                            children: [
-                                              const Text('💰', style: TextStyle(fontSize: 10, color: NeoColors.subDark)),
-                                              const SizedBox(width: 4),
-                                              Text(u.fees, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white60)),
-                                              const SizedBox(width: 10),
-                                              const Text('💺', style: TextStyle(fontSize: 10, color: NeoColors.subDark)),
-                                              const SizedBox(width: 4),
-                                              Text('${u.seats} seats', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: Colors.white60)),
-                                              const Spacer(),
-                                              GestureDetector(
-                                                onTap: () => notifier.toggleSaved(u.id),
-                                                child: Icon(
-                                                  isSaved ? Icons.bookmark : Icons.bookmark_border,
-                                                  size: 18,
-                                                  color: Colors.white,
-                                                ),
-                                              ),
-                                              const SizedBox(width: 44), // space for FAB
-                                            ],
-                                          ),
                                         ],
+                                      ),
+                                    ),
+                                    Positioned(
+                                      bottom: -10,
+                                      right: -10,
+                                      child: FloatingActionBtn(
+                                        icon: '→',
+                                        bg: c,
+                                        onClick: () =>
+                                            context.push('/university/$id'),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              Positioned(
-                                bottom: -10,
-                                right: -10,
-                                child: FloatingActionBtn(
-                                  icon: '→',
-                                  bg: u.color,
-                                  onClick: () => context.push('/university/${u.id}'),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
                   ],
                 ),
               ),
             ),
-            Positioned(
-              bottom: 16,
-              left: 16,
-              right: 16,
-              child: FloatingNav(
-                activeId: 'discover',
-                onChange: (id) {
-                  if (id == 'home') context.go('/home');
-                  if (id == 'discover') context.go('/discover');
-                  if (id == 'apps') context.go('/applications');
-                  if (id == 'ai') context.go('/copilot');
-                  if (id == 'plan') context.go('/planner'); // Note: planner not yet in exact list but leaving logic
-                },
-              ),
+            FloatingNav(
+              activeId: 'uni',
+              onChange: (id) {
+                if (id == 'home') context.go('/home');
+                if (id == 'apps') context.push('/applications');
+                if (id == 'ai') context.push('/copilot');
+                if (id == 'plan') context.push('/planner');
+              },
             ),
           ],
         ),
