@@ -6,6 +6,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flutter/foundation.dart';
 import '../../../firebase_options.dart';
+import '../firestore/seed_service.dart';
 
 class FirebaseService {
   static Future<void> initialize() async {
@@ -21,6 +22,9 @@ class FirebaseService {
         persistenceEnabled: true,
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
+
+      // Seed initial university data on first run
+      await SeedService.seedIfEmpty();
     } catch (e) {
       debugPrint('Firebase initialization failed: $e');
     }
