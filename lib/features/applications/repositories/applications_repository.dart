@@ -19,7 +19,7 @@ class ApplicationRepository extends BaseRepository<UniversityApplication> {
   Stream<List<UniversityApplication>> getApplicationsStream() {
     final col = getUserCollection();
     if (col == null) return Stream.value([]);
-    return col.snapshots().map((snapshot) {
+    return col.orderBy('updatedAt', descending: true).snapshots().map((snapshot) {
       return snapshot.docs
           .map((doc) => UniversityApplication.fromMap(doc.data(), doc.id))
           .toList();

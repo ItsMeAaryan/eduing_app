@@ -1,8 +1,57 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/university_application.dart';
 import '../repositories/applications_repository.dart';
 import '../../../shared/models/university_model.dart';
+
+// ── Raw-map stream (for new UI and dashboard) ─────────────────────────────
+
+final myApplicationsProvider =
+    StreamProvider<List<Map<String, dynamic>>>((ref) {
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  if (uid == null) return Stream.value([]);
+  return FirebaseFirestore.instance
+      .collection('applications')
+      .where('studentId', isEqualTo: uid)
+      .orderBy('updatedAt', descending: true)
+      .snapshots()
+      .map((s) =>
+          s.docs.map((d) => {'id': d.id, ...d.data()}).toList());
+});
+
+// ── Create application with full spec structure ────────────────────────────
+
+Future<void> createApplicationInFirestore({
+  required Map<String, dynamic> studentData,
+  required Map<String, dynamic> university,
+  required Map<String, dynamic> program,
+}) async {
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  if (uid == null) return;
+  await FirebaseFirestore.instance.collection('applications').add({
+    'studentId': uid,
+    'studentName': studentData['displayName'] ?? '',
+    'studentEmail': studentData['email'] ?? '',
+    'universityId': university['id'] ?? '',
+    'universityName': university['name'] ?? '',
+    'programId': program['id'] ?? '',
+    'courseName': program['name'] ?? '',
+    'status': 'in_progress',
+    'progress': 10.0,
+    'deadline': university['applicationDeadline'],
+    'createdAt': FieldValue.serverTimestamp(),
+    'updatedAt': FieldValue.serverTimestamp(),
+    'documents': [],
+    'steps': [
+      {'id': 'profile', 'label': 'Profile Complete', 'status': 'done'},
+      {'id': 'documents', 'label': 'Documents', 'status': 'pending'},
+      {'id': 'form', 'label': 'Application Form', 'status': 'pending'},
+      {'id': 'payment', 'label': 'Payment', 'status': 'pending'},
+      {'id': 'submitted', 'label': 'Submitted', 'status': 'pending'},
+    ],
+  });
+}
 
 final applicationRepositoryProvider =
     Provider((ref) => ApplicationRepository());
@@ -31,61 +80,7 @@ class ApplicationsNotifier extends Notifier<List<UniversityApplication>> {
 
   void _loadInitialData() {
     _repository.getApplicationsStream().listen((apps) {
-      if (apps.isNotEmpty) {
-        state = apps;
-      } else if (state.isEmpty) {
-        state = [
-          const UniversityApplication(
-            id: 'app_1',
-            university: University(
-              id: 'uni_mit',
-              name: 'Massachusetts Institute of Technology (MIT)',
-              location: 'Cambridge, MA',
-              imageUrl: '',
-              logoUrl: '',
-              aiMatch: 95,
-              rating: 4.9,
-              nirfRanking: '#1 Global',
-              accreditation: 'NECHE',
-              type: 'Private Research',
-              established: '1861',
-              course: 'M.S. in Computer Science',
-              fees: '\$58,000/yr',
-              placementScore: 98.0,
-              roiScore: 96.0,
-              researchScore: 99.0,
-              tags: ['AI', 'Tech', 'Engineering'],
-              studentCount: '11,500',
-            ),
-            course: 'M.S. in Computer Science',
-            status: ApplicationStatus.review,
-            submissionDate: '15 Oct 2025',
-            deadline: '01 Dec 2025',
-            progress: 0.85,
-            notes:
-                'Followed up with professor regarding research assistantship.',
-            timeline: [
-              ApplicationTimelineStage(
-                  title: 'Profile Created', date: '01 Sep', isCompleted: true),
-              ApplicationTimelineStage(
-                  title: 'Documents Uploaded',
-                  date: '15 Sep',
-                  isCompleted: true),
-              ApplicationTimelineStage(
-                  title: 'Application Submitted',
-                  date: '15 Oct',
-                  isCompleted: true,
-                  isActive: true),
-              ApplicationTimelineStage(
-                  title: 'Interview', date: '10 Nov', isCompleted: false),
-              ApplicationTimelineStage(
-                  title: 'Decision Received',
-                  date: '15 Dec',
-                  isCompleted: false),
-            ],
-          ),
-        ];
-      }
+      state = apps;
     });
   }
 
