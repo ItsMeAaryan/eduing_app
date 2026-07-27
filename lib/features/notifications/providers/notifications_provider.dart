@@ -1,64 +1,64 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../models/notification_item.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class NotificationsNotifier extends Notifier<List<NotificationItem>> {
-  @override
-  List<NotificationItem> build() {
-    return _initialData;
-  }
-
-  static final List<NotificationItem> _initialData = [
-    NotificationItem(
-      id: '1',
-      title: 'AI Copilot Finished Audit',
-      message: 'Your SOP has been audited. You scored 85% ATS readiness.',
-      type: 'ai',
-      timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-      isRead: false,
-    ),
-    NotificationItem(
-      id: '2',
-      title: 'Stanford Application Deadline',
-      message:
-          'Your Stanford university application is due in 3 days. Complete the checklist.',
-      type: 'deadline',
-      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-      isRead: false,
-    ),
-    NotificationItem(
-      id: '3',
-      title: 'Resume Exported',
-      message:
-          'Your Executive ATS Resume was exported successfully to your files.',
-      type: 'success',
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-      isRead: true,
-    ),
-    NotificationItem(
-      id: '4',
-      title: 'System Update',
-      message: 'Welcome to the newly redesigned EDUing app experience!',
-      type: 'system',
-      timestamp: DateTime.now().subtract(const Duration(days: 3)),
-      isRead: true,
-    ),
-  ];
-
-  void markAsRead(String id) {
-    state =
-        state.map((n) => n.id == id ? n.copyWith(isRead: true) : n).toList();
-  }
-
-  void markAllAsRead() {
-    state = state.map((n) => n.copyWith(isRead: true)).toList();
-  }
-
-  void clearAll() {
-    state = [];
-  }
-}
+// ── All notifications (top-level collection, limit 50) ────────────────────
 
 final notificationsProvider =
-    NotifierProvider<NotificationsNotifier, List<NotificationItem>>(() {
-  return NotificationsNotifier();
+    StreamProvider<List<Map<String, dynamic>>>((ref) {
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  if (uid == null) return Stream.value([]);
+  return FirebaseFirestore.instance
+      .collection('notifications')
+      .where('userId', isEqualTo: uid)
+      .orderBy('createdAt', descending: true)
+      .limit(50)
+      .snapshots()
+      .map((s) =>
+          s.docs.map((d) => {'id': d.id, ...d.data()}).toList());
 });
+
+// ── Unread badge count ────────────────────────────────────────────────────
+
+final unreadCountProvider = StreamProvider<int>((ref) {
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  if (uid == null) return Stream.value(0);
+  return FirebaseFirestore.instance
+      .collection('notifications')
+      .where('userId', isEqualTo: uid)
+      .where('isRead', isEqualTo: false)
+      .snapshots()
+      .map((s) => s.docs.length);
+});
+
+// ── Actions ───────────────────────────────────────────────────────────────
+
+final notificationsActionsProvider =
+    Provider((ref) => NotificationsActions());
+
+class NotificationsActions {
+  final _db = FirebaseFirestore.instance;
+
+  Future<void> markAsRead(String notifId) async {
+    await _db.collection('notifications').doc(notifId).update({
+      'isRead': true,
+      'readAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> markAllAsRead(
+      List<Map<String, dynamic>> notifications) async {
+    final unread =
+        notifications.where((n) => n['isRead'] != true).toList();
+    if (unread.isEmpty) return;
+    final batch = _db.batch();
+    for (final n in unread) {
+      final ref = _db.collection('notifications').doc(n['id'] as String);
+      batch.update(ref, {
+        'isRead': true,
+        'readAt': FieldValue.serverTimestamp(),
+      });
+    }
+    await batch.commit();
+  }
+}

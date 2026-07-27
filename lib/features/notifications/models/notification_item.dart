@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class NotificationItem {
   final String id;
   final String title;
@@ -14,6 +16,18 @@ class NotificationItem {
     required this.timestamp,
     this.isRead = false,
   });
+
+  factory NotificationItem.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return NotificationItem(
+      id: doc.id,
+      title: data['title'] ?? 'Notification',
+      message: data['message'] ?? '',
+      type: data['type'] ?? 'system',
+      timestamp: (data['timestamp'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      isRead: data['isRead'] ?? false,
+    );
+  }
 
   NotificationItem copyWith({
     String? id,
