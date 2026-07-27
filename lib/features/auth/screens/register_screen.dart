@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/green_button.dart';
@@ -18,7 +19,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   String _name = '';
   String _email = '';
   String _pass = '';
-  bool _loading = false;
   bool _obscurePassword = true;
   bool _acceptedTerms = false;
   bool _triedSubmit = false;
@@ -37,9 +37,30 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       (_, state) {
         state.whenOrNull(
           error: (error, _) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(error.toString())),
-            );
+            if (error is FirebaseAuthException &&
+                error.code == 'email-already-in-use') {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Account already exists. Please log in instead.'),
+                  backgroundColor: Colors.red.shade800,
+                  action: SnackBarAction(
+                    label: 'Log In',
+                    textColor: const Color(0xFF3DFF54),
+                    onPressed: () => context.go('/login'),
+                  ),
+                ),
+              );
+            } else {
+              final msg = error is FirebaseAuthException
+                  ? error.message ?? 'An error occurred.'
+                  : error.toString();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(msg),
+                  backgroundColor: Colors.red.shade800,
+                ),
+              );
+            }
           },
         );
       },
@@ -297,22 +318,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           children: [
                             GreenButton(
                               label: 'Create Account',
-                              loading: _loading,
+                              loading: ref.watch(authControllerProvider).isLoading,
                               disabled: _name.isEmpty ||
                                   _email.isEmpty ||
                                   _pass.length < 8 ||
                                   !_acceptedTerms,
-                              onClick: () {
+                              onClick: () async {
                                 setState(() => _triedSubmit = true);
                                 if (!_acceptedTerms) return;
-                                setState(() => _loading = true);
-                                Future.delayed(
-                                    const Duration(milliseconds: 1200), () {
-                                  if (context.mounted) {
-                                    setState(() => _loading = false);
-                                    context.go('/otp');
-                                  }
-                                });
+                                
+                                await ref
+                                    .read(authControllerProvider.notifier)
+                                    .registerWithEmail(_email.trim(), _pass, _name.trim());
+                                
+                                if (context.mounted &&
+                                    !ref.read(authControllerProvider).hasError) {
+                                  context.go('/otp');
+                                }
                               },
                             ),
                             const SizedBox(height: 12),
