@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
@@ -5,12 +6,15 @@ import '../../../core/widgets/floating_nav.dart';
 import '../../../core/widgets/notched_card.dart';
 import '../../../core/widgets/badge_chip.dart';
 import '../../../core/widgets/glow_progress_bar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/dashboard_provider.dart';
+import '../../notifications/providers/notifications_provider.dart';
 
-class DashboardScreen extends StatefulWidget {
+class DashboardScreen extends ConsumerStatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  ConsumerState<DashboardScreen> createState() => _DashboardScreenState();
 }
 
 String _getGreeting() {
@@ -21,13 +25,11 @@ String _getGreeting() {
   return 'Good night';
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   String _nav = 'home';
 
   void _onNavChange(String id) {
     setState(() => _nav = id);
-    // Usually here we'd also context.go to the respective route if this was a shell route
-    // but the request implies DashboardScreen uses FloatingNav internally.
     switch (id) {
       case 'uni':
         context.push('/universities');
@@ -46,6 +48,20 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userData = ref.watch(userDataProvider).value ?? {};
+    final appCounts = ref.watch(applicationsCountProvider).value ??
+        {'total': 0, 'active': 0, 'offers': 0};
+    final uniCount = ref.watch(universitiesCountProvider).value ?? 0;
+    final activeAppsAsync = ref.watch(activeApplicationsProvider);
+    final tasks = ref.watch(upcomingTasksProvider).value ?? [];
+    final unreadCount = ref.watch(unreadCountProvider).value ?? 0;
+
+    final displayName = userData['displayName'] ?? 'Student';
+    final readinessScore =
+        ((userData['aiProfile']?['readinessScore'] ?? 0) as num).toDouble();
+    final profileCompletion =
+        ((userData['profileCompletion'] ?? 0) as num).toDouble();
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -54,7 +70,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Positioned.fill(
               child: SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(18, 10, 18, MediaQuery.of(context).padding.bottom + 80),
+                padding: EdgeInsets.fromLTRB(
+                    18, 10, 18, MediaQuery.of(context).padding.bottom + 80),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -74,9 +91,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 color: Colors.white54,
                               ),
                             ),
-                            const Text(
-                              'Aaryan Sharma 👋',
-                              style: TextStyle(
+                            Text(
+                              '$displayName 👋',
+                              style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w900,
                                 color: Colors.white,
@@ -87,7 +104,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Row(
                           children: [
-                            // Bell
+                            // Bell with unread badge
                             GestureDetector(
                               onTap: () => context.push('/notifications'),
                               child: Container(
@@ -100,21 +117,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 ),
                                 alignment: Alignment.center,
                                 child: Stack(
+                                  clipBehavior: Clip.none,
                                   children: [
-                                    const Icon(Icons.notifications_none, color: AppColors.text, size: 20),
-                                    Positioned(
-                                      top: 2,
-                                      right: 2,
-                                      child: Container(
-                                        width: 8,
-                                        height: 8,
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primaryAccent,
-                                          shape: BoxShape.circle,
-                                          border: Border.all(color: AppColors.background, width: 2),
+                                    const Icon(Icons.notifications_none,
+                                        color: AppColors.text, size: 20),
+                                    if (unreadCount > 0)
+                                      Positioned(
+                                        top: -2,
+                                        right: -2,
+                                        child: Container(
+                                          width: unreadCount > 9 ? 16 : 12,
+                                          height: 12,
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primaryAccent,
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
+                                                color: AppColors.background,
+                                                width: 1.5),
+                                          ),
+                                          alignment: Alignment.center,
+                                          child: unreadCount > 9
+                                              ? const Text('9+',
+                                                  style: TextStyle(
+                                                      fontSize: 7,
+                                                      fontWeight:
+                                                          FontWeight.w900,
+                                                      color: Colors.black))
+                                              : null,
                                         ),
                                       ),
-                                    ),
                                   ],
                                 ),
                               ),
@@ -133,10 +164,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                     colors: [AppColors.purple, AppColors.blue],
                                   ),
                                   shape: BoxShape.circle,
-                                  border: Border.all(color: AppColors.primaryAccent.withValues(alpha: 0.26), width: 2),
+                                  border: Border.all(
+                                      color: AppColors.primaryAccent
+                                          .withValues(alpha: 0.26),
+                                      width: 2),
                                 ),
                                 alignment: Alignment.center,
-                                child: const Text('👤', style: TextStyle(fontSize: 18)),
+                                child: const Text('👤',
+                                    style: TextStyle(fontSize: 18)),
                               ),
                             ),
                           ],
@@ -147,7 +182,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
                     // ── READINESS HERO CARD ──
                     NotchedCard(
-                      bg: Colors.transparent, // We will use a Container inside for gradient, or we can just apply gradient manually. Actually let's use a custom child container to fake the bg gradient
+                      bg: Colors.transparent,
                       notchColor: AppColors.background,
                       actionIcon: const Text('→'),
                       actionBg: AppColors.primaryAccent,
@@ -162,18 +197,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             colors: [AppColors.purple, AppColors.blue],
                           ),
                         ),
-                        child: const Column(
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            BadgeChip(
+                            const BadgeChip(
                               label: 'ADMISSION READINESS',
                               color: AppColors.text,
-                              bg: Color(0x26FFFFFF), // rgba(255,255,255,0.15)
+                              bg: Color(0x26FFFFFF),
                             ),
-                            SizedBox(height: 10),
+                            const SizedBox(height: 10),
                             Text(
-                              '85%',
-                              style: TextStyle(
+                              '${readinessScore.toInt()}%',
+                              style: const TextStyle(
                                 fontSize: 52,
                                 fontWeight: FontWeight.w900,
                                 color: AppColors.text,
@@ -181,22 +216,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 height: 1,
                               ),
                             ),
-                            SizedBox(height: 4),
+                            const SizedBox(height: 4),
                             Text(
-                              '4 tasks left · Fall 2027 admissions',
-                              style: TextStyle(
+                              '${(appCounts['active'] ?? 0)} active app${(appCounts['active'] ?? 0) == 1 ? '' : 's'} · Fall 2027 admissions',
+                              style: const TextStyle(
                                 fontSize: 13,
-                                color: Color(0xA6FFFFFF), // rgba(255,255,255,0.65)
+                                color: Color(0xA6FFFFFF),
                               ),
                             ),
-                            SizedBox(height: 14),
-                            GlowProgressBar(value: 85, color: AppColors.text, height: 4),
-                            SizedBox(height: 8),
+                            const SizedBox(height: 14),
+                            GlowProgressBar(
+                                value: readinessScore,
+                                color: AppColors.text,
+                                height: 4),
+                            const SizedBox(height: 8),
                             Text(
-                              'Next: Upload IELTS Score',
-                              style: TextStyle(
+                              profileCompletion < 100
+                                  ? 'Next: Complete your profile (${profileCompletion.toInt()}%)'
+                                  : 'Profile complete ✓',
+                              style: const TextStyle(
                                 fontSize: 12,
-                                color: Color(0x80FFFFFF), // rgba(255,255,255,0.5)
+                                color: Color(0x80FFFFFF),
                               ),
                             ),
                           ],
@@ -206,13 +246,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     const SizedBox(height: 14),
 
                     // ── STATS ROW ──
-                    const Row(
+                    Row(
                       children: [
-                        _StatCard(label: 'Universities', value: '18', delta: '↑ +3', color: AppColors.primaryAccent),
-                        SizedBox(width: 10),
-                        _StatCard(label: 'Applications', value: '5', delta: '2 active', color: AppColors.blue),
-                        SizedBox(width: 10),
-                        _StatCard(label: 'Offers', value: '2', delta: '↑ new', color: AppColors.orange),
+                        _StatCard(
+                            label: 'Universities',
+                            value: uniCount.toString(),
+                            delta: 'Available',
+                            color: AppColors.primaryAccent),
+                        const SizedBox(width: 10),
+                        _StatCard(
+                            label: 'Applications',
+                            value: (appCounts['total'] ?? 0).toString(),
+                            delta:
+                                '${appCounts['active'] ?? 0} active',
+                            color: AppColors.blue),
+                        const SizedBox(width: 10),
+                        _StatCard(
+                            label: 'Offers',
+                            value: (appCounts['offers'] ?? 0).toString(),
+                            delta: (appCounts['offers'] ?? 0) > 0
+                                ? '🎉 New!'
+                                : 'Pending',
+                            color: AppColors.orange),
                       ],
                     ),
                     const SizedBox(height: 14),
@@ -224,71 +279,160 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text30,
-                        letterSpacing: 10 * 0.1,
+                        letterSpacing: 1.0,
                       ),
                     ),
                     const SizedBox(height: 10),
-                    NotchedCard(
-                      bg: AppColors.surface,
-                      notchColor: AppColors.background,
-                      actionIcon: const Text('→'),
-                      actionBg: AppColors.blue,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                    activeAppsAsync.when(
+                      data: (apps) {
+                        if (apps.isEmpty) {
+                          return GestureDetector(
+                            onTap: () => context.push('/universities'),
+                            child: Container(
+                              padding: const EdgeInsets.all(20),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                    color: AppColors.primaryAccent
+                                        .withValues(alpha: 0.2)),
+                              ),
+                              child: const Column(
+                                children: [
+                                  Text('🏛',
+                                      style: TextStyle(fontSize: 32)),
+                                  SizedBox(height: 8),
+                                  Text('No active applications yet',
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700)),
+                                  SizedBox(height: 4),
+                                  Text('Browse universities to get started →',
+                                      style: TextStyle(
+                                          color: AppColors.primaryAccent,
+                                          fontSize: 13)),
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        final app = apps.first;
+                        final deadline =
+                            (app['deadline'] as Timestamp?)?.toDate();
+                        final progress =
+                            ((app['progress'] ?? 0) as num).toDouble();
+                        return NotchedCard(
+                          bg: AppColors.surface,
+                          notchColor: AppColors.background,
+                          actionIcon: const Text('→'),
+                          actionBg: AppColors.blue,
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Container(
-                                width: 44,
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  color: AppColors.blue.withValues(alpha: 0.13), // 22 hex
-                                  border: Border.all(color: AppColors.blue.withValues(alpha: 0.26)), // 44 hex
-                                  borderRadius: BorderRadius.circular(14),
-                                ),
-                                alignment: Alignment.center,
-                                child: const Text('🏛', style: TextStyle(fontSize: 20)),
-                              ),
-                              const SizedBox(width: 12),
-                              const Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'BITS Pilani',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w900,
-                                        color: AppColors.text,
-                                        letterSpacing: -0.3,
-                                      ),
+                              Row(
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.blue
+                                          .withValues(alpha: 0.13),
+                                      border: Border.all(
+                                          color: AppColors.blue
+                                              .withValues(alpha: 0.26)),
+                                      borderRadius:
+                                          BorderRadius.circular(14),
                                     ),
-                                    Text(
-                                      'B.Tech CSE · Pilani Campus',
-                                      style: TextStyle(
+                                    alignment: Alignment.center,
+                                    child: const Text('🏛',
+                                        style: TextStyle(fontSize: 20)),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          (app['universityName'] as String?)
+                                                  ?.isNotEmpty ==
+                                              true
+                                              ? app['universityName']
+                                              : 'Unknown University',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w900,
+                                            color: AppColors.text,
+                                            letterSpacing: -0.3,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        Text(
+                                          (app['courseName'] as String?)
+                                                  ?.isNotEmpty ==
+                                              true
+                                              ? app['courseName']
+                                              : 'Course unspecified',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: AppColors.text60,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  BadgeChip(
+                                    label: ((app['status'] as String?) ??
+                                            'draft')
+                                        .replaceAll('_', ' ')
+                                        .toUpperCase(),
+                                    color: AppColors.blue,
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 14),
+                              GlowProgressBar(
+                                  value: progress,
+                                  color: AppColors.primaryAccent,
+                                  height: 5),
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    deadline != null
+                                        ? 'Deadline: ${deadline.day}/${deadline.month}/${deadline.year}'
+                                        : 'No deadline set',
+                                    style: const TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.text30),
+                                  ),
+                                  Text(
+                                    '${progress.toInt()}%',
+                                    style: const TextStyle(
                                         fontSize: 12,
-                                        color: AppColors.text60,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.primaryAccent),
+                                  ),
+                                ],
                               ),
-                              const BadgeChip(label: 'IN PROGRESS', color: AppColors.blue),
                             ],
                           ),
-                          const SizedBox(height: 14),
-                          const GlowProgressBar(value: 91, color: AppColors.primaryAccent, height: 5),
-                          const SizedBox(height: 8),
-                          const Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Deadline: Aug 30, 2025', style: TextStyle(fontSize: 11, color: AppColors.text30)),
-                              Text('91%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, color: AppColors.primaryAccent)),
-                            ],
-                          ),
-                        ],
-                      ),
+                        );
+                      },
+                      loading: () => const Center(
+                          child: CircularProgressIndicator(
+                              color: AppColors.primaryAccent)),
+                      error: (err, stack) => _ErrorTile(
+                          message: 'Could not load applications.',
+                          onRetry: () =>
+                              ref.invalidate(activeApplicationsProvider)),
                     ),
                     const SizedBox(height: 14),
 
@@ -299,7 +443,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text30,
-                        letterSpacing: 10 * 0.1,
+                        letterSpacing: 1.0,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -307,43 +451,95 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       spacing: 8,
                       runSpacing: 8,
                       children: [
-                        _QuickAction(label: 'SOP Builder', icon: '📝', color: AppColors.purple, route: '/sop'),
-                        _QuickAction(label: 'Doc Vault', icon: '🔐', color: AppColors.blue, route: '/vault'),
-                        _QuickAction(label: 'Interview', icon: '🎤', color: Color(0xFF1C8A5E)),
-                        _QuickAction(label: 'AI Copilot', icon: '✦', color: AppColors.primaryAccent, route: '/copilot/chat'),
+                        _QuickAction(
+                            label: 'SOP Builder',
+                            icon: '📝',
+                            color: AppColors.purple,
+                            route: '/sop'),
+                        _QuickAction(
+                            label: 'Doc Vault',
+                            icon: '🔐',
+                            color: AppColors.blue,
+                            route: '/vault'),
+                        _QuickAction(
+                            label: 'Interview',
+                            icon: '🎤',
+                            color: Color(0xFF1C8A5E)),
+                        _QuickAction(
+                            label: 'AI Copilot',
+                            icon: '✦',
+                            color: AppColors.primaryAccent,
+                            route: '/copilot/chat'),
                       ],
                     ),
                     const SizedBox(height: 16),
 
-                    // ── UPCOMING TIMELINE ──
+                    // ── UPCOMING DEADLINES / TASKS ──
                     const Text(
                       'UPCOMING DEADLINES',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text30,
-                        letterSpacing: 10 * 0.1,
+                        letterSpacing: 1.0,
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const Column(
-                      children: [
-                        _TimelineItem(title: 'Passport Upload', tag: 'REQUIRED', date: 'Tomorrow', color: AppColors.red),
-                        _TimelineItem(title: 'BITS Application', tag: 'IN 2 DAYS', date: '22 Jul 2025', color: AppColors.yellow),
-                        _TimelineItem(title: 'Interview Round', tag: 'IN 5 DAYS', date: '25 Jul 2025', color: AppColors.blue),
-                        _TimelineItem(title: 'Stanford Application', tag: 'DEADLINE', date: '27 Jul 2025', color: AppColors.orange),
-                      ],
-                    ),
+                    if (tasks.isEmpty)
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: const Text(
+                          'No upcoming deadlines. You\'re all caught up! 🎉',
+                          style:
+                              TextStyle(color: Colors.white54, fontSize: 13),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    else
+                      Column(
+                        children: tasks.map((task) {
+                          final dueDate =
+                              (task['dueDate'] as Timestamp?)?.toDate();
+                          final dueDateStr = dueDate != null
+                              ? '${dueDate.day}/${dueDate.month}/${dueDate.year}'
+                              : 'No date';
+                          final now = DateTime.now();
+                          final daysLeft = dueDate != null
+                              ? dueDate.difference(now).inDays
+                              : 99;
+                          final color = daysLeft <= 1
+                              ? AppColors.red
+                              : daysLeft <= 3
+                                  ? AppColors.yellow
+                                  : AppColors.blue;
+                          final tag = daysLeft <= 0
+                              ? 'TODAY'
+                              : daysLeft == 1
+                                  ? 'TOMORROW'
+                                  : 'IN $daysLeft DAYS';
+                          return _TimelineItem(
+                            title: task['title'] ?? 'Task',
+                            tag: tag,
+                            date: dueDateStr,
+                            color: color,
+                          );
+                        }).toList(),
+                      ),
                     const SizedBox(height: 16),
 
-                    // ── SCHOLARSHIPS ──
+                    // ── SCHOLARSHIPS (static UI, future Firestore) ──
                     const Text(
                       'SCHOLARSHIPS',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
                         color: AppColors.text30,
-                        letterSpacing: 10 * 0.1,
+                        letterSpacing: 1.0,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -358,11 +554,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('MATCH', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.primaryAccent, letterSpacing: 10 * 0.06)),
+                                Text('MATCH',
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w800,
+                                        color: AppColors.primaryAccent,
+                                        letterSpacing: 0.6)),
                                 SizedBox(height: 6),
-                                Text('94%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.text)),
+                                Text('94%',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.text)),
                                 SizedBox(height: 4),
-                                Text('STEM Innovators Grant', style: TextStyle(fontSize: 11, color: AppColors.text60, height: 1.3)),
+                                Text('STEM Innovators Grant',
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.text60,
+                                        height: 1.3)),
                               ],
                             ),
                           ),
@@ -377,11 +586,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('MATCH', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.purple, letterSpacing: 10 * 0.06)),
+                                Text('MATCH',
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w800,
+                                        color: AppColors.purple,
+                                        letterSpacing: 0.6)),
                                 SizedBox(height: 6),
-                                Text('87%', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.text)),
+                                Text('87%',
+                                    style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w900,
+                                        color: AppColors.text)),
                                 SizedBox(height: 4),
-                                Text('Merit Excellence Fund', style: TextStyle(fontSize: 11, color: AppColors.text60, height: 1.3)),
+                                Text('Merit Excellence Fund',
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        color: AppColors.text60,
+                                        height: 1.3)),
                               ],
                             ),
                           ),
@@ -395,6 +617,45 @@ class _DashboardScreenState extends State<DashboardScreen> {
             FloatingNav(activeId: _nav, onChange: _onNavChange),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ── Supporting widgets ──────────────────────────────────────────────────────
+
+class _ErrorTile extends StatelessWidget {
+  final String message;
+  final VoidCallback? onRetry;
+  const _ErrorTile({required this.message, this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.red.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.error_outline, color: AppColors.red, size: 20),
+          const SizedBox(width: 10),
+          Expanded(
+              child: Text(message,
+                  style:
+                      const TextStyle(color: Colors.white70, fontSize: 13))),
+          if (onRetry != null)
+            GestureDetector(
+              onTap: onRetry,
+              child: const Text('Retry',
+                  style: TextStyle(
+                      color: AppColors.primaryAccent,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700)),
+            ),
+        ],
       ),
     );
   }
@@ -431,14 +692,16 @@ class _StatCardState extends State<_StatCard> {
           scale: _pressed ? 0.97 : 1.0,
           duration: const Duration(milliseconds: 150),
           child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
+            padding:
+                const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
             decoration: BoxDecoration(
               color: AppColors.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: widget.color.withValues(alpha: 0.2)), // 33 hex
+              border: Border.all(
+                  color: widget.color.withValues(alpha: 0.2)),
               boxShadow: [
                 BoxShadow(
-                  color: widget.color.withValues(alpha: 0.09), // 18 hex
+                  color: widget.color.withValues(alpha: 0.09),
                   blurRadius: 20,
                   offset: const Offset(0, 4),
                 )
@@ -453,7 +716,7 @@ class _StatCardState extends State<_StatCard> {
                     fontSize: 9,
                     fontWeight: FontWeight.w800,
                     color: AppColors.text30,
-                    letterSpacing: 9 * 0.08,
+                    letterSpacing: 0.72,
                   ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
@@ -500,9 +763,10 @@ class _QuickAction extends StatelessWidget {
         height: 36,
         padding: const EdgeInsets.only(left: 12, right: 14),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.09), // 18 hex approx
+          color: color.withValues(alpha: 0.09),
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: color.withValues(alpha: 0.26), width: 1.5), // 44 hex approx
+          border: Border.all(
+              color: color.withValues(alpha: 0.26), width: 1.5),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -545,7 +809,7 @@ class _TimelineItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.13)), // 22 hex
+        border: Border.all(color: color.withValues(alpha: 0.13)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -559,7 +823,9 @@ class _TimelineItem extends StatelessWidget {
                   color: color,
                   borderRadius: BorderRadius.circular(2),
                   boxShadow: [
-                    BoxShadow(color: color.withValues(alpha: 0.53), blurRadius: 8) // 88 hex
+                    BoxShadow(
+                        color: color.withValues(alpha: 0.53),
+                        blurRadius: 8)
                   ],
                 ),
               ),
