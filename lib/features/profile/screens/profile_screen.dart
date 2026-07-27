@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/theme/neo_design_system.dart' hide Badge;
 import '../../../core/theme/neo_design_system.dart' as neo show Badge;
 import '../providers/profile_provider.dart';
@@ -16,27 +17,27 @@ class ProfileScreen extends ConsumerWidget {
       {
         'title': 'PERSONAL',
         'items': [
-          {'icon': '👤', 'label': 'Personal Information', 'sub': 'Name, DOB, gender', 'color': NeoColors.blue},
-          {'icon': '📚', 'label': 'Academic Details', 'sub': 'Boards, scores, grades', 'color': NeoColors.purple},
-          {'icon': '👨‍👩‍👦', 'label': 'Parent / Guardian', 'sub': 'Contact & income info', 'color': const Color(0xFFFF6B35)},
-          {'icon': '📍', 'label': 'Address', 'sub': 'Permanent & current', 'color': NeoColors.yellow},
+          {'icon': '👤', 'label': 'Personal Information', 'sub': 'Name, DOB, gender', 'color': NeoColors.blue, 'route': '/profile/personal'},
+          {'icon': '📚', 'label': 'Academic Details', 'sub': 'Boards, scores, grades', 'color': NeoColors.purple, 'route': '/profile/academic'},
+          {'icon': '👨‍👩‍👦', 'label': 'Parent / Guardian', 'sub': 'Contact & income info', 'color': const Color(0xFFFF6B35), 'route': '/profile/guardian'},
+          {'icon': '📍', 'label': 'Address', 'sub': 'Permanent & current', 'color': NeoColors.yellow, 'route': '/profile/address'},
         ]
       },
       {
         'title': 'ADMISSION',
         'items': [
-          {'icon': '🏆', 'label': 'Entrance Exams', 'sub': 'JEE, NEET, CAT scores', 'color': NeoColors.green},
-          {'icon': '📋', 'label': 'Category & Quota', 'sub': 'General / OBC / SC / ST', 'color': const Color(0xFFFF3B7A)},
-          {'icon': '🪪', 'label': 'Student ID', 'sub': 'Digital ID card & QR', 'color': NeoColors.blue},
+          {'icon': '🏆', 'label': 'Entrance Exams', 'sub': 'JEE, NEET, CAT scores', 'color': NeoColors.green, 'route': '/profile/exams'},
+          {'icon': '📋', 'label': 'Category & Quota', 'sub': 'General / OBC / SC / ST', 'color': const Color(0xFFFF3B7A), 'route': '/profile/category'},
+          {'icon': '🪪', 'label': 'Student ID', 'sub': 'Digital ID card & QR', 'color': NeoColors.blue, 'route': '/profile/student-id'},
         ]
       },
       {
         'title': 'ACCOUNT',
         'items': [
-          {'icon': '🔒', 'label': 'Security', 'sub': 'Password, 2FA, sessions', 'color': NeoColors.red},
-          {'icon': '🔔', 'label': 'Notifications', 'sub': 'Email, SMS, push', 'color': NeoColors.yellow},
-          {'icon': '🎨', 'label': 'Appearance', 'sub': 'Theme, language', 'color': NeoColors.purple},
-          {'icon': '🔗', 'label': 'Connected Accounts', 'sub': 'Google, Apple', 'color': NeoColors.blue},
+          {'icon': '🔒', 'label': 'Security', 'sub': 'Password, 2FA, sessions', 'color': NeoColors.red, 'route': '/settings/security'},
+          {'icon': '🔔', 'label': 'Notifications', 'sub': 'Email, SMS, push', 'color': NeoColors.yellow, 'route': '/settings/notifications'},
+          {'icon': '🎨', 'label': 'Appearance', 'sub': 'Theme, language', 'color': NeoColors.purple, 'route': '/settings/appearance'},
+          {'icon': '🔗', 'label': 'Connected Accounts', 'sub': 'Google, Apple', 'color': NeoColors.blue, 'route': '/settings/connected'},
         ]
       },
     ];
@@ -263,8 +264,15 @@ class ProfileScreen extends ConsumerWidget {
                           children: List.generate(items.length, (i) {
                             final item = items[i];
                             final color = item['color'] as Color;
-                            return Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            return GestureDetector(
+                              onTap: () {
+                                if (item.containsKey('route')) {
+                                  context.push(item['route'] as String);
+                                }
+                              },
+                              behavior: HitTestBehavior.opaque,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                               decoration: BoxDecoration(
                                 border: Border(
                                   bottom: BorderSide(
@@ -312,6 +320,7 @@ class ProfileScreen extends ConsumerWidget {
                                   const Text('›', style: TextStyle(fontSize: 16, color: NeoColors.subDark)),
                                 ],
                               ),
+                              ),
                             );
                           }),
                         ),
@@ -335,7 +344,10 @@ class ProfileScreen extends ConsumerWidget {
                       label: 'Log out',
                       color: Colors.white60,
                       hasBorder: true,
-                      onTap: () {},
+                      onTap: () async {
+                        await FirebaseAuth.instance.signOut();
+                        if (context.mounted) context.go('/');
+                      },
                     ),
                     _DangerItem(
                       icon: '🗑️',

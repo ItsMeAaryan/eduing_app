@@ -22,11 +22,11 @@ class MainLayout extends StatelessWidget {
               Expanded(child: child),
             ],
           ),
-          const Positioned(
-            bottom: 16,
+          Positioned(
+            bottom: MediaQuery.of(context).padding.bottom + 16,
             left: 16,
             right: 16,
-            child: FloatingBottomNav(),
+            child: const FloatingBottomNav(),
           ),
         ],
       ),

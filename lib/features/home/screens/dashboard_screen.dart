@@ -13,6 +13,14 @@ class DashboardScreen extends StatefulWidget {
   State<DashboardScreen> createState() => _DashboardScreenState();
 }
 
+String _getGreeting() {
+  final hour = DateTime.now().hour;
+  if (hour < 12) return 'Good morning';
+  if (hour < 17) return 'Good afternoon';
+  if (hour < 21) return 'Good evening';
+  return 'Good night';
+}
+
 class _DashboardScreenState extends State<DashboardScreen> {
   String _nav = 'home';
 
@@ -46,7 +54,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           children: [
             Positioned.fill(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(18, 10, 18, 90), // 90px bottom padding for floating nav
+                padding: EdgeInsets.fromLTRB(18, 10, 18, MediaQuery.of(context).padding.bottom + 80),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -55,25 +63,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        const Column(
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'GOOD MORNING',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.text30,
-                                letterSpacing: 10 * 0.12,
+                              '${_getGreeting()},',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white54,
                               ),
                             ),
-                            SizedBox(height: 3),
-                            Text(
+                            const Text(
                               'Aaryan Sharma 👋',
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 24,
                                 fontWeight: FontWeight.w900,
-                                color: AppColors.text,
+                                color: Colors.white,
                                 letterSpacing: -0.5,
                               ),
                             ),
@@ -82,32 +88,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         Row(
                           children: [
                             // Bell
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                color: AppColors.surface,
-                                border: Border.all(color: AppColors.border),
-                                shape: BoxShape.circle,
-                              ),
-                              alignment: Alignment.center,
-                              child: Stack(
-                                children: [
-                                  const Icon(Icons.notifications_none, color: AppColors.text, size: 20),
-                                  Positioned(
-                                    top: 2,
-                                    right: 2,
-                                    child: Container(
-                                      width: 8,
-                                      height: 8,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primaryAccent,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: AppColors.background, width: 2),
+                            GestureDetector(
+                              onTap: () => context.push('/notifications'),
+                              child: Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surface,
+                                  border: Border.all(color: AppColors.border),
+                                  shape: BoxShape.circle,
+                                ),
+                                alignment: Alignment.center,
+                                child: Stack(
+                                  children: [
+                                    const Icon(Icons.notifications_none, color: AppColors.text, size: 20),
+                                    Positioned(
+                                      top: 2,
+                                      right: 2,
+                                      child: Container(
+                                        width: 8,
+                                        height: 8,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primaryAccent,
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: AppColors.background, width: 2),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             const SizedBox(width: 10),

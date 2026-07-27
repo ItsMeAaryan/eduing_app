@@ -47,6 +47,7 @@ import '../../features/vault/screens/doc_upload_screen.dart';
 import '../../features/profile/screens/profile_setup_screen.dart';
 import '../../features/planner/screens/planner_calendar_screen.dart';
 import '../../features/profile/screens/student_id_screen.dart';
+import '../../shared/widgets/placeholder_screen.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _subscription;
@@ -297,6 +298,46 @@ class AppRouter {
           GoRoute(
             path: '/notifications',
             builder: (context, state) => const NotificationsScreen(),
+          ),
+          GoRoute(
+            path: '/profile/personal',
+            builder: (context, state) => const PlaceholderScreen(title: 'Personal Information'),
+          ),
+          GoRoute(
+            path: '/profile/academic',
+            builder: (context, state) => const PlaceholderScreen(title: 'Academic Details'),
+          ),
+          GoRoute(
+            path: '/profile/guardian',
+            builder: (context, state) => const PlaceholderScreen(title: 'Parent / Guardian'),
+          ),
+          GoRoute(
+            path: '/profile/address',
+            builder: (context, state) => const PlaceholderScreen(title: 'Address'),
+          ),
+          GoRoute(
+            path: '/profile/exams',
+            builder: (context, state) => const PlaceholderScreen(title: 'Entrance Exams'),
+          ),
+          GoRoute(
+            path: '/profile/category',
+            builder: (context, state) => const PlaceholderScreen(title: 'Category & Quota'),
+          ),
+          GoRoute(
+            path: '/settings/security',
+            builder: (context, state) => const PlaceholderScreen(title: 'Security'),
+          ),
+          GoRoute(
+            path: '/settings/notifications',
+            builder: (context, state) => const PlaceholderScreen(title: 'Notifications'),
+          ),
+          GoRoute(
+            path: '/settings/appearance',
+            builder: (context, state) => const PlaceholderScreen(title: 'Appearance'),
+          ),
+          GoRoute(
+            path: '/settings/connected',
+            builder: (context, state) => const PlaceholderScreen(title: 'Connected Accounts'),
           ),
         ],
       ),
