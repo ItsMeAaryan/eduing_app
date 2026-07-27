@@ -1,13 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import '../../../core/services/firebase/firebase_service.dart';
 
 class AuthRepository {
   final FirebaseAuth _auth = FirebaseService.auth;
   final FirebaseFirestore _firestore = FirebaseService.firestore;
-  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
-  bool _isGoogleSignInInitialized = false;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
@@ -19,33 +16,6 @@ class AuthRepository {
           email: email, password: password);
     } on FirebaseAuthException catch (e) {
       throw _handleAuthException(e);
-    }
-  }
-
-  Future<UserCredential?> signInWithGoogle() async {
-    try {
-      if (!_isGoogleSignInInitialized) {
-        // TODO: This requires SHA-1 fingerprint in Firebase Console
-        // await _googleSignIn.initialize();
-        _isGoogleSignInInitialized = true;
-      }
-      
-      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
-
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
-      final OAuthCredential credential = GoogleAuthProvider.credential(
-        idToken: googleAuth.idToken,
-      );
-
-      final userCredential = await _auth.signInWithCredential(credential);
-      if (userCredential.user != null) {
-        await _createUserDocument(
-            userCredential.user!, userCredential.user!.displayName ?? 'User');
-      }
-      return userCredential;
-    } catch (e) {
-      // TODO: The actual SHA-1 fix must be done in Firebase Console
-      throw Exception('Google Sign-In failed: $e');
     }
   }
 
@@ -83,7 +53,6 @@ class AuthRepository {
   }
 
   Future<void> signOut() async {
-    await _googleSignIn.signOut();
     await _auth.signOut();
   }
 

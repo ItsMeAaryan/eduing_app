@@ -1,210 +1,248 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/neo_design_system.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/green_button.dart';
+import '../../../core/widgets/glow_input.dart';
+import '../providers/auth_provider.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
-  final VoidCallback onNavigateToLogin;
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
+  // Keep this for compatibility with existing router usage
+  final VoidCallback? onNavigateToLogin;
 
-  const ForgotPasswordScreen({
-    super.key,
-    required this.onNavigateToLogin,
-  });
+  const ForgotPasswordScreen({super.key, this.onNavigateToLogin});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final TextEditingController _emailController = TextEditingController();
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
+  String _email = '';
+  bool _sent = false;
 
   @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    SystemChannels.textInput.invokeMethod('TextInput.hide');
+  }
+
+  void _sendReset() async {
+    if (_email.isEmpty) return;
+    await ref.read(authControllerProvider.notifier).sendPasswordReset(_email.trim());
+    if (mounted && !ref.read(authControllerProvider).hasError) {
+      setState(() => _sent = true);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final t = NeoThemeData.of(context);
+    ref.listen<AsyncValue<void>>(
+      authControllerProvider,
+      (_, state) {
+        state.whenOrNull(
+          error: (error, _) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(error.toString())),
+            );
+          },
+        );
+      },
+    );
+
+    final isLoading = ref.watch(authControllerProvider).isLoading;
 
     return Scaffold(
-      backgroundColor: t.bg,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: t.text),
-          onPressed: widget.onNavigateToLogin,
-        ),
-      ),
-      resizeToAvoidBottomInset: false,
+      backgroundColor: const Color(0xFF0A0A0A),
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-              // Logo + headline
-              Padding(
-                padding: const EdgeInsets.only(bottom: 28),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 52,
-                      height: 52,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        gradient: const LinearGradient(
-                          colors: [NeoColors.red, NeoColors.yellow],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: NeoColors.red.withValues(alpha: 0.2),
-                            blurRadius: 20,
-                            offset: const Offset(0, 8),
-                          )
-                        ],
-                      ),
-                      alignment: Alignment.center,
-                      margin: const EdgeInsets.only(bottom: 20),
-                      child: const Text(
-                        "🔑",
-                        style: TextStyle(fontSize: 24),
-                      ),
-                    ),
-                    const Text(
-                      "ACCOUNT RECOVERY",
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: NeoColors.red,
-                        letterSpacing: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      "Reset your\npassword.",
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: t.text,
-                        letterSpacing: -0.5,
-                        height: 1.15,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      "Enter your email and we'll send you a link to reset your password.",
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: t.sub,
-                        height: 1.4,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              // Inputs
-              NeoInput(
-                label: "Email",
-                placeholder: "you@example.com",
-                controller: _emailController,
-              ),
-
-                  ],
-                ),
-              ),
-            ),
-            AnimatedPadding(
-              duration: const Duration(milliseconds: 200),
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-                left: 20,
-                right: 20,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Notched send button
-                  NotchedCard(
-                    bg: NeoColors.red,
-                    notchPos: "br",
-                    notchSize: 52,
-                    padding: const EdgeInsets.all(20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Send Link",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          "Check your inbox",
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.white.withValues(alpha: 0.65),
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
-                  ),
-                  Transform.translate(
-                    offset: const Offset(0, -31),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: FloatingActionBtn(
-                          icon: "→",
-                          bg: t.surf,
-                          size: 52,
-                          onClick: () {
-                            // reset logic
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-                  // Back to Login
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const ClampingScrollPhysics(),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: IntrinsicHeight(
+                  child: Column(
                     children: [
-                      Text(
-                        "Remembered it? ",
-                        style: TextStyle(fontSize: 13, color: t.sub),
+                      // ── Content ──
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            // Back
+                            Padding(
+                              padding:
+                                  const EdgeInsets.only(top: 6, bottom: 32),
+                              child: Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      if (widget.onNavigateToLogin != null) {
+                                        widget.onNavigateToLogin!();
+                                      } else {
+                                        context.go('/login');
+                                      }
+                                    },
+                                    child: Container(
+                                      width: 32,
+                                      height: 32,
+                                      decoration: const BoxDecoration(
+                                        color: AppColors.surface,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: const Icon(
+                                        Icons.arrow_back,
+                                        color: AppColors.text,
+                                        size: 14,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  const Text(
+                                    'ACCOUNT RECOVERY',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.text60,
+                                      letterSpacing: 0.52,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Progress bar
+                            Container(
+                              height: 3,
+                              decoration: BoxDecoration(
+                                color: AppColors.surface,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                              margin: const EdgeInsets.only(bottom: 32),
+                              alignment: Alignment.centerLeft,
+                              child: FractionallySizedBox(
+                                widthFactor: 0.66,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primaryAccent,
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            // Headline
+                            const Text(
+                              'Reset your\npassword.',
+                              style: TextStyle(
+                                fontSize: 38,
+                                fontWeight: FontWeight.w900,
+                                color: AppColors.text,
+                                letterSpacing: -1,
+                                height: 1.1,
+                                fontFamily: 'Inter',
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              "Enter your email and we'll send you a link to reset your password.",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.text60,
+                                height: 1.4,
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+
+                            if (_sent) ...[
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primaryAccent.withValues(
+                                      alpha: 0.08),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                      color: AppColors.primaryAccent
+                                          .withValues(alpha: 0.3)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.check_circle_outline,
+                                        color: AppColors.primaryAccent,
+                                        size: 20),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'Reset link sent to $_email',
+                                        style: const TextStyle(
+                                          color: AppColors.primaryAccent,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ] else ...[
+                              GlowInput(
+                                label: 'EMAIL ADDRESS',
+                                placeholder: 'you@example.com',
+                                value: _email,
+                                onChange: (v) => setState(() => _email = v),
+                                keyboardType: TextInputType.emailAddress,
+                                textInputAction: TextInputAction.done,
+                              ),
+                            ],
+                          ],
+                        ),
                       ),
-                      GestureDetector(
-                        onTap: widget.onNavigateToLogin,
-                        child: const Text(
-                          "Sign in →",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w800,
-                            color: NeoColors.purple,
-                          ),
+
+                      const Spacer(),
+
+                      // ── Bottom button ──
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                        child: Column(
+                          children: [
+                            GreenButton(
+                              label: _sent ? 'Resend Link' : 'Send Reset Link',
+                              loading: isLoading,
+                              disabled: _email.isEmpty,
+                              onClick: _sendReset,
+                            ),
+                            const SizedBox(height: 20),
+                            GestureDetector(
+                              onTap: () {
+                                if (widget.onNavigateToLogin != null) {
+                                  widget.onNavigateToLogin!();
+                                } else {
+                                  context.go('/login');
+                                }
+                              },
+                              child: const Text(
+                                'Back to Sign in →',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: AppColors.text60,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ],
+            );
+          },
         ),
       ),
     );

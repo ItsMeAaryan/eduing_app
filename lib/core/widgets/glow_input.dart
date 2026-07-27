@@ -9,6 +9,7 @@ class GlowInput extends StatefulWidget {
   final TextInputType keyboardType;
   final bool obscureText;
   final Widget? right;
+  final TextInputAction? textInputAction;
 
   const GlowInput({
     super.key,
@@ -19,6 +20,7 @@ class GlowInput extends StatefulWidget {
     this.keyboardType = TextInputType.text,
     this.obscureText = false,
     this.right,
+    this.textInputAction,
   });
 
   @override
@@ -102,6 +104,24 @@ class _GlowInputState extends State<GlowInput> {
                     onChanged: widget.onChange,
                     keyboardType: widget.keyboardType,
                     obscureText: widget.obscureText,
+                    keyboardAppearance: Brightness.dark,
+                    textInputAction: widget.textInputAction,
+                    scrollPadding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom + 100,
+                    ),
+                    onTap: () {
+                      final scrollable = Scrollable.maybeOf(context);
+                      final renderObject = context.findRenderObject();
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                        if (!mounted || scrollable == null || renderObject == null) return;
+                        scrollable.position.ensureVisible(
+                          renderObject,
+                          duration: const Duration(milliseconds: 200),
+                          curve: Curves.easeOut,
+                          alignment: 0.5,
+                        );
+                      });
+                    },
                     style: const TextStyle(
                       fontSize: 15,
                       color: AppColors.text,

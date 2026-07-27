@@ -44,15 +44,7 @@ class AuthController extends Notifier<AsyncValue<void>> {
       state = AsyncError(e, st);
     }
   }
-  Future<void> signInWithGoogle() async {
-    try {
-      state = const AsyncLoading();
-      await _repository.signInWithGoogle();
-      state = const AsyncData(null);
-    } catch (e, st) {
-      state = AsyncError(e, st);
-    }
-  }
+
 
   Future<void> registerWithEmail(
       String email, String password, String fullName) async {

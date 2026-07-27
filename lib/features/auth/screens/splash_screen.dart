@@ -189,111 +189,67 @@ class SplashScreen extends ConsumerWidget {
               child: Column(
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      ref.read(guestModeProvider.notifier).update(true);
-                      context.go('/home');
-                    },
+                    onTap: () => context.push('/login'),
                     child: Container(
                       width: double.infinity,
                       height: 50,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.white24, width: 1.5),
+                        border: Border.all(color: Colors.white, width: 1.5),
                         borderRadius: BorderRadius.circular(25),
                       ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.person_outline, color: Colors.white60, size: 18),
-                          SizedBox(width: 8),
-                          Text(
-                            "Continue as Guest",
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
+                      child: const Center(
+                        child: Text(
+                          "Log in",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 12),
                   GestureDetector(
-                    onTap: () {
-                      ref.read(authControllerProvider.notifier).signInWithGoogle();
-                    },
+                    onTap: () => context.push('/register'),
                     child: Container(
                       width: double.infinity,
-                      height: 52,
+                      height: 50,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
-                        borderRadius: BorderRadius.circular(26),
-                        border: Border.all(color: Colors.white12),
+                        color: const Color(0xFF3DFF54),
+                        borderRadius: BorderRadius.circular(25),
                       ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('G', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold, fontFamily: 'Inter')),
-                          SizedBox(width: 10),
-                          Text(
-                            "Continue with Google",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w700,
-                            ),
+                      child: const Center(
+                        child: Text(
+                          "Create account",
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      TextButton(
-                        onPressed: () => context.push('/login'),
-                        style: TextButton.styleFrom(
-                          minimumSize: Size.zero,
-                          padding: EdgeInsets.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: const Text(
-                          "Log in",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Colors.white,
-                          ),
-                        ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {
+                      ref.read(guestModeProvider.notifier).update(true);
+                      context.go('/home');
+                    },
+                    style: TextButton.styleFrom(
+                      minimumSize: Size.zero,
+                      padding: EdgeInsets.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: const Text(
+                      "Continue as Guest",
+                      style: TextStyle(
+                        color: Colors.white60,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
                       ),
-                      Container(
-                        width: 1,
-                        height: 16,
-                        color: Colors.white24,
-                        margin: const EdgeInsets.symmetric(horizontal: 12),
-                      ),
-                      TextButton(
-                        onPressed: () => context.push('/register'),
-                        style: TextButton.styleFrom(
-                          minimumSize: Size.zero,
-                          padding: EdgeInsets.zero,
-                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        ),
-                        child: const Text(
-                          "Register",
-                          style: TextStyle(
-                            color: Color(0xFF3DFF54),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            decoration: TextDecoration.underline,
-                            decorationColor: Color(0xFF3DFF54),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                   SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
                 ],

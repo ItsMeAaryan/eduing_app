@@ -268,59 +268,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                                 onPressed: _submit,
                               ),
                             ),
-                            if (_mode == AuthMode.login) ...[
-                              const SizedBox(height: AppSpacing.p24),
-                              Row(
-                                children: [
-                                  Expanded(
-                                      child: Divider(
-                                          color: (isDark
-                                                  ? AppColors.darkBorder
-                                                  : AppColors.border)
-                                              .withValues(alpha: 0.5))),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: AppSpacing.p16),
-                                    child: Text('OR',
-                                        style: AppTypography.caption.copyWith(
-                                            color: AppColors.textSecondary)),
-                                  ),
-                                  Expanded(
-                                      child: Divider(
-                                          color: (isDark
-                                                  ? AppColors.darkBorder
-                                                  : AppColors.border)
-                                              .withValues(alpha: 0.5))),
-                                ],
-                              ),
-                              const SizedBox(height: AppSpacing.p24),
-                              SizedBox(
-                                width: double.infinity,
-                                child: AppButton(
-                                  text: 'Continue with Google',
-                                  icon: Iconsax
-                                      .global, // Using global as a placeholder for Google icon
-                                  variant: AppButtonVariant.secondary,
-                                  isLoading: isLoading,
-                                  onPressed: () async {
-                                    final repo =
-                                        ref.read(authRepositoryProvider);
-                                    try {
-                                      final credential =
-                                          await repo.signInWithGoogle();
-                                      if (!context.mounted) return;
-                                      if (credential != null) {
-                                        context.go('/');
-                                      }
-                                    } catch (e) {
-                                      if (context.mounted) {
-                                        _showError('Google Sign-In: $e');
-                                      }
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
+
                           ],
                         ),
                       ),
