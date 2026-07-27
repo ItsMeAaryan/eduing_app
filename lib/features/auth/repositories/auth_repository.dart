@@ -14,8 +14,8 @@ class AuthRepository {
     try {
       return await _auth.signInWithEmailAndPassword(
           email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+    } on FirebaseAuthException {
+      rethrow;
     }
   }
 
@@ -39,16 +39,16 @@ class AuthRepository {
       }
 
       return credential;
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+    } on FirebaseAuthException {
+      rethrow;
     }
   }
 
   Future<void> sendPasswordReset(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-    } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+    } on FirebaseAuthException {
+      rethrow;
     }
   }
 
@@ -60,6 +60,7 @@ class AuthRepository {
     final user = _auth.currentUser;
     if (user != null) {
       await _firestore.collection('users').doc(user.uid).delete();
+      await _firestore.collection('student_profiles').doc(user.uid).delete();
       await user.delete();
     }
   }
@@ -69,34 +70,55 @@ class AuthRepository {
     final doc = await docRef.get();
 
     if (!doc.exists) {
+      final now = FieldValue.serverTimestamp();
       await docRef.set({
+        'uid': user.uid,
+        'email': user.email,
+        'displayName': fullName,
+        'photoUrl': '',
+        'role': 'student',
+        'createdAt': now,
+        'updatedAt': now,
+        'onboardingCompleted': false,
+        'profileCompletion': 10,
+        'personal': {
+          'fullName': fullName,
+          'dob': null,
+          'gender': '',
+          'phone': '',
+        },
+        'academic': {
+          'board': '',
+          'percentage12': null,
+          'graduationYear': null,
+        },
+        'entranceExams': {
+          'jeeMainPercentile': null,
+          'bitsatScore': null,
+          'neetScore': null,
+        },
+        'reservation': {'category': 'General'},
+        'aiProfile': {
+          'readinessScore': 15,
+          'lastComputed': now,
+        },
+        'settings': {
+          'notifications': true,
+          'darkMode': true,
+          'language': 'en',
+        },
+        'referralSource': [],
+      });
+
+      // Mirror to student_profiles collection (visible to university portal)
+      await _firestore.collection('student_profiles').doc(user.uid).set({
         'uid': user.uid,
         'displayName': fullName,
         'email': user.email,
-        'photoUrl': user.photoURL ?? '',
-        'createdAt': FieldValue.serverTimestamp(),
-        'updatedAt': FieldValue.serverTimestamp(),
-        'profileCompletion': 0,
-        'settings': {},
-        'preferences': {},
+        'role': 'student',
+        'profileCompletion': 10,
+        'createdAt': now,
       });
-    }
-  }
-
-  String _handleAuthException(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'user-not-found':
-        return 'No user found for that email.';
-      case 'wrong-password':
-        return 'Wrong password provided for that user.';
-      case 'email-already-in-use':
-        return 'The account already exists for that email.';
-      case 'weak-password':
-        return 'The password provided is too weak.';
-      case 'invalid-email':
-        return 'The email address is badly formatted.';
-      default:
-        return e.message ?? 'An unknown error occurred.';
     }
   }
 }
