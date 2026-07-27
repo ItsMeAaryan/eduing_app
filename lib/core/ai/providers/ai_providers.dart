@@ -36,22 +36,25 @@ final documentAiServiceProvider = Provider<DocumentAiService>((ref) {
   return DocumentAiService(ref.read(geminiServiceProvider));
 });
 
-// A bridge provider to supply UserProfile for AI services. 
-// In a real app, this would fetch from a database.
-final userProfileProvider = FutureProvider.family<UserProfile, String>((ref, userId) async {
-  final profileState = ref.watch(profileProvider);
+// A bridge provider to supply UserProfile for AI services.
+final aiUserProfileProvider = FutureProvider.family<UserProfile, String>((ref, userId) async {
+  final profile = ref.watch(profileProvider);
+  if (profile.value == null || profile.value!.isEmpty) {
+    return const UserProfile(name: '', email: '', phone: '', percentage: 0.0, jeePercentile: 0.0, board: '');
+  }
+  final p = profile.value!;
   return UserProfile(
-    name: profileState.name,
-    email: profileState.email,
-    phone: profileState.phone,
-    percentage: 85.0, // Stub data
-    jeePercentile: 95.0, // Stub data
-    board: 'CBSE', // Stub data
+    name: p.displayName,
+    email: p.email,
+    phone: p.phone,
+    percentage: ((p['academic']?['percentage12'] as num?) ?? 85.0).toDouble(),
+    jeePercentile: ((p['entranceExams']?['jeeMainPercentile'] as num?) ?? 0.0).toDouble(),
+    board: (p['academic']?['board'] as String?) ?? 'CBSE',
   );
 });
 
 final readinessScoreProvider = FutureProvider.family<ReadinessResult, String>((ref, userId) async {
   final service = ReadinessScoreService();
-  final profile = await ref.read(userProfileProvider(userId).future);
+  final profile = await ref.read(aiUserProfileProvider(userId).future);
   return service.computeReadinessScore(profile);
 });

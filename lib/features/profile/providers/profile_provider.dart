@@ -1,40 +1,32 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class ProfileState {
-  final String name;
-  final String email;
-  final String phone;
-  final int completion;
-
-  const ProfileState({
-    this.name = 'Aaryan Sharma',
-    this.email = 'aaryan@example.com',
-    this.phone = '+91 98765 43210',
-    this.completion = 72,
-  });
-
-  ProfileState copyWith({
-    String? name,
-    String? email,
-    String? phone,
-    int? completion,
-  }) {
-    return ProfileState(
-      name: name ?? this.name,
-      email: email ?? this.email,
-      phone: phone ?? this.phone,
-      completion: completion ?? this.completion,
-    );
-  }
-}
-
-class ProfileNotifier extends Notifier<ProfileState> {
-  @override
-  ProfileState build() {
-    return const ProfileState();
-  }
-}
-
-final profileProvider = NotifierProvider<ProfileNotifier, ProfileState>(() {
-  return ProfileNotifier();
+/// Streams the current user's full Firestore document as a raw map.
+/// All screens should read from this instead of holding their own streams.
+final profileProvider = StreamProvider<Map<String, dynamic>>((ref) {
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  if (uid == null) return Stream.value({});
+  return FirebaseFirestore.instance
+      .collection('users')
+      .doc(uid)
+      .snapshots()
+      .map((s) => s.data() ?? {});
 });
+
+/// Convenience getters for UI consumption.
+extension ProfileDataX on Map<String, dynamic> {
+  String get displayName =>
+      this['displayName'] as String? ??
+      this['personal']?['fullName'] as String? ??
+      'Student';
+  String get email => this['email'] as String? ?? '';
+  String get phone =>
+      (this['personal']?['phone'] as String?)?.isNotEmpty == true
+          ? this['personal']['phone'] as String
+          : 'Not added';
+  int get profileCompletion =>
+      (this['profileCompletion'] as num?)?.toInt() ?? 0;
+  double get readinessScore =>
+      (this['aiProfile']?['readinessScore'] as num?)?.toDouble() ?? 0.0;
+}

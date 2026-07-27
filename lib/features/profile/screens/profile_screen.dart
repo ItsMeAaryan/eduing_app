@@ -11,7 +11,7 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(profileProvider);
+    final profileAsync = ref.watch(profileProvider);
 
     final sections = [
       {
@@ -95,22 +95,32 @@ class ProfileScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                    Text(
-                      state.name,
-                      style: const TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: -0.5,
+                    profileAsync.when(
+                      data: (profile) => Text(
+                        profile.displayName,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: -0.5,
+                        ),
                       ),
+                      loading: () => const Text('Loading...',
+                          style: TextStyle(color: Colors.white, fontSize: 22)),
+                      error: (_, __) => const Text('—',
+                          style: TextStyle(color: Colors.red, fontSize: 22)),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '${state.email} · ${state.phone}',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: NeoColors.subDark,
+                    profileAsync.when(
+                      data: (profile) => Text(
+                        '${profile.email} · ${profile.phone}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: NeoColors.subDark,
+                        ),
                       ),
+                      loading: () => const SizedBox(),
+                      error: (_, __) => const SizedBox(),
                     ),
                     const SizedBox(height: 10),
 
@@ -137,18 +147,28 @@ class ProfileScreen extends ConsumerWidget {
                                   color: Colors.white60,
                                 ),
                               ),
-                              Text(
-                                '${state.completion}%',
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w900,
-                                  color: NeoColors.green,
+                                profileAsync.when(
+                                  data: (profile) => Text(
+                                    '${profile.profileCompletion}%',
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w900,
+                                      color: NeoColors.green,
+                                    ),
+                                  ),
+                                  loading: () => const Text('--%',
+                                      style: TextStyle(color: NeoColors.green)),
+                                  error: (_, __) => const Text('!',
+                                      style: TextStyle(color: Colors.red)),
                                 ),
-                              ),
                             ],
                           ),
                           const SizedBox(height: 8),
-                          ProgressBar(value: state.completion.toDouble(), color: NeoColors.green, height: 5),
+                          ProgressBar(
+                            value: profileAsync.value?.profileCompletion.toDouble() ?? 0.0,
+                            color: NeoColors.green,
+                            height: 5,
+                          ),
                           const SizedBox(height: 6),
                           const Text(
                             'Add entrance exam scores to reach 85%',
@@ -195,13 +215,19 @@ class ProfileScreen extends ConsumerWidget {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Text(
-                          state.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
+                        profileAsync.when(
+                          data: (profile) => Text(
+                            profile.displayName,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                            ),
                           ),
+                          loading: () => const Text('Loading...',
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 18)),
+                          error: (_, __) => const SizedBox(),
                         ),
                         const SizedBox(height: 2),
                         Text(
