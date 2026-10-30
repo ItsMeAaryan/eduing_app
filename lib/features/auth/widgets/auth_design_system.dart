@@ -680,36 +680,13 @@ class LogoMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return Image.asset(
+      'assets/brand/eduing_logo.png',
       width: size,
       height: size,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(size * 0.3),
-        gradient: const LinearGradient(
-          colors: [AuthColors.purple, AuthColors.blue2],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AuthColors.purple.withValues(alpha: 0.5),
-            blurRadius: 24,
-            offset: const Offset(0, 8),
-          ),
-          const BoxShadow(
-            color: Color(0x26FFFFFF),
-            blurRadius: 0,
-            spreadRadius: 1,
-            blurStyle: BlurStyle.inner,
-          ),
-        ],
-      ),
-      child: Center(
-        child: Text(
-          "🎓",
-          style: TextStyle(fontSize: size * 0.45),
-        ),
-      ),
+      fit: BoxFit.contain,
+      filterQuality: FilterQuality.medium,
+      semanticLabel: 'EDUING',
     );
   }
 }

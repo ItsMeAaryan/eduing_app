@@ -173,7 +173,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                       child: const Column(
                         children: [
-                          Text('🎓', style: TextStyle(fontSize: 32)),
+                          Image(image: AssetImage('assets/brand/eduing_logo.png'), width: 44, height: 44),
                           SizedBox(height: 6),
                           Text('EDUING', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.white)),
                           Text('Version 1.0.0 · Build 42', style: TextStyle(fontSize: 11, color: NeoColors.subDark)),

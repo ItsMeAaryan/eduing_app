@@ -53,14 +53,20 @@ class SplashScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'EDUING',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.15,
-                    ),
+                  Row(
+                    children: [
+                      Image.asset('assets/brand/eduing_logo.png', width: 22, height: 22),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'EDUING',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 0.15,
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 20),
                   FittedBox(
