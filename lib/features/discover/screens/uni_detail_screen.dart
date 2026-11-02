@@ -1,463 +1,297 @@
+// University detail — loaded from universities/{id} and its programs.
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
+
 import '../widgets/apply_program_sheet.dart';
+import '../../applications/data/admission_service.dart' show toDate;
 import '../../../core/theme/neo_design_system.dart' hide Badge;
 import '../../../core/theme/neo_design_system.dart' as neo show Badge;
 
-class UniDetailScreen extends StatefulWidget {
+final _universityProvider = StreamProvider.family<Map<String, dynamic>?, String>((ref, id) =>
+    FirebaseFirestore.instance.collection('universities').doc(id).snapshots().map((s) => s.exists ? {'id': s.id, ...s.data()!} : null));
+
+final _programsProvider = StreamProvider.family<List<Map<String, dynamic>>, String>((ref, id) => FirebaseFirestore.instance
+    .collection('programs')
+    .where('universityId', isEqualTo: id)
+    .snapshots()
+    .map((s) => s.docs
+        .map((d) => {'id': d.id, ...d.data()})
+        .where((p) => p['isActive'] != false && p['status'] != 'inactive')
+        .toList()
+      ..sort((a, b) => (a['name'] ?? '').toString().compareTo((b['name'] ?? '').toString()))));
+
+String _inr(dynamic v) {
+  final n = v is num ? v : num.tryParse('$v');
+  if (n == null) return '$v';
+  if (n >= 100000) return '₹${(n / 100000).toStringAsFixed(n % 100000 == 0 ? 0 : 1)} lakh';
+  return NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 0).format(n);
+}
+
+class UniDetailScreen extends ConsumerStatefulWidget {
   final String universityId;
   const UniDetailScreen({super.key, required this.universityId});
 
   @override
-  State<UniDetailScreen> createState() => _UniDetailScreenState();
+  ConsumerState<UniDetailScreen> createState() => _UniDetailScreenState();
 }
 
-class _UniDetailScreenState extends State<UniDetailScreen> {
+class _UniDetailScreenState extends ConsumerState<UniDetailScreen> {
   String tab = 'overview';
-  final tabs = ['overview', 'courses', 'placements', 'reviews'];
 
   @override
   Widget build(BuildContext context) {
+    final uniAsync = ref.watch(_universityProvider(widget.universityId));
+    final programs = ref.watch(_programsProvider(widget.universityId)).value ?? const [];
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () => context.pop(),
-                    child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 16),
-                  const Expanded(
-                    child: Text(
-                      'UNIVERSITY DETAIL',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: -0.2,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: NeoColors.surfDark,
-                      border: Border.all(color: NeoColors.borderDark),
-                      shape: BoxShape.circle,
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text('🔖', style: TextStyle(fontSize: 15)),
-                  ),
-                ],
-              ),
-            ),
-
-            // Content
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Hero
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(18, 16, 18, 0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            height: 140,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [
-                                  NeoColors.purple.withValues(alpha: 0.27), // 44 hex
-                                  NeoColors.blue.withValues(alpha: 0.27),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(color: NeoColors.purple.withValues(alpha: 0.2)), // 33 hex
-                            ),
-                            alignment: Alignment.center,
-                            margin: const EdgeInsets.only(bottom: 16),
-                            child: const Text('🏛', style: TextStyle(fontSize: 64)),
-                          ),
-                          const Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'BITS Pilani',
-                                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5),
-                                    ),
-                                    SizedBox(height: 2),
-                                    Text(
-                                      '📍 Pilani, Rajasthan · Est. 1964',
-                                      style: TextStyle(fontSize: 13, color: NeoColors.subDark),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              neo.Badge(label: 'NIRF #1', color: NeoColors.green),
-                            ],
-                          ),
-                          const SizedBox(height: 14),
-
-                          // Quick stats
-                          Row(
-                            children: [
-                              {'label': 'Match', 'value': '96%', 'color': NeoColors.green},
-                              {'label': 'Fees', 'value': '₹18L', 'color': NeoColors.blue},
-                              {'label': 'Seats', 'value': '120', 'color': NeoColors.purple},
-                              {'label': 'Cutoff', 'value': '260', 'color': const Color(0xFFFF6B35)}, // orange
-                            ].map((s) {
-                              final c = s['color'] as Color;
-                              return Expanded(
-                                child: Container(
-                                  margin: EdgeInsets.only(right: s['label'] != 'Cutoff' ? 8 : 0),
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-                                  decoration: BoxDecoration(
-                                    color: NeoColors.surfDark,
-                                    border: Border.all(color: c.withValues(alpha: 0.13)), // 22 hex
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      Text(
-                                        s['value'] as String,
-                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: c),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        (s['label'] as String).toUpperCase(),
-                                        style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w800, color: NeoColors.subDark, letterSpacing: 9 * 0.04),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Apply CTA
-                          Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () => showApplyProgramSheet(context, widget.universityId),
-                                  child: Container(
-                                  height: 48,
-                                  decoration: BoxDecoration(
-                                    color: NeoColors.green,
-                                    borderRadius: BorderRadius.circular(24),
-                                    boxShadow: [
-                                      BoxShadow(color: NeoColors.green.withValues(alpha: 0.27), blurRadius: 20, offset: const Offset(0, 4)),
-                                    ],
-                                  ),
-                                  alignment: Alignment.center,
-                                  child: const Text(
-                                    'Apply Now →',
-                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.black),
-                                  ),
-                                ),
-                                ),
-                              ),
-                              const SizedBox(width: 10),
-                              Container(
-                                width: 48,
-                                height: 48,
-                                decoration: BoxDecoration(
-                                  color: NeoColors.surfDark,
-                                  border: Border.all(color: NeoColors.borderDark),
-                                  shape: BoxShape.circle,
-                                ),
-                                alignment: Alignment.center,
-                                child: const Text('📤', style: TextStyle(fontSize: 18)),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-
-                    // Tab switcher
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      child: Row(
-                        children: tabs.map((t) {
-                          final isSelected = tab == t;
-                          return GestureDetector(
-                            onTap: () => setState(() => tab = t),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              height: 36,
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: isSelected ? NeoColors.green : Colors.transparent,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                              alignment: Alignment.center,
-                              child: Text(
-                                '${t[0].toUpperCase()}${t.substring(1)}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w800,
-                                  color: isSelected ? NeoColors.green : NeoColors.subDark,
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-
-                    // Tab content
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18),
-                      child: _buildTabContent(),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+        child: uniAsync.when(
+          loading: () => const Center(child: CircularProgressIndicator(color: NeoColors.green)),
+          error: (_, __) => _message('Couldn’t load this university. Check your connection.'),
+          data: (u) => u == null ? _message('This university isn’t on EDUING any more.') : _content(u, programs),
         ),
       ),
     );
   }
 
-  Widget _buildTabContent() {
-    if (tab == 'overview') {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 14),
-            decoration: BoxDecoration(
-              color: NeoColors.surfDark,
-              border: Border.all(color: NeoColors.borderDark),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('ABOUT', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: NeoColors.subDark, letterSpacing: 10 * 0.08)),
-                SizedBox(height: 10),
-                Text(
-                  'Birla Institute of Technology and Science, Pilani is a private deemed university known for its rigorous engineering programs, research culture, and strong industry connections. Consistently ranked #1 among private universities in India.',
-                  style: TextStyle(fontSize: 13, color: Colors.white60, height: 1.6),
-                ),
-              ],
+  Widget _message(String text) => Column(children: [
+        _header(''),
+        Expanded(child: Center(child: Padding(padding: const EdgeInsets.all(32), child: Text(text, textAlign: TextAlign.center, style: const TextStyle(color: Colors.white70))))),
+      ]);
+
+  Widget _header(String title) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        child: Row(children: [
+          Semantics(
+            button: true,
+            label: 'Back',
+            child: GestureDetector(
+              onTap: () => context.canPop() ? context.pop() : context.go('/discover'),
+              child: const Icon(Icons.arrow_back, color: Colors.white, size: 24),
             ),
           ),
-          ...[
-            {'label': 'Accreditation', 'value': 'NAAC A++ · NBA Accredited', 'icon': '🏅', 'color': NeoColors.green},
-            {'label': 'Intake Season', 'value': 'July–August (JEE + BITSAT)', 'icon': '📅', 'color': NeoColors.blue},
-            {'label': 'Placement Rate', 'value': '95% placed · Avg ₹18 LPA', 'icon': '💼', 'color': NeoColors.purple},
-            {'label': 'Campus Size', 'value': '1,095 acres · 4 campuses', 'icon': '🌳', 'color': const Color(0xFFFF6B35)}, // orange
-          ].map((item) {
-            final c = item['color'] as Color;
-            return Container(
-              margin: const EdgeInsets.only(bottom: 10),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: NeoColors.surfDark,
-                border: Border.all(color: c.withValues(alpha: 0.13)),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: c.withValues(alpha: 0.09), // 18 hex
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(item['icon'] as String, style: const TextStyle(fontSize: 16)),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(item['label'] as String, style: const TextStyle(fontSize: 11, color: NeoColors.subDark, fontWeight: FontWeight.w700)),
-                        const SizedBox(height: 1),
-                        Text(item['value'] as String, style: const TextStyle(fontSize: 13, color: Colors.white, fontWeight: FontWeight.w700)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }),
-        ],
-      );
-    }
-
-    if (tab == 'courses') {
-      return Column(
-        children: [
-          {'name': 'B.Tech Computer Science', 'duration': '4 years', 'seats': 120, 'fees': '₹18L/yr', 'cutoff': '260', 'color': NeoColors.green},
-          {'name': 'B.Tech Electrical Engg', 'duration': '4 years', 'seats': 80, 'fees': '₹18L/yr', 'cutoff': '270', 'color': NeoColors.blue},
-          {'name': 'B.Tech Mechanical Engg', 'duration': '4 years', 'seats': 100, 'fees': '₹18L/yr', 'cutoff': '290', 'color': const Color(0xFFFF6B35)}, // orange
-          {'name': 'M.Tech Artificial Intel', 'duration': '2 years', 'seats': 40, 'fees': '₹8L/yr', 'cutoff': 'N/A', 'color': NeoColors.purple},
-        ].map((c) {
-          final color = c['color'] as Color;
-          return Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            decoration: BoxDecoration(
-              color: NeoColors.surfDark,
-              border: Border.all(color: color.withValues(alpha: 0.13)),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(c['name'] as String, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.white)),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    neo.Badge(label: c['duration'] as String, color: color),
-                    neo.Badge(label: '${c['seats']} seats', color: NeoColors.subDark),
-                    neo.Badge(label: c['fees'] as String, color: NeoColors.yellow),
-                    neo.Badge(label: 'Cutoff: ${c['cutoff']}', color: NeoColors.red),
-                  ],
-                ),
-              ],
-            ),
-          );
-        }).toList(),
-      );
-    }
-
-    if (tab == 'placements') {
-      return Column(
-        children: [
-          NotchedCard(
-            bg: Colors.transparent, // Background handled by container
-            padding: EdgeInsets.zero,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [Color(0xFF1C8A5E), NeoColors.blue],
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('2024 PLACEMENTS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: Colors.white.withValues(alpha: 0.5), letterSpacing: 10 * 0.1)),
-                      const SizedBox(height: 6),
-                      const Text('₹18 LPA', style: TextStyle(fontSize: 36, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -1)),
-                      const SizedBox(height: 4),
-                      Text('Average Package · 95% placement rate', style: TextStyle(fontSize: 13, color: Colors.white.withValues(alpha: 0.6))),
-                    ],
-                  ),
-                ),
-                Positioned(
-                  bottom: -10,
-                  right: -10,
-                  child: FloatingActionBtn(
-                    icon: '→',
-                    bg: NeoColors.green,
-                    color: Colors.black,
-                    onClick: () {},
-                  ),
-                ),
-              ],
-            ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: Colors.white)),
           ),
-          const SizedBox(height: 14),
-          ...[
-            {'name': 'Google', 'pkg': '₹45L'},
-            {'name': 'Microsoft', 'pkg': '₹38L'},
-            {'name': 'Amazon', 'pkg': '₹36L'},
-            {'name': 'Goldman Sachs', 'pkg': '₹40L'},
-            {'name': 'Uber', 'pkg': '₹32L'},
-            {'name': 'Adobe', 'pkg': '₹28L'},
-          ].map((c) {
-            return Container(
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              decoration: BoxDecoration(
-                color: NeoColors.surfDark,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: NeoColors.borderDark),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: NeoColors.surfDark2,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    alignment: Alignment.center,
-                    child: const Text('🏢', style: TextStyle(fontSize: 16)),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(child: Text(c['name'] as String, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white))),
-                  Text(c['pkg'] as String, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: NeoColors.green)),
-                ],
-              ),
-            );
-          }),
-        ],
+        ]),
       );
-    }
 
-    if (tab == 'reviews') {
-      return Container(
+  Widget _content(Map<String, dynamic> u, List<Map<String, dynamic>> programs) {
+    final name = (u['name'] ?? 'University').toString();
+    final place = [u['city'], u['state']].where((e) => e != null && '$e'.isNotEmpty).join(', ');
+    final placement = (u['placementData'] as Map?) ?? const {};
+    final tabs = ['overview', 'programs', if (placement.values.any((v) => v != null && '$v'.isNotEmpty && v is! List || (v is List && v.isNotEmpty))) 'placements'];
+    if (!tabs.contains(tab)) tab = 'overview';
+
+    return Column(children: [
+      _header(u['shortName']?.toString() ?? name),
+      Expanded(
+        child: ListView(padding: const EdgeInsets.only(bottom: 24), children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 8, 18, 0),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: double.infinity,
+                height: 132,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFF4B2FC9), Color(0xFF161326)]),
+                  borderRadius: BorderRadius.circular(24),
+                ),
+                alignment: Alignment.center,
+                child: (u['logoUrl'] ?? u['logo']) != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(18),
+                        child: Image.network((u['logoUrl'] ?? u['logo']).toString(), height: 72, width: 72, fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Text('🏛', style: TextStyle(fontSize: 56))),
+                      )
+                    : const Text('🏛', style: TextStyle(fontSize: 56)),
+              ),
+              const SizedBox(height: 16),
+              Text(name, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Colors.white, letterSpacing: -0.5, height: 1.1)),
+              if (place.isNotEmpty) ...[
+                const SizedBox(height: 4),
+                Text('📍 $place', style: const TextStyle(fontSize: 13, color: NeoColors.subDark)),
+              ],
+              const SizedBox(height: 12),
+              Wrap(spacing: 8, runSpacing: 8, children: [
+                if (u['type'] != null) neo.Badge(label: '${u['type']}'.toUpperCase(), color: NeoColors.purpleSoft),
+                if (u['accreditation'] != null && '${u['accreditation']}'.isNotEmpty) neo.Badge(label: '${u['accreditation']}'.toUpperCase(), color: NeoColors.green),
+                if (u['rating'] != null) neo.Badge(label: '★ ${u['rating']}', color: NeoColors.yellow),
+                if (u['isVerified'] == true) const neo.Badge(label: 'VERIFIED', color: NeoColors.blue),
+              ]),
+              const SizedBox(height: 16),
+              GreenBtn(
+                label: programs.isEmpty ? 'No programs open right now' : 'Apply now',
+                disabled: programs.isEmpty,
+                onClick: () => showApplyProgramSheet(context, widget.universityId),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 18),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: Row(children: [
+              for (final t in tabs)
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: GestureDetector(
+                    onTap: () => setState(() => tab = t),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                      decoration: BoxDecoration(
+                        color: tab == t ? Colors.white : NeoColors.surfDark,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: tab == t ? Colors.white : NeoColors.borderDark),
+                      ),
+                      child: Text(t == 'programs' ? 'Programs (${programs.length})' : '${t[0].toUpperCase()}${t.substring(1)}',
+                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: tab == t ? Colors.black : Colors.white70)),
+                    ),
+                  ),
+                ),
+            ]),
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: tab == 'programs' ? _programsTab(programs) : tab == 'placements' ? _placementsTab(placement) : _overviewTab(u),
+          ),
+        ]),
+      ),
+    ]);
+  }
+
+  Widget _card({required Widget child}) => Container(
         width: double.infinity,
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: NeoColors.surfDark,
-          border: Border.all(color: NeoColors.borderDark),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Column(
-          children: [
-            Text('⭐', style: TextStyle(fontSize: 32)),
-            SizedBox(height: 8),
-            Text('4.6 / 5', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: Colors.white)),
-            Text('Based on 2,340 student reviews', style: TextStyle(fontSize: 13, color: NeoColors.subDark)),
-          ],
-        ),
+        padding: const EdgeInsets.all(16),
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(color: NeoColors.surfDark, borderRadius: BorderRadius.circular(20), border: Border.all(color: NeoColors.borderDark)),
+        child: child,
       );
-    }
 
-    return const SizedBox.shrink();
+  Widget _fact(String label, String value) => Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(color: NeoColors.surfDark, borderRadius: BorderRadius.circular(16), border: Border.all(color: NeoColors.borderDark)),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(label, style: const TextStyle(fontSize: 11, color: NeoColors.subDark, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 3),
+          Text(value, style: const TextStyle(fontSize: 15, color: Colors.white, fontWeight: FontWeight.w800)),
+        ]),
+      );
+
+  Widget _overviewTab(Map<String, dynamic> u) {
+    final facts = <List<String>>[
+      if (u['established'] != null) ['Established', '${u['established']}'],
+      if (u['totalStudents'] != null && u['totalStudents'] != 0) ['Students', NumberFormat.decimalPattern('en_IN').format(u['totalStudents'])],
+      if (u['campusSize'] != null && '${u['campusSize']}'.isNotEmpty) ['Campus', '${u['campusSize']}'],
+      if (u['alumniCount'] != null && u['alumniCount'] != 0) ['Alumni', NumberFormat.compact(locale: 'en_IN').format(u['alumniCount'])],
+    ];
+    final facilities = (u['facilities'] as List?)?.map((e) => '$e').where((e) => e.isNotEmpty).toList() ?? const [];
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      if ((u['description'] ?? '').toString().isNotEmpty)
+        _card(child: Text(u['description'].toString(), style: const TextStyle(color: Colors.white70, fontSize: 13.5, height: 1.5))),
+      if (facts.isNotEmpty)
+        GridView.count(
+          crossAxisCount: 2,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 10,
+          childAspectRatio: 2.4,
+          children: [for (final f in facts) _fact(f[0], f[1])],
+        ),
+      if (facilities.isNotEmpty) ...[
+        const SizedBox(height: 14),
+        const Text('Facilities', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+        const SizedBox(height: 8),
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          for (final f in facilities)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(color: NeoColors.surfDark, borderRadius: BorderRadius.circular(16), border: Border.all(color: NeoColors.borderDark)),
+              child: Text(f, style: const TextStyle(color: Colors.white70, fontSize: 12.5)),
+            ),
+        ]),
+      ],
+      if ((u['website'] ?? '').toString().isNotEmpty) ...[
+        const SizedBox(height: 14),
+        Text('Website: ${u['website']}', style: const TextStyle(color: NeoColors.subDark, fontSize: 12.5)),
+      ],
+    ]);
+  }
+
+  Widget _programsTab(List<Map<String, dynamic>> programs) {
+    if (programs.isEmpty) {
+      return _card(child: const Text('This university hasn’t opened admissions on EDUING yet.', style: TextStyle(color: Colors.white70)));
+    }
+    final now = DateTime.now();
+    return Column(children: [
+      for (final p in programs)
+        Builder(builder: (context) {
+          final deadline = toDate(p['applicationDeadline']);
+          final closed = deadline != null && deadline.isBefore(now);
+          final seats = p['availableSeats'] ?? p['totalSeats'];
+          return _card(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(child: Text('${p['name'] ?? 'Program'}', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15))),
+                if (p['level'] != null) neo.Badge(label: '${p['level']}'.toUpperCase(), color: NeoColors.purpleSoft),
+              ]),
+              const SizedBox(height: 8),
+              Wrap(spacing: 14, runSpacing: 6, children: [
+                if (p['duration'] != null) _meta('⏱', '${p['duration']}'),
+                if (p['annualFee'] != null) _meta('💰', '${_inr(p['annualFee'])} / year'),
+                if (seats != null) _meta('🎟', '$seats seats'),
+                if (p['entranceExam'] != null && '${p['entranceExam']}'.isNotEmpty) _meta('📝', '${p['entranceExam']}'),
+                if (deadline != null) _meta('📅', closed ? 'Closed ${DateFormat('d MMM').format(deadline)}' : 'Apply by ${DateFormat('d MMM yyyy').format(deadline)}'),
+              ]),
+              if ((p['eligibility'] ?? '').toString().isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Text('Eligibility: ${p['eligibility']}', style: const TextStyle(color: NeoColors.subDark, fontSize: 12.5)),
+              ],
+            ]),
+          );
+        }),
+      GreenBtn(label: 'Apply to a program', onClick: () => showApplyProgramSheet(context, widget.universityId)),
+    ]);
+  }
+
+  Widget _meta(String icon, String text) => Row(mainAxisSize: MainAxisSize.min, children: [
+        Text(icon, style: const TextStyle(fontSize: 12)),
+        const SizedBox(width: 4),
+        Text(text, style: const TextStyle(color: Colors.white70, fontSize: 12.5)),
+      ]);
+
+  Widget _placementsTab(Map placement) {
+    final recruiters = (placement['topRecruiters'] as List?)?.map((e) => '$e').where((e) => e.isNotEmpty).toList() ?? const [];
+    final facts = <List<String>>[
+      if ('${placement['placementRate'] ?? ''}'.isNotEmpty) ['Placement rate', '${placement['placementRate']}'.contains('%') ? '${placement['placementRate']}' : '${placement['placementRate']}%'],
+      if ('${placement['averageSalary'] ?? placement['averagePackage'] ?? ''}'.isNotEmpty) ['Average package', '${placement['averageSalary'] ?? placement['averagePackage']}'],
+      if ('${placement['highestSalary'] ?? placement['highestPackage'] ?? ''}'.isNotEmpty) ['Highest package', '${placement['highestSalary'] ?? placement['highestPackage']}'],
+    ];
+    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+      const Text('As reported by the university.', style: TextStyle(color: NeoColors.subDark, fontSize: 12.5)),
+      const SizedBox(height: 10),
+      for (final f in facts) Padding(padding: const EdgeInsets.only(bottom: 10), child: _fact(f[0], f[1])),
+      if (recruiters.isNotEmpty) ...[
+        const SizedBox(height: 4),
+        const Text('Top recruiters', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 15)),
+        const SizedBox(height: 8),
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          for (final r in recruiters)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(color: NeoColors.surfDark, borderRadius: BorderRadius.circular(16), border: Border.all(color: NeoColors.borderDark)),
+              child: Text(r, style: const TextStyle(color: Colors.white70, fontSize: 12.5)),
+            ),
+        ]),
+      ],
+    ]);
   }
 }

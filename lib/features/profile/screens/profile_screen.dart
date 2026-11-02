@@ -19,24 +19,22 @@ class ProfileScreen extends ConsumerWidget {
         'items': [
           {'icon': '👤', 'label': 'Personal Information', 'sub': 'Name, DOB, gender', 'color': NeoColors.blue, 'route': '/profile/personal'},
           {'icon': '📚', 'label': 'Academic Details', 'sub': 'Boards, scores, grades', 'color': NeoColors.purple, 'route': '/profile/academic'},
-          {'icon': '👨‍👩‍👦', 'label': 'Parent / Guardian', 'sub': 'Contact & income info', 'color': const Color(0xFFFF6B35), 'route': '/profile/guardian'},
-          {'icon': '📍', 'label': 'Address', 'sub': 'Permanent & current', 'color': NeoColors.yellow, 'route': '/profile/address'},
+          {'icon': '👨‍👩‍👦', 'label': 'Parent / Guardian', 'sub': 'Contact & family income', 'color': const Color(0xFFFF6B35), 'route': '/profile/guardian'},
+          {'icon': '📍', 'label': 'Address', 'sub': 'Permanent address', 'color': NeoColors.yellow, 'route': '/profile/address'},
         ]
       },
       {
         'title': 'ADMISSION',
         'items': [
-          {'icon': '🏆', 'label': 'Entrance Exams', 'sub': 'JEE, NEET, CAT scores', 'color': NeoColors.green, 'route': '/profile/exams'},
+          {'icon': '🏆', 'label': 'Entrance Exams', 'sub': 'JEE, NEET, CUET, NATA, CLAT…', 'color': NeoColors.green, 'route': '/profile/exams'},
           {'icon': '📋', 'label': 'Category & Quota', 'sub': 'General / OBC / SC / ST', 'color': const Color(0xFFFF3B7A), 'route': '/profile/category'},
         ]
       },
       {
         'title': 'ACCOUNT',
         'items': [
-          {'icon': '🔒', 'label': 'Security', 'sub': 'Password, 2FA, sessions', 'color': NeoColors.red, 'route': '/settings/security'},
-          {'icon': '🔔', 'label': 'Notifications', 'sub': 'Email, SMS, push', 'color': NeoColors.yellow, 'route': '/settings/notifications'},
-          {'icon': '🎨', 'label': 'Appearance', 'sub': 'Theme, language', 'color': NeoColors.purple, 'route': '/settings/appearance'},
-          {'icon': '🔗', 'label': 'Connected Accounts', 'sub': 'Google, Apple', 'color': NeoColors.blue, 'route': '/settings/connected'},
+          {'icon': '🔒', 'label': 'Security', 'sub': 'Change your password', 'color': NeoColors.red, 'route': '/settings/security'},
+          {'icon': '🔔', 'label': 'Notifications', 'sub': 'What we tell you about', 'color': NeoColors.yellow, 'route': '/settings/notifications'},
         ]
       },
     ];
@@ -77,7 +75,7 @@ class ProfileScreen extends ConsumerWidget {
                             bottom: 0,
                             right: 0,
                             child: GestureDetector(
-                              onTap: () => context.push('/profile/edit'),
+                              onTap: () => context.push('/profile/personal'),
                               child: Container(
                                 width: 26,
                                 height: 26,

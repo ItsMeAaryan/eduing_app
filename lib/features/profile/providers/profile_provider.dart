@@ -16,15 +16,19 @@ final profileProvider = StreamProvider<Map<String, dynamic>>((ref) {
 
 /// Convenience getters for UI consumption.
 extension ProfileDataX on Map<String, dynamic> {
-  String get displayName =>
-      this['displayName'] as String? ??
-      this['personal']?['fullName'] as String? ??
-      'Student';
+  String get displayName {
+    for (final v in [this['fullName'], this['displayName'], this['personal']?['fullName']]) {
+      if (v is String && v.trim().isNotEmpty) return v;
+    }
+    return 'Student';
+  }
   String get email => this['email'] as String? ?? '';
-  String get phone =>
-      (this['personal']?['phone'] as String?)?.isNotEmpty == true
-          ? this['personal']['phone'] as String
-          : 'Not added';
+  String get phone {
+    for (final v in [this['phone'], this['personal']?['phone']]) {
+      if (v is String && v.trim().isNotEmpty) return v;
+    }
+    return 'Not added';
+  }
   int get profileCompletion =>
       (this['profileCompletion'] as num?)?.toInt() ?? 0;
   double get readinessScore =>

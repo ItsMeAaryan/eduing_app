@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/university_application.dart';
+import '../data/admission_service.dart';
 import '../repositories/applications_repository.dart';
 import '../../../shared/models/university_model.dart';
 
@@ -14,10 +15,14 @@ final myApplicationsProvider =
   return FirebaseFirestore.instance
       .collection('applications')
       .where('studentId', isEqualTo: uid)
-      .orderBy('updatedAt', descending: true)
       .snapshots()
-      .map((s) =>
-          s.docs.map((d) => {'id': d.id, ...d.data()}).toList());
+      .map((s) {
+    // sorted here so no composite index is needed
+    final list = s.docs.map((d) => {'id': d.id, ...d.data()}).toList();
+    int ms(dynamic v) => toDate(v)?.millisecondsSinceEpoch ?? 0;
+    list.sort((a, b) => ms(b['updatedAt'] ?? b['createdAt']).compareTo(ms(a['updatedAt'] ?? a['createdAt'])));
+    return list;
+  });
 });
 
 // ── Create application with full spec structure ────────────────────────────
@@ -29,7 +34,10 @@ Future<void> createApplicationInFirestore({
 }) async {
   final uid = FirebaseAuth.instance.currentUser?.uid;
   if (uid == null) return;
-  await FirebaseFirestore.instance.collection('applications').add({
+  final created = await FirebaseFirestore.instance.collection('applications').add({
+    'statusHistory': [
+      {'status': 'submitted', 'date': DateTime.now().toIso8601String(), 'note': 'Application submitted'}
+    ],
     'studentId': uid,
     'userId': uid,
     'studentName': studentData['displayName'] ??
@@ -60,6 +68,10 @@ Future<void> createApplicationInFirestore({
       {'id': 'submitted', 'label': 'Submitted', 'status': 'done'},
     ],
   });
+  // Give the university the documents the student has already uploaded.
+  try {
+    await shareDocumentsWithApplication(created.id);
+  } catch (_) {}
 }
 
 final applicationRepositoryProvider =
