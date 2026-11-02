@@ -1,489 +1,158 @@
-import 'dart:io';
+// Documents — EDUING doesn't store document files. Students enter their marks
+// and details in the profile (shared with every application); documents will
+// be verified through DigiLocker. Same content as the website's Documents page.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iconsax/iconsax.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/theme/colors/app_colors.dart';
-import '../../../core/theme/typography/app_typography.dart';
-import '../../../core/theme/spacing/app_spacing.dart';
-import '../../../shared/components/atoms/app_text_field.dart';
-import '../../../shared/components/atoms/app_button.dart';
-import '../../../shared/components/atoms/app_icon_button.dart';
-import '../providers/documents_provider.dart';
-import '../widgets/document_card.dart';
-import '../models/document_model.dart';
+import '../../../core/theme/neo_design_system.dart' hide Badge;
+import '../../profile/providers/profile_provider.dart';
 
-class DocumentsScreen extends ConsumerStatefulWidget {
+class _Item {
+  final String name;
+  final String why;
+  final bool inDigiLocker;
+  final String? field; // profile detail that covers it today
+  final String? route;
+  final bool Function(Map<String, dynamic>)? ready;
+  const _Item(this.name, this.why, {this.inDigiLocker = false, this.field, this.route, this.ready});
+}
+
+bool _has(Map<String, dynamic> p, String k) => (p[k] ?? '').toString().trim().isNotEmpty;
+dynamic _nested(Map<String, dynamic> p, String a, String b) => (p[a] is Map) ? (p[a] as Map)[b] : null;
+
+final _items = <_Item>[
+  _Item('Class 10 marksheet', 'Date of birth and Class 10 marks', inDigiLocker: true, field: '10th percentage', route: '/profile/academic',
+      ready: (p) => _has(p, 'tenthScore') || _nested(p, 'academic', 'marks10') != null),
+  _Item('Class 12 marksheet', 'Eligibility for UG programs', inDigiLocker: true, field: '12th percentage', route: '/profile/academic',
+      ready: (p) => _has(p, 'twelfthScore') || _nested(p, 'academic', 'marks12') != null),
+  _Item('Entrance exam scorecard', 'JEE, NEET, CUET, NATA, CLAT … as the program needs', field: 'exam scores', route: '/profile/exams',
+      ready: (p) => ['jeeScore', 'neetScore', 'cuetScore', 'bitsatScore', 'nataScore', 'clatScore', 'catPercentile', 'gateScore'].any((k) => _has(p, k))),
+  _Item('Category certificate', 'Only for EWS / OBC-NCL / SC / ST / PwD seats', inDigiLocker: true, field: 'category', route: '/profile/category',
+      ready: (p) => _has(p, 'category')),
+  _Item('Domicile certificate', 'Only for state-quota seats', inDigiLocker: true, field: 'domicile state', route: '/profile/category',
+      ready: (p) => _has(p, 'domicileState')),
+  const _Item('Aadhaar', 'Identity check at admission', inDigiLocker: true),
+  const _Item('Passport-size photographs', 'Carry 4–6 recent copies to the campus'),
+];
+
+class DocumentsScreen extends ConsumerWidget {
   const DocumentsScreen({super.key});
 
   @override
-  ConsumerState<DocumentsScreen> createState() => _DocumentsScreenState();
-}
-
-class _DocumentsScreenState extends ConsumerState<DocumentsScreen> {
-  final List<String> _filters = [
-    'All',
-    'Academic',
-    'Identity',
-    'Financial',
-    'Certificates'
-  ];
-  String _selectedFilter = 'All';
-  final TextEditingController _searchController = TextEditingController();
-
-  Future<void> _handleFileSelection(
-      BuildContext context, String source, String name, String category) async {
-    final storageService = ref.read(documentStorageServiceProvider);
-    File? selectedFile;
-
-    try {
-      if (source == 'file') {
-        selectedFile = await storageService.pickDocumentFile();
-      } else if (source == 'gallery') {
-        selectedFile = await storageService.pickImageFromGallery();
-      } else if (source == 'camera') {
-        selectedFile = await storageService.captureImageFromCamera();
-      }
-
-      if (selectedFile != null) {
-        await ref.read(documentsNotifierProvider.notifier).uploadDocumentFile(
-              file: selectedFile,
-              name: name,
-              category: category,
-            );
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Uploading $name...'),
-              backgroundColor: AppColors.primary));
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(e.toString()), backgroundColor: AppColors.error));
-      }
-    }
-  }
-
-  void _showUploadModal() {
-    final nameController = TextEditingController();
-    String category = 'Academic';
-    String source = 'file';
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Theme.of(context).cardColor,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(32))),
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                  left: 24,
-                  right: 24,
-                  top: 32,
-                  bottom: MediaQuery.of(context).viewInsets.bottom + 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text('Upload Document', style: AppTypography.titleLarge),
-                  const SizedBox(height: 24),
-                  AppTextField(
-                    controller: nameController,
-                    hintText: 'Document Name (e.g. Passport)',
-                  ),
-                  const SizedBox(height: 16),
-                  DropdownButtonFormField<String>(
-                    initialValue: category,
-                    items: _filters
-                        .where((f) => f != 'All')
-                        .map((c) => DropdownMenuItem(value: c, child: Text(c)))
-                        .toList(),
-                    onChanged: (val) {
-                      if (val != null) setModalState(() => category = val);
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Category',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _UploadSourceButton(
-                          icon: Iconsax.folder_add,
-                          label: 'File',
-                          isSelected: source == 'file',
-                          onTap: () => setModalState(() => source = 'file'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _UploadSourceButton(
-                          icon: Iconsax.gallery,
-                          label: 'Gallery',
-                          isSelected: source == 'gallery',
-                          onTap: () => setModalState(() => source = 'gallery'),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _UploadSourceButton(
-                          icon: Iconsax.camera,
-                          label: 'Camera',
-                          isSelected: source == 'camera',
-                          onTap: () => setModalState(() => source = 'camera'),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 32),
-                  AppButton(
-                    text: 'Select & Upload',
-                    icon: Iconsax.document_upload,
-                    onPressed: () {
-                      if (nameController.text.isEmpty) return;
-                      ctx.pop();
-                      _handleFileSelection(context, source,
-                          nameController.text.trim(), category);
-                    },
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final documents = ref.watch(documentsNotifierProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    final filteredDocuments = _selectedFilter == 'All'
-        ? documents
-        : documents.where((d) => d.category == _selectedFilter).toList();
-
-    final verifiedCount =
-        documents.where((d) => d.status == DocumentStatus.verified).length;
-    final pendingCount =
-        documents.where((d) => d.status == DocumentStatus.pending).length;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = ref.watch(profileProvider).value ?? const <String, dynamic>{};
+    final details = _items.where((i) => i.ready != null).toList();
+    final done = details.where((i) => i.ready!(p)).length;
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _showUploadModal,
-        backgroundColor: AppColors.primary,
-        icon: const Icon(Iconsax.add, color: Colors.white),
-        label: Text('Upload',
-            style: AppTypography.labelLarge.copyWith(color: Colors.white)),
+      backgroundColor: NeoColors.bgDark,
+      appBar: AppBar(
+        backgroundColor: NeoColors.bgDark,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: const Text('Documents', style: TextStyle(fontWeight: FontWeight.w900)),
       ),
-      body: SafeArea(
-        bottom: false,
-        child: Column(
-          children: [
-            // Floating Header
-            Padding(
-              padding: const EdgeInsets.all(AppSpacing.p24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Secure Vault', style: AppTypography.display),
-                      const SizedBox(height: AppSpacing.p4),
-                      Text('${documents.length} Total Documents',
-                          style: AppTypography.bodyMedium
-                              .copyWith(color: AppColors.textSecondary)),
-                    ],
-                  ),
-                  AppIconButton(
-                    icon: Iconsax.shield_tick,
-                    isFilled: true,
-                    backgroundColor:
-                        isDark ? AppColors.darkSurface : AppColors.surface,
-                    color: AppColors.success,
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ),
-
-            // Search Bar
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
-              child: AppTextField(
-                controller: _searchController,
-                hintText: 'Search documents...',
-                prefixIcon: Iconsax.search_normal,
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.p24),
-
-            // Summary Chips
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
-              child: Row(
-                children: [
-                  _SummaryChip(
-                      label: 'Verified',
-                      count: verifiedCount.toString(),
-                      color: AppColors.success),
-                  const SizedBox(width: AppSpacing.p12),
-                  _SummaryChip(
-                      label: 'Pending Review',
-                      count: pendingCount.toString(),
-                      color: AppColors.warning),
-                  const SizedBox(width: AppSpacing.p12),
-                  const _SummaryChip(
-                      label: 'Missing',
-                      count: '2',
-                      color: AppColors.error), // Mock missing count
-                ],
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.p24),
-
-            // Filters
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.p24),
-              child: Row(
-                children: _filters.map((filter) {
-                  final isSelected = _selectedFilter == filter;
-                  return Padding(
-                    padding: const EdgeInsets.only(right: AppSpacing.p12),
-                    child: GestureDetector(
-                      onTap: () => setState(() => _selectedFilter = filter),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.p16,
-                            vertical: AppSpacing.p8),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primary
-                              : Colors.transparent,
-                          borderRadius: BorderRadius.circular(100),
-                          border: Border.all(
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : (isDark
-                                      ? AppColors.darkBorder
-                                      : AppColors.border)),
-                        ),
-                        child: Text(
-                          filter,
-                          style: AppTypography.labelMedium.copyWith(
-                            color: isSelected
-                                ? Colors.white
-                                : (isDark
-                                    ? AppColors.darkTextPrimary
-                                    : AppColors.textPrimary),
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-
-            const SizedBox(height: AppSpacing.p16),
-
-            // Content
-            Expanded(
-              child: filteredDocuments.isEmpty
-                  ? _buildEmptyState(isDark)
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.p24, vertical: AppSpacing.p8),
-                      itemCount: filteredDocuments.length,
-                      itemBuilder: (context, index) {
-                        final doc = filteredDocuments[index];
-                        final progressState =
-                            ref.watch(activeUploadProgressProvider)[doc.id];
-
-                        return Padding(
-                          padding:
-                              const EdgeInsets.only(bottom: AppSpacing.p16),
-                          child: Stack(
-                            children: [
-                              DocumentCard(
-                                document: doc,
-                                onTap: () => context.push('/documents/preview',
-                                    extra: doc),
-                                onDelete: () => ref
-                                    .read(documentsNotifierProvider.notifier)
-                                    .deleteDocument(doc.id),
-                                onRename:
-                                    () {}, // Handled directly inside preview typically, or add modal
-                                onShare: () => ref
-                                    .read(documentsNotifierProvider.notifier)
-                                    .shareDocument(doc.id),
-                              ),
-                              if (progressState != null &&
-                                  !progressState.isCompleted)
-                                Positioned.fill(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: (isDark
-                                              ? AppColors.darkBackground
-                                              : AppColors.background)
-                                          .withValues(alpha: 0.8),
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                    child: Center(
-                                      child: CircularProgressIndicator(
-                                        value: progressState.progress > 0
-                                            ? progressState.progress
-                                            : null,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          )
-                              .animate()
-                              .fade()
-                              .slideY(begin: 0.1, delay: (index * 50).ms),
-                        );
-                      },
-                    ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(bool isDark) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.p32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.darkSurface : AppColors.surface,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Iconsax.folder_add,
-                  size: 48, color: AppColors.primary),
-            ),
-            const SizedBox(height: AppSpacing.p24),
-            Text('No Documents Found', style: AppTypography.titleLarge),
-            const SizedBox(height: AppSpacing.p8),
-            Text(
-              'Upload your first document to secure it in your vault.',
-              textAlign: TextAlign.center,
-              style: AppTypography.bodyMedium
-                  .copyWith(color: AppColors.textSecondary),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SummaryChip extends StatelessWidget {
-  final String label;
-  final String count;
-  final Color color;
-
-  const _SummaryChip(
-      {required this.label, required this.count, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.p16, vertical: AppSpacing.p12),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(6),
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Text(
-              count,
-              style: AppTypography.labelLarge
-                  .copyWith(color: color, fontWeight: FontWeight.bold),
-            ),
+      body: ListView(padding: const EdgeInsets.fromLTRB(18, 4, 18, 32), children: [
+        Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(26),
+            gradient: const LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [Color(0xFF3A2A8F), Color(0xFF161326)]),
           ),
-          const SizedBox(width: AppSpacing.p12),
-          Text(label,
-              style: AppTypography.labelMedium.copyWith(
-                  color: isDark
-                      ? AppColors.darkTextPrimary
-                      : AppColors.textPrimary)),
-        ],
-      ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
+              decoration: BoxDecoration(color: const Color(0xFFF5B829), borderRadius: BorderRadius.circular(14)),
+              child: const Text('Coming soon', style: TextStyle(color: Color(0xFF161326), fontWeight: FontWeight.w900, fontSize: 11.5)),
+            ),
+            const SizedBox(height: 12),
+            const Text('Verify your documents with DigiLocker',
+                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, height: 1.15, letterSpacing: -0.4)),
+            const SizedBox(height: 8),
+            Text(
+              'You won’t need to scan or upload anything. Connect DigiLocker once, and your marksheets, Aadhaar and certificates come straight from the board or government — already verified for every university you apply to.',
+              style: TextStyle(color: Colors.white.withValues(alpha: 0.7), fontSize: 13, height: 1.45),
+            ),
+            const SizedBox(height: 6),
+            Text('Until then, enter your marks in your profile. Universities see them on your application.',
+                style: TextStyle(color: Colors.white.withValues(alpha: 0.5), fontSize: 12)),
+            const SizedBox(height: 14),
+            PillBtn(label: 'Fill in my details', bg: Colors.white, color: const Color(0xFF161326), onClick: () => context.push('/profile/academic')),
+          ]),
+        ),
+        const SizedBox(height: 18),
+        Row(children: [
+          const Expanded(child: Text('What universities see now', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900))),
+          Text('$done of ${details.length} filled', style: const TextStyle(color: NeoColors.green, fontSize: 12.5, fontWeight: FontWeight.w800)),
+        ]),
+        const SizedBox(height: 10),
+        for (final i in details)
+          _Row(
+            title: i.field![0].toUpperCase() + i.field!.substring(1),
+            sub: i.ready!(p) ? 'Added' : 'Not added yet',
+            ok: i.ready!(p),
+            onTap: () => context.push(i.route!),
+          ),
+        const SizedBox(height: 18),
+        const Text('Keep these ready for admission day', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900)),
+        const SizedBox(height: 4),
+        const Text('Universities check originals when you report to the campus.', style: TextStyle(color: NeoColors.subDark, fontSize: 12.5)),
+        const SizedBox(height: 10),
+        for (final i in _items)
+          Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: NeoColors.surfDark, borderRadius: BorderRadius.circular(18), border: Border.all(color: NeoColors.borderDark)),
+            child: Row(children: [
+              const Icon(Icons.verified_user_outlined, color: Colors.white54, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(i.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13.5)),
+                  Text(i.why, style: const TextStyle(color: NeoColors.subDark, fontSize: 12)),
+                ]),
+              ),
+              if (i.inDigiLocker)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), border: Border.all(color: const Color(0xFF745CF5))),
+                  child: const Text('In DigiLocker', style: TextStyle(color: Color(0xFFB2A2FF), fontSize: 10.5, fontWeight: FontWeight.w700)),
+                ),
+            ]),
+          ),
+      ]),
     );
   }
 }
 
-class _UploadSourceButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isSelected;
+class _Row extends StatelessWidget {
+  final String title;
+  final String sub;
+  final bool ok;
   final VoidCallback onTap;
-
-  const _UploadSourceButton(
-      {required this.icon,
-      required this.label,
-      required this.isSelected,
-      required this.onTap});
-
+  const _Row({required this.title, required this.sub, required this.ok, required this.onTap});
   @override
-  Widget build(BuildContext context) {
-    final color = isSelected ? AppColors.primary : AppColors.textSecondary;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary.withValues(alpha: 0.1)
-              : Colors.transparent,
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-              color: isSelected ? AppColors.primary : Colors.grey.shade300),
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: NeoColors.surfDark, borderRadius: BorderRadius.circular(16)),
+            child: Row(children: [
+              Icon(ok ? Icons.check_circle_rounded : Icons.radio_button_unchecked, color: ok ? NeoColors.green : Colors.white38, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
+                  Text(sub, style: const TextStyle(color: NeoColors.subDark, fontSize: 12)),
+                ]),
+              ),
+              if (!ok) const Text('Add', style: TextStyle(color: Color(0xFFB2A2FF), fontWeight: FontWeight.w800)),
+            ]),
+          ),
         ),
-        child: Column(
-          children: [
-            Icon(icon, color: color),
-            const SizedBox(height: 8),
-            Text(label, style: AppTypography.caption.copyWith(color: color)),
-          ],
-        ),
-      ),
-    );
-  }
+      );
 }
