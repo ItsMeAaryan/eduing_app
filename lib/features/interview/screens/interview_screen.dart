@@ -259,9 +259,9 @@ class _InterviewScreenState extends State<InterviewScreen> with SingleTickerProv
         const SizedBox(height: 12),
         ...[
           {'icon': '🎓', 'label': 'University Admission', 'count': 24, 'color': NeoColors.purple},
-          {'icon': '🌍', 'label': 'Visa Interview', 'count': 18, 'color': NeoColors.blue},
-          {'icon': '💼', 'label': 'HR & Behavioral', 'count': 30, 'color': const Color(0xFFFF6B35)}, // orange
-          {'icon': '🔬', 'label': 'Technical CS', 'count': 40, 'color': NeoColors.green},
+          {'icon': '🎓', 'label': 'MBA GD-PI', 'count': 18, 'color': NeoColors.blue},
+          {'icon': '💬', 'label': 'Personal Interview', 'count': 30, 'color': const Color(0xFFFF6B35)}, // orange
+          {'icon': '📐', 'label': 'Design & Architecture Portfolio', 'count': 40, 'color': NeoColors.green},
         ].map((c) {
           final color = c['color'] as Color;
           return GestureDetector(

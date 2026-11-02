@@ -26,10 +26,6 @@ class StorageController extends Notifier<AsyncValue<String?>> {
     return _upload('documents/\$docId.pdf', file);
   }
 
-  Future<String?> uploadResume(File file) async {
-    return _upload('resume/resume.pdf', file);
-  }
-
   Future<String?> uploadSOP(File file) async {
     return _upload('sop/statement.pdf', file);
   }

@@ -10,11 +10,9 @@ class CopilotScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final features = [
       {'icon': '📝', 'label': 'SOP Builder', 'sub': 'Draft & refine', 'color': NeoColors.purple, 'route': '/sop'},
-      {'icon': '👤', 'label': 'Resume AI', 'sub': 'ATS optimized', 'color': NeoColors.blue, 'route': '/resume'},
       {'icon': '🎤', 'label': 'Mock Interview', 'sub': 'AI feedback', 'color': const Color(0xFF1C8A5E), 'route': '/interview'},
-      {'icon': '📄', 'label': 'Vault Analysis', 'sub': 'Doc insights', 'color': NeoColors.yellow, 'route': '/vault'},
-      {'icon': '🎓', 'label': 'Uni Recommender', 'sub': 'AI matched', 'color': const Color(0xFFFF6B35), 'route': '/recommend'},
-      {'icon': '✍️', 'label': 'Essay Writer', 'sub': 'Personal stmt', 'color': const Color(0xFFFF3B7A), 'route': '/essay'},
+      {'icon': '📄', 'label': 'Documents', 'sub': 'Upload & verify', 'color': NeoColors.yellow, 'route': '/documents'},
+      {'icon': '🎓', 'label': 'Uni Recommender', 'sub': 'AI matched', 'color': const Color(0xFFFF6B35), 'route': '/discover'},
     ];
 
     return Scaffold(

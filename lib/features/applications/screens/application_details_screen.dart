@@ -249,7 +249,7 @@ class _ApplicationDetailsScreenState
         children: [
           Text('Requirements', style: AppTypography.titleLarge),
           const SizedBox(height: AppSpacing.p16),
-          _buildChecklistItem('IELTS / TOEFL Score', true),
+          _buildChecklistItem('Entrance exam scorecard', true),
           _buildChecklistItem('Transcripts', true),
           _buildChecklistItem('Statement of Purpose', false),
           _buildChecklistItem('2x Letters of Recommendation', false),

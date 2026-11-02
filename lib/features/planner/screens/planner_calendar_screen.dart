@@ -17,13 +17,13 @@ class _PlannerCalendarScreenState extends State<PlannerCalendarScreen> {
   final DateTime _today = DateTime.now();
 
   final Map<int, List<Map<String, dynamic>>> _events = {
-    12: [{"title": "Stanford Application Due", "color": NeoColors.yellow}],
+    12: [{"title": "NEET UG counselling round 1", "color": NeoColors.yellow}],
     15: [{"title": "Mock Interview with AI", "color": NeoColors.purple}],
     20: [{"title": "Submit Transcripts", "color": NeoColors.green}],
   };
 
   final List<Map<String, dynamic>> _upcoming = [
-    {"date": "12 Aug", "title": "Stanford Application Due", "badge": "Urgent", "color": NeoColors.yellow},
+    {"date": "12 Aug", "title": "NEET UG counselling round 1", "badge": "Urgent", "color": NeoColors.yellow},
     {"date": "15 Aug", "title": "Mock Interview with AI", "badge": "Prep", "color": NeoColors.purple},
     {"date": "20 Aug", "title": "Submit Transcripts", "badge": "Doc", "color": NeoColors.green},
   ];

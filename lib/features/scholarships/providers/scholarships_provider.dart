@@ -23,7 +23,7 @@ class ScholarshipsNotifier extends Notifier<ScholarshipDashboardData> {
         Scholarship(
           id: 'schol_1',
           name: 'Global Excellence Scholarship',
-          organization: 'Stanford University',
+          organization: 'National Scholarship Portal (Govt. of India)',
           logoUrl: 'https://via.placeholder.com/150',
           fundingAmount: '\$50,000 / year',
           coverage: 'Full Tuition',

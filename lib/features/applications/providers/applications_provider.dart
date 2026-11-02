@@ -31,13 +31,22 @@ Future<void> createApplicationInFirestore({
   if (uid == null) return;
   await FirebaseFirestore.instance.collection('applications').add({
     'studentId': uid,
-    'studentName': studentData['displayName'] ?? '',
+    'userId': uid,
+    'studentName': studentData['displayName'] ??
+        studentData['fullName'] ??
+        studentData['personal']?['fullName'] ??
+        '',
     'studentEmail': studentData['email'] ?? '',
+    'studentPhone': studentData['personal']?['phone'] ?? '',
+    'category': studentData['category'] ?? '',
     'universityId': university['id'] ?? '',
     'universityName': university['name'] ?? '',
     'programId': program['id'] ?? '',
+    // The university portal reads programName; the student website reads program.
+    'programName': program['name'] ?? '',
+    'program': program['name'] ?? '',
     'courseName': program['name'] ?? '',
-    'status': 'in_progress',
+    'status': 'submitted',
     'progress': 10.0,
     'deadline': university['applicationDeadline'],
     'createdAt': FieldValue.serverTimestamp(),
@@ -46,9 +55,9 @@ Future<void> createApplicationInFirestore({
     'steps': [
       {'id': 'profile', 'label': 'Profile Complete', 'status': 'done'},
       {'id': 'documents', 'label': 'Documents', 'status': 'pending'},
-      {'id': 'form', 'label': 'Application Form', 'status': 'pending'},
+      {'id': 'form', 'label': 'Application Form', 'status': 'done'},
       {'id': 'payment', 'label': 'Payment', 'status': 'pending'},
-      {'id': 'submitted', 'label': 'Submitted', 'status': 'pending'},
+      {'id': 'submitted', 'label': 'Submitted', 'status': 'done'},
     ],
   });
 }

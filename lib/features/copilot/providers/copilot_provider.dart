@@ -41,7 +41,7 @@ class CopilotNotifier extends Notifier<CopilotDashboardData> {
         'Complete mock interview practice.',
       ],
       upcomingDeadlines: const [
-        'Nov 15: Stanford Application Deadline',
+        'Nov 15: BITSAT application deadline',
         'Dec 30: Global Tech Scholarship',
       ],
       recommendedNextActions: const [
@@ -117,7 +117,7 @@ class CopilotNotifier extends Notifier<CopilotDashboardData> {
       id: aiTypingId,
       text: aiResponse.isNotEmpty
           ? aiResponse
-          : 'I am here to guide your study abroad journey. How can I help with your documents or applications?',
+          : 'I am here to guide your admission journey to Indian universities and colleges. How can I help with your documents or applications?',
       role: MessageRole.ai,
       timestamp: DateTime.now(),
       isTyping: false,

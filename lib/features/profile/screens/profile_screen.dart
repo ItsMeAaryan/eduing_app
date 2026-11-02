@@ -28,7 +28,6 @@ class ProfileScreen extends ConsumerWidget {
         'items': [
           {'icon': '🏆', 'label': 'Entrance Exams', 'sub': 'JEE, NEET, CAT scores', 'color': NeoColors.green, 'route': '/profile/exams'},
           {'icon': '📋', 'label': 'Category & Quota', 'sub': 'General / OBC / SC / ST', 'color': const Color(0xFFFF3B7A), 'route': '/profile/category'},
-          {'icon': '🪪', 'label': 'Student ID', 'sub': 'Digital ID card & QR', 'color': NeoColors.blue, 'route': '/profile/student-id'},
         ]
       },
       {

@@ -7,8 +7,7 @@ import '../../../core/theme/colors/app_colors.dart';
 import '../../../core/theme/typography/app_typography.dart';
 import '../../../shared/models/university_model.dart';
 import '../providers/universities_provider.dart';
-import '../../applications/providers/applications_provider.dart';
-import 'package:go_router/go_router.dart';
+import '../../discover/widgets/apply_program_sheet.dart';
 
 class CompareUniversitiesScreen extends ConsumerWidget {
   final List<String> universityIds;
@@ -469,25 +468,17 @@ class CompareUniversitiesScreen extends ConsumerWidget {
               Expanded(
                 flex: 2,
                 child: ElevatedButton(
-                  onPressed: () {
-                    for (var id in universityIds) {
-                      ref
-                          .read(applicationsNotifierProvider.notifier)
-                          .createApplication(
-                            universityName: 'University $id',
-                            course: 'M.S. Degree',
-                            deadline: '01 Dec 2025',
-                          );
-                    }
-                    context.go('/applications');
-                  },
+                  // Applications are per program, so apply from each university's page.
+                  onPressed: universityIds.isEmpty
+                      ? null
+                      : () => showApplyProgramSheet(context, universityIds.first),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: Text('Apply to Selected',
+                  child: Text('Apply',
                       style:
                           AppTypography.button.copyWith(color: Colors.white)),
                 ),
