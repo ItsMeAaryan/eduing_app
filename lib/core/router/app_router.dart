@@ -28,7 +28,8 @@ import '../../features/copilot/screens/copilot_chat_screen.dart';
 import '../../features/copilot/screens/copilot_settings_screen.dart';
 import '../../features/planner/screens/planner_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
-import '../../features/settings/screens/settings_screen.dart';
+import '../../features/settings/screens/account_screens.dart';
+import '../../features/profile/screens/profile_section_screen.dart';
 import '../../features/discover/screens/uni_detail_screen.dart';
 import '../../features/auth/screens/splash_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
@@ -39,7 +40,6 @@ import '../../features/auth/screens/forgot_password_screen.dart';
 import '../../shared/widgets/main_layout.dart';
 import '../../features/profile/screens/profile_setup_screen.dart';
 import '../../features/planner/screens/planner_calendar_screen.dart';
-import '../../shared/widgets/placeholder_screen.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<dynamic> _subscription;
@@ -242,51 +242,23 @@ class AppRouter {
           ),
           GoRoute(
             path: '/settings',
-            builder: (context, state) => const SettingsScreen(),
+            redirect: (context, state) => '/settings/notifications',
           ),
           GoRoute(
             path: '/planner',
             builder: (context, state) => const PlannerScreen(),
           ),
           GoRoute(
-            path: '/profile/personal',
-            builder: (context, state) => const PlaceholderScreen(title: 'Personal Information'),
-          ),
-          GoRoute(
-            path: '/profile/academic',
-            builder: (context, state) => const PlaceholderScreen(title: 'Academic Details'),
-          ),
-          GoRoute(
-            path: '/profile/guardian',
-            builder: (context, state) => const PlaceholderScreen(title: 'Parent / Guardian'),
-          ),
-          GoRoute(
-            path: '/profile/address',
-            builder: (context, state) => const PlaceholderScreen(title: 'Address'),
-          ),
-          GoRoute(
-            path: '/profile/exams',
-            builder: (context, state) => const PlaceholderScreen(title: 'Entrance Exams'),
-          ),
-          GoRoute(
-            path: '/profile/category',
-            builder: (context, state) => const PlaceholderScreen(title: 'Category & Quota'),
+            path: '/profile/:section(personal|academic|guardian|address|exams|category)',
+            builder: (context, state) => ProfileSectionScreen(sectionId: state.pathParameters['section']!),
           ),
           GoRoute(
             path: '/settings/security',
-            builder: (context, state) => const PlaceholderScreen(title: 'Security'),
+            builder: (context, state) => const SecurityScreen(),
           ),
           GoRoute(
             path: '/settings/notifications',
-            builder: (context, state) => const PlaceholderScreen(title: 'Notifications'),
-          ),
-          GoRoute(
-            path: '/settings/appearance',
-            builder: (context, state) => const PlaceholderScreen(title: 'Appearance'),
-          ),
-          GoRoute(
-            path: '/settings/connected',
-            builder: (context, state) => const PlaceholderScreen(title: 'Connected Accounts'),
+            builder: (context, state) => const NotificationPrefsScreen(),
           ),
         ],
       ),

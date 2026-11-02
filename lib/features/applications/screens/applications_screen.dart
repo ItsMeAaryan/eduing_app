@@ -16,7 +16,7 @@ class ApplicationsScreen extends ConsumerWidget {
     final currentApps = ref.watch(currentAppsProvider);
     
     final totalApps = state.apps.length;
-    final activeApps = state.apps.where((a) => a.type == 'active').length;
+    final activeApps = state.apps.where((a) => a.type != 'withdrawn').length;
     final offersApps = state.apps.where((a) => a.type == 'offers').length;
 
     return Scaffold(
@@ -128,21 +128,38 @@ class ApplicationsScreen extends ConsumerWidget {
                     ),
 
                     // Cards or empty state
-                    if (currentApps.isEmpty)
+                    if (state.loading)
                       const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 40),
+                        padding: EdgeInsets.symmetric(vertical: 48),
+                        child: Center(child: CircularProgressIndicator(color: NeoColors.green)),
+                      )
+                    else if (currentApps.isEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 40),
                         child: Column(
                           children: [
-                            Text('📋', style: TextStyle(fontSize: 48)),
-                            SizedBox(height: 12),
+                            const Text('📋', style: TextStyle(fontSize: 48)),
+                            const SizedBox(height: 12),
                             Text(
-                              'No applications here',
-                              style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white60,
-                              ),
+                              state.currentTab == 'offers'
+                                  ? 'No offers yet'
+                                  : state.currentTab == 'withdrawn'
+                                      ? 'Nothing closed'
+                                      : 'No applications in progress',
+                              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Colors.white70),
                             ),
+                            const SizedBox(height: 6),
+                            Text(
+                              state.currentTab == 'active'
+                                  ? 'Find a university and apply — your profile and documents go with it.'
+                                  : 'Universities\u2019 decisions will show up here.',
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(fontSize: 12.5, color: NeoColors.subDark),
+                            ),
+                            if (state.currentTab == 'active') ...[
+                              const SizedBox(height: 16),
+                              GreenBtn(label: 'Find universities', small: true, onClick: () => context.push('/discover')),
+                            ],
                           ],
                         ),
                       )
@@ -210,7 +227,7 @@ class ApplicationsScreen extends ConsumerWidget {
                                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          '📅 ${a.deadline}',
+                                          a.deadline,
                                           style: const TextStyle(
                                             fontSize: 11,
                                             color: NeoColors.subDark,
@@ -236,7 +253,7 @@ class ApplicationsScreen extends ConsumerWidget {
                                 bottom: -10, // Adjust to overlap the notch
                                 right: -10,
                                 child: FloatingActionBtn(
-                                  icon: a.status == 'OFFER' ? '✓' : '→',
+                                  icon: a.needsAction ? '!' : '→',
                                   bg: a.color,
                                   onClick: () => context.push('/application/${a.id}'),
                                 ),

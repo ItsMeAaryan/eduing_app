@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/document_model.dart';
 import '../repositories/documents_repository.dart';
 import '../services/document_storage_service.dart';
+import '../../applications/data/admission_service.dart';
 
 final documentRepositoryProvider = Provider((ref) => DocumentRepository());
 final documentStorageServiceProvider =
@@ -93,11 +94,13 @@ class DocumentsNotifier extends Notifier<List<AppDocument>> {
         final updatedDoc = initialDoc.copyWith(
           previewUrl: progress.downloadUrl,
           storagePath: progress.storagePath,
-          status: DocumentStatus.verified,
+          // Uploaded, not verified — only a university can verify a document.
+          status: DocumentStatus.pending,
         );
 
-        // Sync to Firestore
+        // Sync to Firestore, then send it to every application still in progress.
         await _repository.create(docId, updatedDoc);
+        shareDocumentsWithActiveApplications();
         ref.read(activeUploadProgressProvider.notifier).updateProgress(docId, null);
       }
     });
