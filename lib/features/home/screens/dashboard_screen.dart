@@ -457,10 +457,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                             color: AppColors.purple,
                             route: '/sop'),
                         _QuickAction(
-                            label: 'Doc Vault',
+                            label: 'Documents',
                             icon: '🔐',
                             color: AppColors.blue,
-                            route: '/vault'),
+                            route: '/documents'),
                         _QuickAction(
                             label: 'Interview',
                             icon: '🎤',

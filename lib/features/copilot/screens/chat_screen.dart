@@ -158,7 +158,7 @@ class _CopilotChatScreenState extends ConsumerState<CopilotChatScreen> {
 
   Widget _buildQuickPromptsBar(bool isDark) {
     final suggestions = [
-      'What documents do I need for Stanford?',
+      'What documents do I need for JoSAA counselling?',
       'How to structure an SOP for MIT?',
       'Find STEM scholarships for CS majors',
     ];

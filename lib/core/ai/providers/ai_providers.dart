@@ -2,10 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../gemini_service.dart';
 import '../../../features/sop/services/sop_ai_service.dart';
-import '../../../features/resume/services/resume_ai_service.dart';
 import '../../../features/interview/services/interview_ai_service.dart';
 import '../../../features/copilot/services/copilot_chat_service.dart';
-import '../../../features/vault/services/document_ai_service.dart';
 import '../readiness_score_service.dart';
 import '../models/user_profile.dart';
 import '../../../features/profile/providers/profile_provider.dart';
@@ -20,20 +18,12 @@ final sopAiServiceProvider = Provider<SOPAiService>((ref) {
   return SOPAiService(ref.read(geminiServiceProvider));
 });
 
-final resumeAiServiceProvider = Provider<ResumeAiService>((ref) {
-  return ResumeAiService(ref.read(geminiServiceProvider));
-});
-
 final interviewAiServiceProvider = Provider<InterviewAiService>((ref) {
   return InterviewAiService(ref.read(geminiServiceProvider));
 });
 
 final copilotChatServiceProvider = Provider<CopilotChatService>((ref) {
   return CopilotChatService(ref.read(geminiServiceProvider));
-});
-
-final documentAiServiceProvider = Provider<DocumentAiService>((ref) {
-  return DocumentAiService(ref.read(geminiServiceProvider));
 });
 
 // A bridge provider to supply UserProfile for AI services.

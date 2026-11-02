@@ -205,7 +205,6 @@ class _PremiumApplicationCardState extends State<PremiumApplicationCard> {
         return AppColors.error;
       case StatusType.inProgress:
       case StatusType.submitted:
-      case StatusType.visa:
         return AppColors.primary;
       case StatusType.notStarted:
         return AppColors.textSecondary;

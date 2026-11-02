@@ -38,30 +38,18 @@ class SopNotifier extends Notifier<UserSop> {
   static UserSop _initialData() {
     return const UserSop(
       id: 'default_sop',
-      universityName: 'Stanford University',
-      targetProgram: 'M.S. in Computer Science',
-      fullContent: '''
-Statement of Purpose
-
-My fascination with Artificial Intelligence began during my undergraduate studies in Computer Science when I built a real-time object classification engine for low-resource embedded systems. This experience demonstrated how intelligent algorithms can democratize access to advanced technology.
-
-I am applying to the Master of Science in Computer Science program at Stanford University to deepen my expertise in Deep Learning and Distributed Systems. Stanford's world-renowned AI Lab and pioneering research in foundation models align perfectly with my long-term career goal of building scalable, privacy-preserving AI systems.
-
-During my undergraduate career, I maintained a 3.9 GPA while serving as a Research Assistant in the Vision and Learning Lab. I led the development of lightweight neural network pruning methods, resulting in a 35% reduction in model inference latency. In addition to academic research, my software engineering internship at Tech Corp gave me practical experience in designing high-throughput distributed microservices.
-
-At Stanford, I am particularly eager to work under the guidance of leading faculty in automated machine learning and computer vision. I intend to contribute actively to student research groups and collaborate with peers from diverse backgrounds.
-
-Upon completing my degree, I plan to lead research initiatives in ethical AI deployment, bridging the gap between cutting-edge algorithmic discoveries and impactful real-world applications. Stanford's rigorous academic environment and collaborative ecosystem will provide the ideal foundation for achieving these aspirations.
-''',
-      wordCount: 320,
-      wordCountProgress: 0.64,
-      aiSopScore: 90,
+      universityName: '',
+      targetProgram: '',
+      fullContent: '',
+      wordCount: 0,
+      wordCountProgress: 0,
+      aiSopScore: 0,
       sections: [
-        SopSection(title: 'Introduction & Hook', isCompleted: true),
-        SopSection(title: 'Academic Background', isCompleted: true),
-        SopSection(title: 'Research & Work Experience', isCompleted: true),
-        SopSection(title: 'Why This University & Program', isCompleted: true),
-        SopSection(title: 'Career Goals & Conclusion', isCompleted: true),
+        SopSection(title: 'Introduction & Hook', isCompleted: false),
+        SopSection(title: 'Academic Background', isCompleted: false),
+        SopSection(title: 'Research & Work Experience', isCompleted: false),
+        SopSection(title: 'Why This University & Program', isCompleted: false),
+        SopSection(title: 'Career Goals & Conclusion', isCompleted: false),
       ],
     );
   }

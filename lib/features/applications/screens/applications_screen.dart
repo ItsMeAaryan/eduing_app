@@ -60,7 +60,7 @@ class ApplicationsScreen extends ConsumerWidget {
                                 ),
                               ),
                               GestureDetector(
-                                onTap: () => context.push('/applications/new'),
+                                onTap: () => context.push('/discover'),
                                 child: Container(
                                   width: 36,
                                   height: 36,

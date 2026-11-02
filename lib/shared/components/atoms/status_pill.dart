@@ -12,7 +12,6 @@ enum StatusType {
   underReview,
   accepted,
   rejected,
-  visa,
   completed
 }
 
@@ -45,7 +44,6 @@ class StatusPill extends StatelessWidget {
         break;
       case StatusType.inProgress:
       case StatusType.submitted:
-      case StatusType.visa:
         bgColor = isDark ? AppColors.darkInfoBg : AppColors.infoBg;
         textColor = AppColors.info;
         break;
@@ -94,8 +92,6 @@ class StatusPill extends StatelessWidget {
         return "Accepted";
       case StatusType.rejected:
         return "Rejected";
-      case StatusType.visa:
-        return "Visa";
       case StatusType.completed:
         return "Completed";
     }

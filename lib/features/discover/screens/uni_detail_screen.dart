@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../widgets/apply_program_sheet.dart';
 import '../../../core/theme/neo_design_system.dart' hide Badge;
 import '../../../core/theme/neo_design_system.dart' as neo show Badge;
 
@@ -155,7 +156,9 @@ class _UniDetailScreenState extends State<UniDetailScreen> {
                           Row(
                             children: [
                               Expanded(
-                                child: Container(
+                                child: GestureDetector(
+                                  onTap: () => showApplyProgramSheet(context, widget.universityId),
+                                  child: Container(
                                   height: 48,
                                   decoration: BoxDecoration(
                                     color: NeoColors.green,
@@ -169,6 +172,7 @@ class _UniDetailScreenState extends State<UniDetailScreen> {
                                     'Apply Now →',
                                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: Colors.black),
                                   ),
+                                ),
                                 ),
                               ),
                               const SizedBox(width: 10),

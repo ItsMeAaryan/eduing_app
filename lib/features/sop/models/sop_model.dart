@@ -125,7 +125,7 @@ class UserSop {
 
   const UserSop({
     required this.id,
-    this.universityName = 'Stanford University',
+    this.universityName = '',
     this.targetProgram = 'M.S. in Computer Science',
     this.fullContent = '',
     this.lastUpdated = 'Just now',
