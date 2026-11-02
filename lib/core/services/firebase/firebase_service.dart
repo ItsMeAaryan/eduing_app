@@ -32,7 +32,6 @@ class FirebaseService {
 
   static FirebaseAuth get auth => FirebaseAuth.instance;
   static FirebaseFirestore get firestore => FirebaseFirestore.instance;
-  // Storage disabled until billing is enabled
-  // static FirebaseStorage get storage => FirebaseStorage.instance;
+  // EDUING stores no files (DigiLocker verification instead of uploads).
   static FirebaseMessaging get messaging => FirebaseMessaging.instance;
 }

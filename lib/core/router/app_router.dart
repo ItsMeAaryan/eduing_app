@@ -11,7 +11,6 @@ import '../../features/universities/screens/compare_universities_screen.dart';
 import '../../features/applications/screens/applications_screen.dart';
 import '../../features/applications/screens/application_details_screen.dart';
 import '../../features/documents/screens/documents_screen.dart';
-import '../../features/documents/screens/document_preview_screen.dart';
 import '../../features/sop/screens/sop_screen.dart';
 import '../../features/sop/screens/sop_preview_screen.dart';
 import '../../features/sop/screens/ai_sop_review_screen.dart';
@@ -158,13 +157,6 @@ class AppRouter {
           GoRoute(
             path: '/documents',
             builder: (context, state) => const DocumentsScreen(),
-          ),
-          GoRoute(
-            path: '/document/:id',
-            builder: (context, state) {
-              final id = state.pathParameters['id']!;
-              return DocumentPreviewScreen(documentId: id);
-            },
           ),
           GoRoute(
             path: '/sop/builder',

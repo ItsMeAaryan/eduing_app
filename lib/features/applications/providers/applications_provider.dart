@@ -34,7 +34,9 @@ Future<void> createApplicationInFirestore({
 }) async {
   final uid = FirebaseAuth.instance.currentUser?.uid;
   if (uid == null) return;
-  final created = await FirebaseFirestore.instance.collection('applications').add({
+  await FirebaseFirestore.instance.collection('applications').add({
+    // The student's declared marks, exams, category … — what the university reviews.
+    'studentProfile': buildProfileSnapshot(studentData),
     'statusHistory': [
       {'status': 'submitted', 'date': DateTime.now().toIso8601String(), 'note': 'Application submitted'}
     ],
@@ -68,10 +70,6 @@ Future<void> createApplicationInFirestore({
       {'id': 'submitted', 'label': 'Submitted', 'status': 'done'},
     ],
   });
-  // Give the university the documents the student has already uploaded.
-  try {
-    await shareDocumentsWithApplication(created.id);
-  } catch (_) {}
 }
 
 final applicationRepositoryProvider =

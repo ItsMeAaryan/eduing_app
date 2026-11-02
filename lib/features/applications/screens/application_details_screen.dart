@@ -1,9 +1,6 @@
 // One application, end to end — same flow as the website's application page:
 // where it stands, what the university published (offer letter, admit card,
 // exam) and what the student has to do next.
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/neo_design_system.dart' hide Badge;
 import '../data/admission_service.dart';
+import '../data/issued_document_pdf.dart';
 
 const _gold = Color(0xFFF5B829);
 const _night = Color(0xFF161326);
@@ -85,7 +83,6 @@ class _Body extends ConsumerWidget {
     final id = app['id'] as String;
     final status = normalizeStatus(app['status'] as String?);
     final generated = ref.watch(generatedDocumentsProvider(id)).value ?? const [];
-    final shared = ref.watch(sharedDocumentsProvider(id)).value ?? const [];
     final exams = ref.watch(examSchedulesProvider('${app['universityId'] ?? ''}|${app['programId'] ?? ''}')).value ?? const [];
     Map<String, dynamic>? latest(String type) {
       for (final g in generated) {
@@ -125,7 +122,7 @@ class _Body extends ConsumerWidget {
                   title: const {'offer_letter': 'Offer letter', 'admit_card': 'Admit card', 'enrollment_certificate': 'Enrollment certificate'}[g['type']] ??
                       (g['type'] ?? 'Document').toString(),
                   sub: 'Issued ${_fmt(toDate(g['generatedAt']))}',
-                  onTap: () => _open(context, g['url'] as String?),
+                  onTap: () => openIssuedDocument(context, g),
                 ),
             ]),
           ),
@@ -135,7 +132,7 @@ class _Body extends ConsumerWidget {
           _ExamCard(exams: exams, admitCard: latest('admit_card')),
         ],
         const SizedBox(height: 14),
-        _DocumentsCard(appId: id, shared: shared, closed: closed),
+        _DetailsCard(appId: id, snapshot: (app['studentProfile'] as Map?)?.cast<String, dynamic>(), closed: closed),
         const SizedBox(height: 14),
         _Section(
           title: 'Activity',
@@ -255,8 +252,7 @@ class _FileRow extends StatelessWidget {
   final String title;
   final String sub;
   final VoidCallback onTap;
-  final Widget? badge;
-  const _FileRow({required this.title, required this.sub, required this.onTap, this.badge});
+  const _FileRow({required this.title, required this.sub, required this.onTap});
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
@@ -277,7 +273,7 @@ class _FileRow extends StatelessWidget {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13.5)),
-                  if (badge != null) Padding(padding: const EdgeInsets.only(top: 3), child: badge!) else Text(sub, style: const TextStyle(color: NeoColors.subDark, fontSize: 11.5)),
+                  Text(sub, style: const TextStyle(color: NeoColors.subDark, fontSize: 11.5)),
                 ]),
               ),
               const Icon(Icons.download_rounded, color: NeoColors.subDark, size: 18),
@@ -418,7 +414,7 @@ class _NextStepState extends State<_NextStep> {
         body: 'Read the offer letter, then accept the seat to move on to fee payment. If you’ve chosen another college, decline so the seat goes to someone on the waitlist.',
         children: [
           if (widget.offerLetter != null)
-            PillBtn(label: 'Offer letter', icon: '📄', bg: Colors.white, color: _night, flex: true, onClick: () => _open(context, widget.offerLetter!['url'] as String?)),
+            PillBtn(label: 'Offer letter', icon: '📄', bg: Colors.white, color: _night, flex: true, onClick: () => openIssuedDocument(context, widget.offerLetter)),
           const SizedBox(height: 8),
           Row(children: [
             Expanded(
@@ -430,7 +426,7 @@ class _NextStepState extends State<_NextStep> {
                 onClick: _busy
                     ? null
                     : () async {
-                        if (await _confirm('Accept this seat?', 'You’ll pay the admission fee next and upload the receipt here.', 'Accept')) {
+                        if (await _confirm('Accept this seat?', 'You’ll pay the admission fee next and enter the payment reference here.', 'Accept')) {
                           _run(() => acceptSeat(id), 'Seat accepted. Pay the fee next.');
                         }
                       },
@@ -464,7 +460,7 @@ class _NextStepState extends State<_NextStep> {
       return _Section(
         title: 'Pay the admission fee',
         child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          const Text('Pay using the bank or UPI details in your offer letter, then add the reference number and receipt.',
+          const Text('Pay using the bank or UPI details in your offer letter, then enter the transaction reference. The admissions office matches it with their bank statement.',
               style: TextStyle(color: Colors.white70, fontSize: 13)),
           if (rejected) ...[
             const SizedBox(height: 12),
@@ -472,7 +468,7 @@ class _NextStepState extends State<_NextStep> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(color: NeoColors.red.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(14)),
               child: Text(
-                'Your last payment couldn’t be verified. ${(app['paymentDetails'] as Map?)?['rejectionReason'] ?? 'Check the reference number and receipt, then submit again.'}',
+                'Your last payment couldn’t be verified. ${(app['paymentDetails'] as Map?)?['rejectionReason'] ?? 'Check the reference number and amount, then submit again.'}',
                 style: const TextStyle(color: Color(0xFFFF8A8D), fontSize: 12.5),
               ),
             ),
@@ -508,7 +504,7 @@ class _NextStepState extends State<_NextStep> {
             : 'The university has verified your payment and will confirm your enrollment shortly.',
         children: [
           if (widget.certificate != null)
-            PillBtn(label: 'Enrollment certificate', icon: '📄', bg: Colors.white, color: _night, flex: true, onClick: () => _open(context, widget.certificate!['url'] as String?)),
+            PillBtn(label: 'Enrollment certificate', icon: '📄', bg: Colors.white, color: _night, flex: true, onClick: () => openIssuedDocument(context, widget.certificate)),
         ],
       );
     }
@@ -637,21 +633,11 @@ class _FeeSheetState extends State<_FeeSheet> {
   final _ref = TextEditingController();
   DateTime _paidOn = DateTime.now();
   String _mode = 'UPI';
-  File? _receipt;
+  final _payer = TextEditingController();
   bool _busy = false;
   String? _error;
 
-  Future<void> _pick() async {
-    final r = await FilePicker.pickFiles(type: FileType.custom, allowedExtensions: const ['pdf', 'jpg', 'jpeg', 'png']);
-    final path = r?.files.single.path;
-    if (path != null) setState(() => _receipt = File(path));
-  }
-
   Future<void> _submit() async {
-    if (_receipt == null) {
-      setState(() => _error = 'Attach the payment receipt or a screenshot of the transaction.');
-      return;
-    }
     setState(() {
       _busy = true;
       _error = null;
@@ -662,13 +648,13 @@ class _FeeSheetState extends State<_FeeSheet> {
           transactionRef: _ref.text,
           paidOn: DateFormat('yyyy-MM-dd').format(_paidOn),
           mode: _mode,
-          receipt: _receipt!);
+          payerName: _payer.text);
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Payment submitted for verification.')));
       }
     } catch (e) {
-      setState(() => _error = e is AdmissionException ? e.message : 'Upload failed. Check your connection and try again.');
+      setState(() => _error = e is AdmissionException ? e.message : 'Couldn\u2019t submit. Check your connection and try again.');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -708,15 +694,11 @@ class _FeeSheetState extends State<_FeeSheet> {
               if (d != null) setState(() => _paidOn = d);
             },
           ),
-          OutlinedButton.icon(
-            onPressed: _pick,
-            icon: const Icon(Icons.upload_file_rounded),
-            label: Text(_receipt == null ? 'Upload receipt (PDF or image)' : _receipt!.path.split(Platform.pathSeparator).last, overflow: TextOverflow.ellipsis),
-            style: OutlinedButton.styleFrom(foregroundColor: Colors.white, minimumSize: const Size.fromHeight(48), side: const BorderSide(color: NeoColors.borderDark)),
-          ),
+          const SizedBox(height: 4),
+          _Field(controller: _payer, label: 'Paid by (optional)', hint: 'Name on the bank account / UPI'),
           if (_error != null) Padding(padding: const EdgeInsets.only(top: 10), child: Text(_error!, style: const TextStyle(color: Color(0xFFFF8A8D)))),
           const SizedBox(height: 16),
-          GreenBtn(label: _busy ? 'Uploading…' : 'Submit for verification', disabled: _busy, onClick: _submit),
+          GreenBtn(label: _busy ? 'Submitting…' : 'Submit for verification', disabled: _busy, onClick: _submit),
         ]),
       ),
     );
@@ -733,7 +715,7 @@ class _ExamCard extends StatelessWidget {
         title: 'Entrance test / interview',
         trailing: admitCard == null
             ? null
-            : PillBtn(label: 'Admit card', size: 'sm', bg: _brand, onClick: () => _open(context, admitCard!['url'] as String?)),
+            : PillBtn(label: 'Admit card', size: 'sm', bg: _brand, onClick: () => openIssuedDocument(context, admitCard)),
         child: exams.isEmpty
             ? const Text('Your admit card is ready. The schedule will appear here when the university publishes it.',
                 style: TextStyle(color: Colors.white70, fontSize: 13))
@@ -763,27 +745,33 @@ class _ExamCard extends StatelessWidget {
       );
 }
 
-// ── documents the university sees ──────────────────────────────────────────
-class _DocumentsCard extends StatefulWidget {
+// ── details the university sees ────────────────────────────────────────────
+const _detailLabels = [
+  ['tenthScore', '10th %'], ['twelfthScore', '12th %'], ['twelfthBoard', '12th board'], ['stream', 'Stream'],
+  ['jeeScore', 'JEE Main'], ['neetScore', 'NEET'], ['cuetScore', 'CUET'], ['bitsatScore', 'BITSAT'], ['nataScore', 'NATA'],
+  ['clatScore', 'CLAT'], ['catPercentile', 'CAT'], ['gateScore', 'GATE'], ['category', 'Category'], ['domicileState', 'Domicile'],
+];
+
+class _DetailsCard extends StatefulWidget {
   final String appId;
-  final List<Map<String, dynamic>> shared;
+  final Map<String, dynamic>? snapshot;
   final bool closed;
-  const _DocumentsCard({required this.appId, required this.shared, required this.closed});
+  const _DetailsCard({required this.appId, required this.snapshot, required this.closed});
   @override
-  State<_DocumentsCard> createState() => _DocumentsCardState();
+  State<_DetailsCard> createState() => _DetailsCardState();
 }
 
-class _DocumentsCardState extends State<_DocumentsCard> {
+class _DetailsCardState extends State<_DetailsCard> {
   bool _busy = false;
 
   Future<void> _share() async {
     setState(() => _busy = true);
     String msg;
     try {
-      final n = await shareDocumentsWithApplication(widget.appId);
-      msg = n > 0 ? 'Sent $n updated document${n > 1 ? 's' : ''} to the university.' : 'The university already has your latest documents.';
+      await shareDetailsWithApplication(widget.appId);
+      msg = 'The university now has your latest details.';
     } catch (_) {
-      msg = 'Couldn’t send documents. Try again in a moment.';
+      msg = 'Couldn’t send your details. Try again in a moment.';
     }
     if (!mounted) return;
     setState(() => _busy = false);
@@ -792,38 +780,35 @@ class _DocumentsCardState extends State<_DocumentsCard> {
 
   @override
   Widget build(BuildContext context) {
-    const labels = {
-      'verified': ['Verified', NeoColors.green],
-      'rejected': ['Rejected', NeoColors.red],
-      'requires_resubmission': ['Re-upload needed', NeoColors.red],
-      'under_review': ['In review', _gold],
-      'pending': ['Waiting for review', NeoColors.subDark],
-    };
+    final snap = widget.snapshot ?? const {};
+    final shown = _detailLabels.where((l) => (snap[l[0]] ?? '').toString().isNotEmpty).toList();
     return _Section(
-      title: 'Documents with the university',
-      trailing: widget.closed
-          ? null
-          : PillBtn(label: _busy ? 'Sending…' : 'Send latest', size: 'sm', ghost: true, onClick: _busy ? null : _share),
-      child: widget.shared.isEmpty
-          ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-              const Text('The university hasn’t received any documents yet. Upload your marksheets and ID, then tap Send latest.',
-                  style: TextStyle(color: Colors.white70, fontSize: 13)),
-              const SizedBox(height: 12),
-              GreenBtn(label: 'Upload documents', small: true, onClick: () => context.push('/documents')),
-            ])
-          : Column(children: [
-              for (final d in widget.shared)
-                Builder(builder: (context) {
-                  final l = labels[d['status']] ?? labels['pending']!;
-                  final color = l[1] as Color;
-                  return _FileRow(
-                    title: (d['name'] ?? 'Document').toString(),
-                    sub: '',
-                    badge: Text(l[0] as String, style: TextStyle(color: color, fontSize: 11.5, fontWeight: FontWeight.w800)),
-                    onTap: () => _open(context, d['url'] as String?),
-                  );
-                }),
-            ]),
+      title: 'Details the university sees',
+      trailing: widget.closed ? null : PillBtn(label: _busy ? 'Sending…' : 'Send latest', size: 'sm', ghost: true, onClick: _busy ? null : _share),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        if (shown.isEmpty) ...[
+          const Text('The university can’t see your marks yet. Add your Class 10/12 marks and exam scores to your profile, then tap Send latest.',
+              style: TextStyle(color: Colors.white70, fontSize: 13)),
+          const SizedBox(height: 12),
+          GreenBtn(label: 'Fill in my details', small: true, onClick: () => context.push('/profile/academic')),
+        ] else
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final l in shown)
+              Container(
+                width: 150,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(color: NeoColors.surf2Dark, borderRadius: BorderRadius.circular(14)),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(l[1], style: const TextStyle(color: NeoColors.subDark, fontSize: 11.5)),
+                  Text(snap[l[0]].toString(), maxLines: 1, overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14)),
+                ]),
+              ),
+          ]),
+        const SizedBox(height: 10),
+        const Text('DigiLocker verification is coming soon — you won’t need to upload marksheets.',
+            style: TextStyle(color: NeoColors.subDark, fontSize: 11.5)),
+      ]),
     );
   }
 }

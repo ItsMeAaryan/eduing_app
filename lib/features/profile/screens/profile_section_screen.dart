@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/theme/neo_design_system.dart' hide Badge;
 import '../providers/profile_provider.dart';
+import '../../applications/data/admission_service.dart' show shareDetailsWithActiveApplications;
 
 enum _Kind { text, phone, number, date, choice }
 
@@ -184,6 +185,8 @@ class _ProfileSectionScreenState extends ConsumerState<ProfileSectionScreen> {
     data['updatedAt'] = FieldValue.serverTimestamp();
     try {
       await FirebaseFirestore.instance.collection('users').doc(uid).update(data);
+      // keep in-progress applications showing the latest details to universities
+      shareDetailsWithActiveApplications();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${_section.title} saved.')));
       context.canPop() ? context.pop() : context.go('/profile');

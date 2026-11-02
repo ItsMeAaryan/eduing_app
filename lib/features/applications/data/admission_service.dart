@@ -6,11 +6,8 @@
 //   submitted → under_review → docs_verified → selected | allotted
 //   → seat_accepted → fee_paid → payment_verified → enrolled
 //   side exits: rejected · waitlisted · offer_declined · withdrawn
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 String normalizeStatus(String? raw) {
@@ -70,14 +67,6 @@ final generatedDocumentsProvider = StreamProvider.family<List<Map<String, dynami
     }
     return latest.values.toList();
   }).handleError((_) => <Map<String, dynamic>>[]);
-});
-
-final sharedDocumentsProvider = StreamProvider.family<List<Map<String, dynamic>>, String>((ref, id) {
-  return _db
-      .collection('applications/$id/documents')
-      .snapshots()
-      .map((s) => s.docs.map((d) => {'id': d.id, ...d.data()}).toList())
-      .handleError((_) => <Map<String, dynamic>>[]);
 });
 
 /// Published exam schedules for (universityId, programId). Key: "uniId|programId".
@@ -170,74 +159,96 @@ Future<void> withdrawApplication(String appId, String reason) async {
   await _notifyUniversity(app, 'Application withdrawn', '${_who(app)} withdrew their application for ${_prog(app)}.');
 }
 
+/// Records a fee payment made outside EDUING (UPI / bank transfer / DD). No receipt
+/// file is stored — the admissions office matches the reference with its bank statement.
 Future<void> submitFeePayment(String appId,
-    {required num amount, required String transactionRef, required String paidOn, required String mode, required File receipt}) async {
+    {required num amount, required String transactionRef, required String paidOn, required String mode, String payerName = ''}) async {
   await _ownedApp(appId);
   if (amount <= 0) throw AdmissionException('Enter the amount you paid.');
-  if (transactionRef.trim().isEmpty) throw AdmissionException('Enter the transaction / UTR reference from your bank.');
-  if (await receipt.length() > 10 * 1024 * 1024) throw AdmissionException('The receipt must be smaller than 10 MB.');
-  final uid = FirebaseAuth.instance.currentUser!.uid;
-  final ext = receipt.path.split('.').last.toLowerCase();
-  final contentType = ext == 'pdf' ? 'application/pdf' : (ext == 'png' ? 'image/png' : 'image/jpeg');
-  final ref = FirebaseStorage.instance.ref('users/$uid/payments/${appId}_${DateTime.now().millisecondsSinceEpoch}.$ext');
-  await ref.putFile(receipt, SettableMetadata(contentType: contentType));
-  final url = await ref.getDownloadURL();
-  final app = await _transition(appId, ['seat_accepted'], 'fee_paid', 'Fee payment submitted (ref ${transactionRef.trim()})', {
+  final ref = transactionRef.trim();
+  if (ref.length < 6) throw AdmissionException('Enter the full transaction / UTR reference from your bank or UPI app.');
+  final app = await _transition(appId, ['seat_accepted'], 'fee_paid', 'Fee payment submitted (ref $ref)', {
     'paymentDetails': {
-      'amountPaid': amount, 'transactionRef': transactionRef.trim(), 'paidOn': paidOn, 'mode': mode,
-      'receiptUrl': url, 'submittedAt': DateTime.now().toIso8601String(), 'status': 'submitted',
+      'amountPaid': amount, 'transactionRef': ref, 'paidOn': paidOn, 'mode': mode, 'payerName': payerName.trim(),
+      'submittedAt': DateTime.now().toIso8601String(), 'status': 'submitted',
     },
   });
-  await _notifyUniversity(app, 'Fee payment submitted', '${_who(app)} submitted a fee payment of ₹$amount for verification.');
+  await _notifyUniversity(app, 'Fee payment submitted', '${_who(app)} submitted a fee payment of ₹$amount (ref $ref) for verification.');
 }
 
-// ── documents shared with universities ─────────────────────────────────────
-const _docLabels = {
-  '10th_marksheet': '10th Marksheet', '12th_marksheet': '12th Marksheet',
-  'id_proof': 'Identity Proof', 'passport_photo': 'Passport Photo',
+// ── details shared with universities ───────────────────────────────────────
+// Students don't upload files. Each application carries a snapshot of the
+// details the student declared (studentProfile) — same keys as the website.
+const sharedProfileKeys = [
+  'fullName', 'phone', 'dob', 'gender', 'nationality', 'category', 'pwd', 'domicileState',
+  'address', 'city', 'state', 'pincode',
+  'guardianName', 'guardianRelation', 'guardianPhone', 'annualIncome',
+  'tenthBoard', 'tenthYear', 'tenthScore', 'school', 'twelfthBoard', 'stream', 'twelfthYear', 'twelfthScore',
+  'jeeScore', 'neetScore', 'cuetScore', 'bitsatScore', 'nataScore', 'clatScore', 'catPercentile', 'gateScore',
+];
+
+/// Older places a value may live (onboarding wrote nested maps).
+const _legacy = {
+  'fullName': ['personal.fullName', 'displayName'], 'phone': ['personal.phone'], 'dob': ['personal.dob'],
+  'gender': ['personal.gender'], 'address': ['personal.address'], 'city': ['personal.city'], 'state': ['personal.state'],
+  'tenthBoard': ['academic.board10'], 'tenthYear': ['academic.year10'], 'tenthScore': ['academic.marks10', 'tenthPercentage'],
+  'school': ['academic.school12'], 'twelfthBoard': ['academic.board12'], 'stream': ['academic.stream'],
+  'twelfthYear': ['academic.year12'], 'twelfthScore': ['academic.marks12', 'twelfthPercentage'],
+  'jeeScore': ['exams.jeeMain'], 'neetScore': ['exams.neet'], 'cuetScore': ['exams.cuet'], 'bitsatScore': ['exams.bitSat'],
 };
 
-/// Copies the student's uploaded documents into an application so the university can verify them.
-Future<int> shareDocumentsWithApplication(String appId) async {
-  final uid = FirebaseAuth.instance.currentUser?.uid;
-  if (uid == null) return 0;
-  final mine = await _db.collection('users/$uid/documents').get();
-  final shared = await _db.collection('applications/$appId/documents').get();
-  final existing = {for (final d in shared.docs) d.id: d.data()};
-  var count = 0;
-  for (final d in mine.docs) {
-    final data = d.data();
-    final url = (data['fileUrl'] ?? data['downloadUrl'] ?? data['url'] ?? data['previewUrl']) as String?;
-    if (url == null || url.isEmpty) continue;
-    final prev = existing[d.id];
-    if (prev != null && prev['url'] == url) continue; // unchanged — keep the university's review
-    await _db.collection('applications/$appId/documents').doc(d.id).set({
-      'name': data['name'] ?? _docLabels[d.id] ?? d.id.replaceAll('_', ' '),
-      'url': url,
-      'category': data['category'] ?? 'Academic',
-      'status': 'pending',
-      'ownerId': uid,
-      'uploadDate': FieldValue.serverTimestamp(),
-      'history': prev != null
-          ? FieldValue.arrayUnion([
-              {'status': 'pending', 'date': DateTime.now().toIso8601String(), 'note': 'Student uploaded a new version'}
-            ])
-          : [],
-    }, SetOptions(merge: true));
-    count++;
+Map<String, String> buildProfileSnapshot(Map<String, dynamic> profile) {
+  dynamic read(String path) {
+    dynamic cur = profile;
+    for (final part in path.split('.')) {
+      if (cur is Map && cur.containsKey(part)) {
+        cur = cur[part];
+      } else {
+        return null;
+      }
+    }
+    return cur;
   }
-  return count;
+
+  final out = <String, String>{};
+  for (final k in sharedProfileKeys) {
+    for (final path in [k, ...?_legacy[k]]) {
+      final v = read(path);
+      if (v != null && v.toString().trim().isNotEmpty) {
+        out[k] = v.toString().trim();
+        break;
+      }
+    }
+  }
+  out['sharedAt'] = DateTime.now().toIso8601String();
+  return out;
 }
 
-Future<void> shareDocumentsWithActiveApplications() async {
+/// Sends the student's current profile details to one application.
+Future<void> shareDetailsWithApplication(String appId) async {
+  final app = await _ownedApp(appId);
+  final s = normalizeStatus(app['status'] as String?);
+  if (closedStatuses.contains(s) || s == 'enrolled') return;
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final profile = (await _db.collection('users').doc(uid).get()).data() ?? {};
+  await _db.collection('applications').doc(appId).update({
+    'studentProfile': buildProfileSnapshot(profile),
+    'updatedAt': FieldValue.serverTimestamp(),
+  });
+}
+
+/// Keeps every in-progress application up to date after the student edits their profile.
+Future<void> shareDetailsWithActiveApplications() async {
   final uid = FirebaseAuth.instance.currentUser?.uid;
   if (uid == null) return;
+  final profile = (await _db.collection('users').doc(uid).get()).data() ?? {};
+  final snapshot = buildProfileSnapshot(profile);
   final apps = await _db.collection('applications').where('studentId', isEqualTo: uid).get();
   for (final a in apps.docs) {
     final s = normalizeStatus(a.data()['status'] as String?);
     if (closedStatuses.contains(s) || s == 'enrolled') continue;
     try {
-      await shareDocumentsWithApplication(a.id);
+      await a.reference.update({'studentProfile': snapshot, 'updatedAt': FieldValue.serverTimestamp()});
     } catch (_) {}
   }
 }
